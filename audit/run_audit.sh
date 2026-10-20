@@ -22,10 +22,13 @@ run main G 36000 35500 35501 --full
 run main G 36000 34200 34201
 run main G 40000 39500 39501 n0=36000 --full
 run main G 40000 35990 35991 n0=36000
-SLICES_DIRECT="35000 20000 1000"; SLICES_ODD="153"     # c=153 holds the thread candidate (2490, 20092, 153)
-for c in $SLICES_DIRECT; do run direct G 36000 $c $((c + 1)) --full; done
-for c in $SLICES_ODD; do run odd G 36000 $c $((c + 1)) --full; done
-run thread G 36000 0 400 --jobs "$J" --full
-run thread G 40000 0 400 n0=36000 --jobs "$J" --full
+# direct path: every slice has survivors (mostly from a = 0, x = 3^b 7^c)
+for c in 35000 20000 1000; do run direct G 36000 $c $((c + 1)) --full; done
+# odd path: slices holding thread candidates found by the production runs (30 for N = 36000, 11 for the shell)
+for c in 153 1058 2164 29958; do run odd G 36000 $c $((c + 1)) --full; done
+for c in 1787 36343; do run odd G 40000 $c $((c + 1)) n0=36000 --full; done
+run thread G 36000 0 400 --jobs "$J" --full                  # holds (2490, 20092, 153)
+run thread G 36000 1000 1400 --jobs "$J" --full              # holds c = 1058, 1301
+run thread G 40000 1700 1800 n0=36000 --jobs "$J" --full     # holds c = 1787
 [ $st -eq 0 ] && echo "AUDIT: reference agrees with $BIN on every region" || echo "AUDIT FAILED"
 exit $st

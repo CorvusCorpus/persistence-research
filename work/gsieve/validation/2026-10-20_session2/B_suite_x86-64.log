@@ -1,0 +1,80 @@
+make: Entering directory '/tmp/tmp.283uBA2mII/work/gsieve'
+python3 gconst.py
+K1=12: P1=195312500 Q=244140625 W=108042893 affine-lift and suffix-collapse checks passed
+K1=13: P1=976562500 Q=1220703125 W=352183518 affine-lift and suffix-collapse checks passed
+eps=+1: 0 thread(s) mod 2^38: []
+eps=-1: 1 thread(s) mod 2^38: [235317736100]
+odd thread last 40 digits: 9313975971735999337397515773773193359375
+odd-thread planted check passed
+#define K12_P1 195312500ULL
+#define K12_Q 244140625ULL
+#define K12_P2 47683715820312500ULL
+#define K12_Q2 59604644775390625ULL
+#define K12_MU3 21544119915983107ULL
+#define K12_MU7 34654393049221985ULL
+#define K12_W 108042893ULL
+#define K12_Y0 1347526534800636ULL
+#define K12_X1 81787109376ULL
+#define K12_TEN 1000000000000ULL
+#define K12_TWO 4096ULL
+#define K13_P1 976562500ULL
+#define K13_Q 1220703125ULL
+#define K13_P2 1192092895507812500ULL
+#define K13_Q2 1490116119384765625ULL
+#define K13_MU3 164595267376920607ULL
+#define K13_MU7 82338108869534485ULL
+#define K13_W 352183518ULL
+#define K13_Y0 1192429777141512659ULL
+#define K13_X1 81787109376ULL
+#define K13_TEN 10000000000000ULL
+#define K13_TWO 8192ULL
+#define L2 5553023288523357132ULL
+#define L3 8801333677940798499ULL
+#define L5 12893720785186194484ULL
+#define L7 15589307261336549707ULL
+#define OF3 27267475107ULL
+#define OF7 116511985354ULL
+#define OTHREAD 235317736100ULL
+
+cc -O3 -march=x86-64 -Wall -Wno-unused-function -DKK=13 -o gsieve_k13 gsieve.c -lgmp -lm -lpthread
+gsieve.c:184:98: warning: 'POS' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:184:82: warning: 'H0' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:184:61: warning: 'AB' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O3 -march=x86-64 -Wall -Wno-unused-function -DKK=12 -o gsieve_k12 gsieve.c -lgmp -lm -lpthread
+gsieve.c:184:98: warning: 'POS' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:184:82: warning: 'H0' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:184:61: warning: 'AB' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O3 -march=x86-64 -Wall -Wno-unused-function -DKK=13 -DNL=7 -o gsieve_k13_nl7 gsieve.c -lgmp -lm -lpthread
+gsieve.c:184:98: warning: 'POS' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:184:82: warning: 'H0' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:184:61: warning: 'AB' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O3 -march=x86-64 -Wall -Wno-unused-function -DKK=12 -DNL=7 -o gsieve_k12_nl7 gsieve.c -lgmp -lm -lpthread
+gsieve.c:184:98: warning: 'POS' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:184:82: warning: 'H0' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:184:61: warning: 'AB' defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O2 -Wall -o val_kernel val_kernel.c
+./val_kernel

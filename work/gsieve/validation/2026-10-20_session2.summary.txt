@@ -1,0 +1,8 @@
+== start Tue Oct 20 19:05:12 UTC 2026 commit fc27561 gsieve.c 3f4827dc3aa9a1b7
+variants: avx512 avx2 scalar; default build: variant=avx512
+A suite V=avx512 T=4 exit=0 91s
+A suite V=avx2 T=4 exit=0 104s
+A suite V=scalar T=4 exit=0 71s
+A suite default build T=1 exit=0 134s
+B suite -march=haswell exit=0 95s
+  variant variant=avx2 AVX-512 instructions: 0
