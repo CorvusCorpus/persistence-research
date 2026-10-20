@@ -1,0 +1,354 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% The proved bound. Raise it only after docs/RESULTS.md records the extension as COMPUTATIONAL.
+\newcommand{\NB}{40{,}000}
+\newcommand{\NBexp}{40000}
+\newcommand{\ncand}{6.4067\cdot 10^{13}}
+
+\title{No multiplicative persistence $12$ below $10^{\NBexp}$:\\ a sieve over chain numbers\\[4pt]
+\large Draft of 20 October 2026 --- computer-assisted, not peer reviewed}
+\author{[Author]\thanks{Computations and drafting were done with the assistance of an AI system (Claude, Anthropic).
+Code, logs and validation records: \url{https://github.com/CorvusCorpus/persistence-research}.}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $p(n)$ be the product of the decimal digits of $n$. The multiplicative persistence of $n$ is the number of
+applications of $p$ needed to reach a single digit. The record value $11$ is attained by $277777788888899$, and it is
+conjectured that no number has persistence $12$. The best published lower bound for the smallest number of
+persistence $12$, if it exists, was $2.67\cdot 10^{30000}$ (T.~Peters, 2023). We show that no number below
+$10^{\NBexp}$ has persistence $12$ or more, so the smallest one, if it exists, exceeds $2.67\cdot 10^{\NBexp}$. The
+proof reduces the question to \emph{chain numbers}: $7$-smooth numbers with no digit $0$ that do not contain both a $5$
+and an even digit. Measured by a ``digit length'' adapted to the digit product, every chain number up to length
+$\NB$ is one of $1{,}117$ known numbers, all below $10^{49}$. The search covers $\ncand$ candidates. It rests on four
+elementary lemmas: a suffix collapse that turns the last $13$ digits of every candidate into one bit of a precomputed
+bitmap, an exact $4^k$ count of admissible endings, an affine formula for the next $13$ digits, and the uniqueness of
+an odd-digit $2$-adic ``thread'' for multiples of high powers of $5$. We describe the implementation and its
+validation: exact-arithmetic comparisons, an independent reference implementation, rediscovery of known zero-free
+numbers, and two complete re-executions on different hardware with an independent implementation of the core stages.
+A random-digit heuristic, calibrated against the complete data, is reported separately; it is not part of the proof.
+\end{abstract}
+
+\section{Introduction}
+
+For a positive integer $n$ let $p(n)$ be the product of its decimal digits and let $\operatorname{per}(n)$ be the least
+$k\ge 0$ with $p^{k}(n)<10$. The smallest numbers of persistence $0,1,\dots,11$ form OEIS A003001~\cite{oeis}, ending with
+\[
+\begin{aligned}
+  277777788888899 &\to 4996238671872 \to 438939648 \to 4478976 \to 338688 \to 27648\\
+                  &\to 2688 \to 768 \to 336 \to 54 \to 20 \to 0 .
+\end{aligned}
+\]
+Sloane~\cite{sloane} asked whether persistence is bounded; the standing conjecture is that $11$ is the maximum in base
+$10$. Orbits that end in an odd digit are settled by Brier, Clavier, Gutsche and Naccache~\cite{bcgn}; a $2$-adic bound
+of Fonga~\cite{fonga} makes the nonzero even final digits a finite (if large) computation. The hard case is the final
+digit $0$, which is where the record orbit ends: it amounts to understanding the $7$-smooth numbers without a digit
+$0$, a problem of the same family as Erd\H{o}s's question whether $2^{86}$ is the last power of $2$ without a digit $0$.
+
+Lower bounds for the smallest number $a(12)$ of persistence $12$ come from computation. Chaffin~\cite{chaffin}
+found that every $7$-smooth number in $(10^{140},10^{20000})$ contains a digit $0$, which gives $a(12)>10^{20585}$
+(Radcliffe~\cite{radcliffe}). Peters~\cite{peters} enumerated the smallest representative of every digit-product
+class up to $30{,}000$ digits (about $3.6\cdot 10^{13}$ candidates) and checked that each digit product has a $0$ among
+its last $306$ digits, giving $a(12)>2.67\cdot 10^{30000}$. We prove:
+
+\begin{theorem}\label{thm:main}
+No positive integer below $10^{\NBexp}$ has multiplicative persistence $12$ or more. Consequently, if $a(12)$ exists,
+then $a(12)>2.67\cdot 10^{\NBexp}$.
+\end{theorem}
+
+The proof is computer-assisted (Section~\ref{sec:results}). Its new ingredient is a sieve over \emph{chain numbers}
+(Section~\ref{sec:chain}) in which most candidates are rejected by a single bit lookup that tests their last $13$
+digits (Section~\ref{sec:suffix}). Section~\ref{sec:validation} describes how the computation was checked,
+Section~\ref{sec:bridges} what a counterexample above the bound would have to look like, and
+Section~\ref{sec:heuristic} a heuristic that is kept apart from the proof.
+
+\section{Chain numbers}\label{sec:chain}
+
+\begin{definition}
+A number is \emph{$7$-smooth} if all its prime factors are at most $7$. For $x=2^a3^b5^d7^c$ put
+\[ m(x)=\tfrac{a}{3}+\tfrac{b}{2}+c+d, \]
+the \emph{digit length} of $x$. A \emph{chain number} is a $7$-smooth $x\ge 10$ with no digit $0$ that does not contain
+both a digit $5$ and an even digit. We write $G$ for the set of chain numbers.
+\end{definition}
+
+A chain number is never divisible by $10$, so it has one of the forms $2^a3^b7^c$ (form~(i)) or $3^a5^b7^c$ with $b\ge1$
+(form~(iii)); in form~(iii) the last digit is $5$, so every digit is odd. (Splitting the search for zero-free digit
+products into these two families is standard; see~\cite{mcelwee}.)
+
+\begin{lemma}[chain lemma]\label{lem:chain}
+Let $n$ have persistence $k\ge 12$ and put $c_i=p^{\,i+1}(n)$. Then $c_0,\dots,c_8$ are chain numbers, and
+$m(c_0)\le \operatorname{len}(n)$, the number of digits of $n$.
+\end{lemma}
+
+\begin{proof}
+By definition $c_i\ge 10$ for $i\le k-2$, and $c_{k-1}$ is a single digit. Every $c_i$ is a digit product, hence
+$7$-smooth, and $c_i\ge10$ is nonzero. For $i\le k-3$, $c_{i+1}=p(c_i)\neq 0$, so $c_i$ has no digit $0$. If $c_i$ contained a
+$5$ and an even digit, then $10\mid p(c_i)=c_{i+1}$, so $c_{i+1}$ would end in $0$ and $c_{i+2}=0$, which is impossible for
+$i+2\le k-2$. Hence $c_i\in G$ for $i\le k-4$, in particular for $i\le 8$. For the second claim, a digit $d$ of $n$
+multiplies $p(n)$ by $d$, which raises $m$ by $0,\tfrac13,\tfrac12,\tfrac23,1,\tfrac56,1,1,1$ for $d=1,\dots,9$; each
+contribution is at most $1$.
+\end{proof}
+
+\begin{corollary}\label{cor:reduction}
+Suppose every chain number $x$ with $m(x)\le N$ is one of a known finite list, all of whose members have
+persistence at most $10$. Then every $n$ with at most $N$ digits has persistence at most $11$.
+\end{corollary}
+
+\begin{proof}
+If $\operatorname{per}(n)\ge 12$ and $\operatorname{len}(n)\le N$, then $c_0=p(n)$ is a chain number with $m(c_0)\le N$
+(Lemma~\ref{lem:chain}), hence on the list, and $\operatorname{per}(n)=1+\operatorname{per}(c_0)\le 11$.
+\end{proof}
+
+The bound $a(12)>2.67\cdot10^{N}$ follows from Corollary~\ref{cor:reduction} by the candidate argument of
+Peters~\cite{peters}. Suppose $a=a(12)$ exists. Permuting digits, deleting a digit $1$, or replacing some digits by
+fewer digits with the same product ($22\to4$, $23\to6$, $24\to8$, $33\to9$, $266\to89$) gives a number with the same
+digit product, hence the same persistence, and a smaller one unless nothing changes; and a number containing a $5$
+and an even digit has persistence at most $2$. So the digits of $a$ are nondecreasing and contain none of these
+configurations. By Corollary~\ref{cor:reduction}, $a$ has at least $N+1$ digits. If its first digit is $2$, its second
+is at least $6$, and after $2,6$ every further digit is at least $7$. Hence
+$a\ge 2\,6\,7\cdots7$ (with $N+1$ digits) $>2.67\cdot10^{N}$.
+
+\begin{remark}
+A chain number with a $5$ has only odd digits. Per digit, a random number satisfies the chain condition with probability
+about $0.8$, against $0.9$ for being zero-free; this, and the weight $m$, which charges each prime by the shortest digit
+string that produces it, are what make chain numbers much rarer than zero-free $7$-smooth numbers: $1{,}117$ chain
+numbers are known, the largest with $49$ digits, against $12{,}606$ zero-free ones up to $140$ digits.
+\end{remark}
+
+\section{Suffix structure}\label{sec:suffix}
+
+Throughout, $K\ge1$, $P_K=4\cdot5^{K-1}$ is the order of $2$ modulo $5^K$, and $\mu_3,\mu_7$ are the discrete logarithms
+$2^{\mu_3}\equiv3$, $2^{\mu_7}\equiv7\pmod{5^K}$ (they exist because $2$ is a primitive root modulo every power of $5$).
+
+\begin{lemma}[suffix collapse]\label{lem:L1}
+If $a\ge K$ then $2^a3^b7^c\equiv 2^e\pmod{10^K}$ for every $e\ge K$ with $e\equiv a+b\mu_3+c\mu_7\pmod{P_K}$.
+\end{lemma}
+
+\begin{proof}
+Both sides are $\equiv0\pmod{2^K}$, and both are $\equiv 2^{a+b\mu_3+c\mu_7}\pmod{5^K}$; apply the Chinese remainder
+theorem.
+\end{proof}
+
+So the last $K$ digits of every form-(i) number with $a\ge K$ are those of a power of two, determined by one residue
+modulo $P_K$. For $K=13$, a bitmap of $P_{13}=976{,}562{,}500$ bits records which residues have last $13$ digits
+free of $0$ and $5$. Along a \emph{row} ($b,c$ fixed, $a$ increasing) the residue increases by one at each step, so a
+row is a contiguous range of bits.
+
+\begin{lemma}[exact branching]\label{lem:L2}
+For $k\ge1$, among the $P_k$ residues $e\bmod P_k$ ($e\ge k$), exactly $4^k$ give a power $2^e$ whose last $k$ digits avoid
+$0$ and $5$.
+\end{lemma}
+
+\begin{proof}
+For $k=1$ the last digit of $2^e$ runs through $2,4,8,6$. Fix $e\ge k+1$ and consider the five lifts $e_t=e+tP_k$,
+$t=0,\dots,4$, of $e\bmod P_k$ to residues modulo $P_{k+1}$. Write $2^{e_t}\equiv x_0+10^k d_t\pmod{10^{k+1}}$ with
+digits $d_t$; the last $k$ digits do not depend on $t$. Since $2^{P_k}=1+5^ku$ with $5\nmid u$, we have
+$2^{e_t}\equiv 2^e(1+t\,5^ku)\pmod{5^{k+1}}$, so $2^k(d_t-d_0)\equiv 2^et u\pmod 5$ and the $d_t$ are distinct modulo
+$5$. Modulo $2^{k+1}$ both $2^{e_t}$ and $2^{e_0}$ vanish, so $2^k5^k(d_t-d_0)\equiv0$ and the $d_t$ have equal parity.
+Hence the $d_t$ are the five digits of one parity, and exactly one of them lies in $\{0,5\}$.
+\end{proof}
+
+The bitmap therefore has exactly $4^{13}=67{,}108{,}864$ set bits (a density of $0.8^{12}\approx0.0687$), and stage~1 of
+the sieve passes exactly that fraction of a complete period. Lifting arguments of this kind are standard for digit
+problems on powers of two (see, e.g.,~\cite{dumitru}); the exact count for the excluded set $\{0,5\}$ is what makes the
+chain condition well suited to a bitmap.
+
+\begin{lemma}[affine lift]\label{lem:L3}
+Let $Q=5^K$, $P=P_K$, $0\le e<P$, and let $y=2^{e-2K}\bmod 5^{2K}=A_{\mathrm{lo}}+QA_{\mathrm{hi}}$ with
+$0\le A_{\mathrm{lo}},A_{\mathrm{hi}}<Q$. Let $w=(2^{P}\bmod 5^{2K}-1)/Q$. Then for every $j\ge0$ with $e+jP\ge 2K$, the
+digits $K+1,\dots,2K$ of $2^{e+jP}$ form the integer
+\[ \Bigl\lfloor\frac{2^K A_{\mathrm{lo}}}{Q}\Bigr\rfloor+2^K\bigl((A_{\mathrm{hi}}+A_{\mathrm{lo}}\,w\,j)\bmod Q\bigr). \]
+\end{lemma}
+
+\begin{proof}
+$2^{e+jP}\bmod 10^{2K}=2^{2K}\bigl(2^{e+jP-2K}\bmod 5^{2K}\bigr)$, and $2^{e+jP-2K}\equiv y(1+Qw)^j\equiv y(1+Qwj)\equiv
+A_{\mathrm{lo}}+Q(A_{\mathrm{hi}}+A_{\mathrm{lo}}wj)\pmod{Q^2}$. Dividing $2^{2K}(A_{\mathrm{lo}}+QY)$, $Y<Q$, by $10^K=2^KQ$
+gives the stated quotient.
+\end{proof}
+
+By Lemma~\ref{lem:L1} with $K$ and $2K$, the full exponent residue of a form-(i) number modulo $P_{2K}$ is $e+jP_K$ with
+$j$ constant along a row. So after the bitmap, the next $K$ digits of each surviving point cost one modular
+multiplication by the row constant $j$.
+
+\begin{lemma}[odd thread]\label{lem:L4}
+There is exactly one residue $r_{40}$ modulo $10^{40}$ with $5^{40}\mid r_{40}$ and all $40$ digits odd:
+\[ r_{40}=\cdots 9313975971735999337397515773773193359375 . \]
+Write $r_{40}\equiv -5^{t}\pmod{2^{40}}$ and $3\equiv-5^{f_3}$, $7\equiv-5^{f_7}\pmod{2^{40}}$. If $b\ge40$, the last $40$
+digits of $x=3^a5^b7^c$ are all odd if and only if $a+c$ is odd and $b\equiv t-af_3-cf_7\pmod{2^{38}}$.
+\end{lemma}
+
+\begin{proof}
+If $r$ has $k$ odd digits and $5^k\mid r$, the lifts $r+j10^k$ divisible by $5^{k+1}$ are $j\equiv j_0\pmod5$, i.e.
+$j_0$ and $j_0+5$, one odd and one even; so exactly one lift survives, starting from $r=5$. For $b\ge40$,
+$x\equiv0\pmod{5^{40}}$ and $x\equiv(-1)^{a+c}5^{\,b+af_3+cf_7}\pmod{2^{40}}$; since $5$ has order $2^{38}$ modulo $2^{40}$
+and $-1$ is not a power of $5$ there, $x\equiv r_{40}\pmod{10^{40}}$ exactly under the stated conditions.
+\end{proof}
+
+So for each pair $(a,c)$ at most one residue class of $b$ modulo $2^{38}$ survives the last $40$ digits: the odd
+form costs $O(1)$ per pair $(a,c)$ for $b\ge40$.
+
+\section{The sieve}\label{sec:sieve}
+
+\paragraph{Regions.} By Corollary~\ref{cor:reduction} it suffices to examine every $x=2^a3^b7^c$ with $2a+3b+6c\le6N$
+and every $x=3^a5^b7^c$, $b\ge1$, with $a+2b+2c\le 2N$. All such $x<10^{131}$ (there are $4{,}483{,}467$) were enumerated
+directly; among them are exactly the $1{,}117$ chain numbers of the known list~\cite{repo}. The sieve handles
+$x\ge10^{130}$, so the two ranges overlap. Shells $N_0<m\le N$ are run separately with an extra lower bound.
+
+\paragraph{Main path} (form (i), $a\ge26$, $x\ge10^{130}$). Each candidate passes through
+\begin{enumerate}
+\item the bitmap of Lemma~\ref{lem:L1}, $K=13$ (last $13$ digits): survival $0.8^{12}$;
+\item the affine lift of Lemma~\ref{lem:L3} (digits $14$--$26$): survival $0.8^{13}$ of the rest;
+\item a leading-digit test: $t=aL_2+bL_3+cL_7\bmod 2^{64}$ with $L_p=\operatorname{round}(2^{64}\log_{10}p)$ approximates
+  $2^{64}\{\log_{10}x\}$ within $(a+b+c)/2$ units, and a $2^{18}$-bin table rejects only bins in which every point (with
+  a margin of $2^{-40}$) has a $0$ or $5$ among its first $5$ significant digits;
+\item exact digits $27$--$126$ by a base-$10^9$ limb product;
+\item GMP: the last $600$ digits, then the whole number.
+\end{enumerate}
+Only stage 3 uses approximations, and it rejects a candidate only when the rejection is certain under a proved error
+bound; everything else is exact integer arithmetic.
+
+\paragraph{Direct and odd paths.} Form (i) with $a<26$ is stepped along $b$ with three $18$-digit limbs. Form (iii) with
+$b\le39$ is stepped along $a$ with an $18$-digit filter, and $b\ge40$ uses Lemma~\ref{lem:L4}. Survivors are decided
+with GMP.
+
+\paragraph{Cost.} The region has about $N^3$ points, so the cost grows like $N^3$. Stages $1$--$2$ cost about
+$0.17$\,ns per candidate on one modern CPU core, or about $5$\,ps on an RTX~3060~Ti.
+
+\section{Implementation and validation}\label{sec:validation}
+
+The program (\texttt{gsieve.c}, C with GMP, about 1,000 lines) has several interchangeable implementations of stages
+1--2: AVX-512 with IFMA (the original production build), AVX-512, AVX2, a scalar reference, and CUDA.
+\begin{itemize}
+\item \emph{Arithmetic.} Every vector implementation divides by $10^4$ as $\lfloor vM/2^{45}\rfloor$ with
+  $M=\lceil2^{45}/10^4\rceil$. This is exact for $0\le v<2^{45}/1168$ (Granlund--Montgomery~\cite{gm}), and the operands
+  are split so that every divided value is below $2^{31}$; the identity was checked for all $v<2^{31}$. The lift uses
+  Montgomery multiplication~\cite{montgomery} modulo $5^{13}$.
+\item \emph{Mutual agreement.} All implementations make identical decisions. Dumps of every stage-2 survivor and
+  stage-3/4 decision agree across implementations and thread counts, and the CUDA dumps are byte-identical to the CPU
+  dumps.
+\end{itemize}
+
+The computation was checked as follows.
+\begin{enumerate}
+\item \emph{Exact arithmetic on full regions.} Every stage decision on full regions up to $N=150$ (both $K=12$ and
+  $K=13$ builds) and on complete production slices (single values of $c$ at $N=36{,}000$ and in the shell, up to
+  $3.6\cdot10^8$ candidates each) was compared with big-integer arithmetic.
+\item \emph{Positive control.} In a zero-free mode the sieve must rediscover known numbers. End to end at $N=160$ it
+  reproduces exactly the $314$ zero-free $7$-smooth numbers of that size from an independent list complete below
+  $10^{5000}$.
+\item \emph{Brute force.} The direct and odd paths agree with brute force on full small regions. The odd thread was also
+  checked digit by digit on production regions that contain real thread candidates.
+\item \emph{Independent reference.} A separate plain-Python implementation shares no code with the program and decides
+  everything from the digits of $x$; it re-derives the constants, Lemma~\ref{lem:L2} for $k\le9$ and the odd thread. It
+  agrees with the program on full regions and on production slices, including all odd-thread candidates found there.
+\item \emph{Kernel tests (GPU).} On the whole table, $6.9\cdot10^{10}$ stage-2 decisions of the GPU agree with an
+  independent host formula. On $2^{20}$ random points, the decisions agree with $2^E\bmod10^{26}$ computed by GMP.
+\item \emph{Complete re-executions.} The logged production run ($\ncand$ candidates, computed on a cloud machine with
+  ECC memory) was re-executed twice on a desktop PC with the GPU implementation of stages 1--2. Every counter of every
+  invocation and every per-$c$ count agreed with the original logs.
+\item \emph{Statistics.} Over the full runs the survival rates of stages 1 and 2 are $0.06872$ and $0.05497$, against
+  $0.8^{12}=0.068719$ and $0.8^{13}=0.054976$.
+\item \emph{Fault tolerance.} On machines without ECC memory, the GPU tables are re-verified every minute against
+  host copies, and output is written only after a passed check. New shells also get an independent second pass on the
+  CPU, compared counter by counter.
+\end{enumerate}
+
+\section{Results}\label{sec:results}
+
+\begin{table}[ht]
+\centering\small
+\begin{tabular}{lrrrr}
+\toprule
+run & main path & direct & odd & total \\
+\midrule
+$m\le 36{,}000$ & $46{,}626{,}195{,}781{,}376$ & $33{,}689{,}253{,}108$ & $50{,}490{,}005{,}607$ & $46{,}710{,}375{,}040{,}091$ \\
+$36{,}000<m\le40{,}000$ & $17{,}337{,}008{,}704{,}000$ & $7{,}903{,}308{,}000$ & $11{,}850{,}072{,}000$ & $17{,}356{,}762{,}084{,}000$ \\
+\midrule
+$m\le 40{,}000$ & & & & $64{,}067{,}137{,}124{,}091$ \\
+\bottomrule
+\end{tabular}
+\caption{Candidates examined (plus $4{,}483{,}467$ numbers below $10^{131}$ enumerated directly). No run produced a chain
+number.}
+\end{table}
+
+\begin{theorem}[computational]\label{thm:comp}
+Every chain number $x$ with $m(x)\le\NB$ is one of the $1{,}117$ chain numbers below $10^{49}$; the largest is
+$4613824623662469877463718941499166849983276122112=2^{132}\cdot3\cdot7^{10}$. All of them have persistence at most
+$10$, and only $4996238671872=2^{19}3^47^6$ and $937638166841712=2^43^{20}7^5$ have persistence exactly $10$.
+\end{theorem}
+
+Theorem~\ref{thm:main} follows from Theorem~\ref{thm:comp} and Corollary~\ref{cor:reduction}.
+
+\section{Above the bound: bridges}\label{sec:bridges}
+
+\begin{lemma}\label{lem:bridge}
+Assume Theorem~\ref{thm:comp} for $N=\NB$, and let $n$ have persistence at least $12$, with $c_i$ as in
+Lemma~\ref{lem:chain}. Then either $c_0,\dots,c_8$ all have $m>\NB$, or some $c_t$ ($t\le7$) is a \emph{bridge}: a chain
+number with more than $27{,}958$ digits whose digit product is one of the $1{,}117$ known chain numbers. A bridge has
+fewer than $162$ digits different from $1$, so more than $99.4\%$ of its digits are $1$s.
+\end{lemma}
+
+\begin{proof}
+By Theorem~\ref{thm:comp}, $m(c_0)>\NB$; let $t$ be the largest index $\le8$ with $m(c_t)>\NB$. If $t<8$ then
+$c_{t+1}=p(c_t)$ is a chain number with $m\le\NB$, hence known and below $2^{162}$, and each digit of $c_t$ other than
+$1$ contributes a factor at least $2$. Finally $m(x)\le\log_{10}x/\log_{10}5<1.431\log_{10}x$ for $7$-smooth $x$, so
+$m(c_t)>\NB$ forces more than $27{,}958$ digits.
+\end{proof}
+
+A bridge is a near-repunit: writing it as $(10^L-1)/9+\sum_i (d_i-1)10^{a_i}$ with at most $161$ digits $d_i\neq1$
+gives $S$-unit equations with up to $161$ terms, far beyond the reach of the linear-forms methods
+of~\cite{bcgn,fonga}.
+
+\section{A heuristic (not part of the proof)}\label{sec:heuristic}
+
+Model the digits of a $7$-smooth number with $L$ digits as independent and uniform. Against the complete list below
+$10^{5000}$ the model predicts $5{,}622$ zero-free numbers with $20$--$39$ digits (actual $5{,}581$), $2{,}059$ with $40$--$59$
+digits (actual $2{,}111$), and $7.3$ chain numbers with $40$--$59$ digits (actual $7$). A number of persistence $12$
+exists if and only if some $7$-smooth number has digit product $4996238671872$ or $937638166841712$ (unless an unknown
+persistence-$10$ digit product exists beyond $10^{20000}$). Under the model, the expected number of such $7$-smooth
+numbers is about $0.019$, concentrated at $18$--$22$ digits, a range long excluded. The expected number of chain numbers
+beyond $25{,}000$ digits is below $10^{-2400}$. Larger computational bounds therefore certify an exponentially thin tail;
+they are not evidence in either direction about the conjecture.
+
+\section{Reproducibility}
+
+The repository~\cite{repo} contains the source, the production logs ($\sim$13\,MB, plus compressed archives for
+later shells), SHA-256 manifests, and all validation logs with the exact commands, build flags, binary hashes and
+commits. The production of the original run took about $5.5$ core-hours on a $2.1$\,GHz AVX-512 machine; the complete
+re-execution takes about $8$ minutes on an RTX~3060~Ti with a $20$-thread CPU.
+
+\begin{thebibliography}{99}
+\bibitem{oeis} OEIS Foundation, Sequence A003001, \emph{The On-Line Encyclopedia of Integer Sequences},
+  \url{https://oeis.org/A003001} (accessed 20 October 2026).
+\bibitem{sloane} N.~J.~A.~Sloane, The persistence of a number, \emph{J. Recreational Math.} 6 (1973), 97--98.
+\bibitem{bcgn} E.~Brier, C.~Clavier, L.~Gutsche, D.~Naccache, The multiplicative persistence conjecture is true for odd
+  targets, arXiv:2110.04263 (2021).
+\bibitem{fonga} P.~N.~Fonga, The multiplicative persistence conjecture: resolving the $2$-adic obstruction for nonzero
+  even targets, arXiv:2608.27802 (2026).
+\bibitem{chaffin} B.~Chaffin, comment in OEIS A003001, 29 September 2016.
+\bibitem{radcliffe} D.~Radcliffe, comment in OEIS A003001, 22 March 2019.
+\bibitem{peters} T.~Peters, comment in OEIS A003001, 19 September 2023.
+\bibitem{mcelwee} K.~McElwee, An algorithm for multiplicative persistence research, blog post, 13 July 2019.
+\bibitem{dumitru} B.~C.~Dumitru, Notes on the finiteness of powers of two with all even digits, arXiv:2503.23177 (2025).
+\bibitem{gm} T.~Granlund, P.~L.~Montgomery, Division by invariant integers using multiplication, \emph{Proc. PLDI}
+  (1994), 61--72.
+\bibitem{montgomery} P.~L.~Montgomery, Modular multiplication without trial division, \emph{Math. Comp.} 44 (1985),
+  519--521.
+\bibitem{repo} Persistence research repository, \url{https://github.com/CorvusCorpus/persistence-research}
+  (\texttt{docs/CHAIN\_SIEVE.md}, \texttt{docs/NOTEBOOK.md}).
+\end{thebibliography}
+
+\end{document}

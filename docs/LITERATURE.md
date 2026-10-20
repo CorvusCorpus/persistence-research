@@ -49,3 +49,29 @@ blocked from the cloud container.
   Hence a(12) > 2.67·10^40000.
 - **Other sources.** A web search finds the same 2.67·10^30000 (30,000 digits) bound cited by Wikipedia and by
   J. D. Cook's blog (Jun 2025). The search is not exhaustive: unindexed or private work cannot be excluded.
+
+## Re-check before the write-up (20 Oct 2026, session 3, desktop)
+- **OEIS A003001**, fetched directly from oeis.org (the page was last modified Oct 20 2026, 17:14 EDT).
+  - The newest bound is still Peters's: a(12) > 2.67·10^30000 (Sep 19 2023).
+  - No comment dated 2024–2026 is about bounds, and no comment mentions chain numbers.
+- **Web and arXiv searches** for bounds on a(12), zero-free 7-smooth searches, and digit lifting for powers of 2
+  found nothing that supersedes the above.
+  - The google-deepmind/formal-conjectures issue #7184 (Oct 2026) also lists persistence 12 as open.
+- **Prior work that the write-up must credit:**
+  - K. McElwee, "An algorithm for multiplicative persistence research", blog post, 13 Jul 2019.
+    - It enumerates zero-free products separately in the families {2,3,7} and {3,5,7}, up to 10^525, and finds
+      2^25·3^227·7^28 as the largest.
+    - It remarks that a number containing both 2s and 5s maps to a multiple of 10.
+    - So the form split, and the elementary 5-with-even observation, are not new.
+  - B. C. Dumitru, arXiv:2503.23177 (2025), on powers of two with all even digits. This and the surrounding
+    discussions use residue lifting of 2^n mod 10^k over exponents mod 4·5^(k−1).
+    - Lemmas L1 and L2 are in that standard style. Only the exact count 4^k for the excluded set {0,5}, and its use
+      as a bitmap sieve, are claimed here, with "not found stated elsewhere" as the wording.
+  - P. N. Fonga, arXiv:2608.27802 (28 Aug 2026), as before: even nonzero targets, with no bound on a(12).
+- **Novelty, as worded in `paper/chain_sieve.tex`:**
+  - the bound itself;
+  - the chain-number sieve weighted by digit length m;
+  - the affine lift (L3) and the odd thread (L4) as sieve tools;
+  - the bridge lemma.
+
+  Everything else is credited.

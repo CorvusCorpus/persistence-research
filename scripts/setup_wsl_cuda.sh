@@ -41,6 +41,11 @@ apt-get update
 apt-get install -y cuda-nvcc-$CUDA_VER cuda-cudart-dev-$CUDA_VER cuda-cuobjdump-$CUDA_VER cuda-nvdisasm-$CUDA_VER \
     cuda-profiler-api-$CUDA_VER cuda-nsight-compute-$CUDA_VER
 
+# optional: TeX for the write-up (paper/Makefile), with TEX=1
+if [ "${TEX:-0}" = 1 ]; then
+    apt-get install -y --no-install-recommends texlive-latex-recommended texlive-fonts-recommended latexmk
+fi
+
 cat > /etc/profile.d/persistence.sh <<EOF
 export PATH=/opt/venv/bin:/usr/local/cuda-${CUDA_VER/-/.}/bin:\$PATH
 EOF
