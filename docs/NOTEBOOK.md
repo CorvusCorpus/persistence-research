@@ -321,3 +321,58 @@ Each check below compares decisions, not only counts, unless it says otherwise.
   2. `python3 work/gsieve/bench.py` for the CPU baseline.
   3. The stage-cost note in 2.3 suggests also moving stage 3 to the GPU if the CPU limits the pipeline.
      Decide after measuring.
+
+### 2.6 Final-binary checks (added after the entry above)
+- **`make test-prod`** with the final avx512 binary (parallel table build, 4 threads): **all counters match the production DONE lines**.
+  `main N=36000 N0=-1 c=[7540,7898): points=858547070292 s1=58998835763 s2=3243476704 s3=1296156297 s4=0 gmp=0 full=0 members=0 | variant=avx512 threads=4 wall=132s | prod time=235.10s -> MATCH`
+- **Committed `val_all.sh`.** Its run on the same binaries was stopped after stage C's fourth slice, to save
+  usage.
+  - Stages A and B and four of the five C slices passed (summary in
+    `work/gsieve/validation/2026-10-20_session2.summary.txt`).
+  - The checks it did not reach are the same as in the earlier complete run (items 5–8), which passed.
+---
+
+## 2026-10-20 · Session 2 · Task 5 (part): independent reference implementation for audits
+
+This is done ahead of tasks 3–4 at the user's request: it needs no GPU, and it closes the vacuous-thread-test
+gap of 1.3. Commit: the one that adds this entry. Audit kit: `audit/ref_sieve.py`, `audit/run_audit.sh`,
+`audit/README.md`.
+
+### 5.1 What it is
+- **Plain Python integers.** No floating point, and nothing imported from `work/gsieve`.
+- **Every decision from its definition.**
+  - Region bounds use exact integer comparisons, including x ≥ 10¹³⁰.
+  - Stage 1 is the last 13 digits and stage 2 the last 26 digits of x = 2ᵃ3ᵇ7ᶜ, computed directly.
+  - The direct and odd paths use the last 54 digits; the odd thread uses the last 40.
+  - `--full` adds all digits of every survivor, which is chain membership independent of stages 3–5.
+- **The odd thread is derived independently** by digit lifting on the residue itself, starting from r = 5.
+  - At every step exactly one lift is divisible by 5ᵏ⁺¹ and has an odd new digit. That proves the
+    40-digit residue is unique.
+  - Writing it as −5ᵗ mod 2⁴⁰ gives t, and 3 = −5^F3, 7 = −5^F7 give F3 and F7.
+  - `gconst.py` instead lifts exponent classes for both signs.
+- **`lemmas`.** Checks every constant in `gconst.h` from its defining property; random tests of L1 and L3
+  against direct computation; L2 exhaustively for k ≤ 9; the thread derivation; and planted thread points.
+- **Comparison with the fast program.** `--exe BIN` runs the fast binary on the same region with `dump` and
+  requires equal point counts, survivor sets (S2, D4, T4) and counters (s1, s2, s4), plus equal members with
+  `--full`.
+
+### 5.2 Results
+- **`python3 audit/ref_sieve.py lemmas`:** all OK, in 1 s.
+  - Every `gconst.h` constant checks out from its defining property.
+  - The independently derived thread gives t = 235,317,736,100 with sign −1, equal to `OTHREAD`. F3 and F7
+    equal `OF3` and `OF7`.
+  - 300/300 planted thread points pass, and 0/300 shifted points do.
+  - L1 and L3 pass 1000 random tests each for K = 12 and 13. L2 gives exactly 4ᵏ for k = 1..9.
+- **Full regions against `work/gsieve/gsieve_k13` (avx512), with `--exe` and `--full`:** main G/E at
+  N = 150, and direct G/E and odd G/E at N = 160.
+  - Points, survivor sets, the s1/s2/s4 counters and members are all equal.
+  - The region bounds are computed exactly and agree with the fast program's floating-point bounds.
+  - Examples: main G has 332,946 points, s1 = 22,867 and 1,271 survivors. Direct E finds the one member,
+    2^25·3^227·7^28.
+- **Not run in this session (usage limit):** the production-scale audit `audit/run_audit.sh`, about 15 min on
+  4 cores.
+  - It covers main slices of N = 36000 and of the shell, direct slices, and odd slices and thread ranges that
+    hold real thread candidates (the full odd re-runs of task 2, item 4, list 41).
+  - Until it runs, the reference has checked only regions in which the G-mode direct and odd survivor sets
+    are empty. So the vacuous-thread gap of 1.3 is not yet closed.
+  - Next step at home: `audit/run_audit.sh`.

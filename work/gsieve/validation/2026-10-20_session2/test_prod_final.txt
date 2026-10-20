@@ -1,0 +1,3 @@
+python3 val_proddone.py ./gsieve_k13 4 --only main:7540:7898 logs/prod_N36000_n0-1_main_0_7898.log
+main N=36000 N0=-1 c=[7540,7898): points=858547070292 s1=58998835763 s2=3243476704 s3=1296156297 s4=0 gmp=0 full=0 members=0 | variant=avx512 threads=4 wall=132s | prod time=235.10s -> MATCH
+all counters match the production DONE lines
