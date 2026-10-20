@@ -27,3 +27,25 @@ Conclusion
   literature on integers with few nonzero digits (e.g. Bennett-Bugeaud-Mignotte); it improved on our own earlier
   weaker form, and should not be claimed as new.
 - Caveat: not exhaustive (theses, unindexed preprints and Kurz's original web pages were not checked).
+
+## Re-check of the persistence-12 bound (20 Oct 2026, session 2)
+Source: OEIS A003001 as of 20 Oct 2026, 14:57 EDT. The page text was supplied by the user, because oeis.org is
+blocked from the cloud container.
+
+- **Latest bound.** Tim Peters, 19 Sep 2023: if a(12) exists, it is > 2.67·10^30000. No later bound is recorded.
+  - His candidates are the digit strings matching eight regular expressions: the smallest integer of each
+    digit-product class.
+  - Every candidate with at most 30000 digits (a bit over 36·10^12 of them) has a digit product with a zero
+    among its last 306 digits.
+  - That method differs from the chain sieve: it enumerates digit strings, while the sieve enumerates digit
+    products.
+- **Chaffin (Sep 2016) agrees with our data.**
+  - The largest digit product with persistence 10 is 2^4·3^20·7^5; the only other known one is 2^19·3^4·7^6.
+  - The largest with persistence 2 is 2^25·3^227·7^28, with 140 digits.
+  - Every p(n) in (10^140, 10^20000) contains a 0.
+  - Radcliffe (Mar 2019): no terms up to 10^20585.
+- **OEIS-style statement of our result.** Every n with at most 40,000 digits has persistence ≤ 11. If a(12)
+  exists it is a candidate, so it is at least the smallest 40,001-digit candidate: 26 followed by 39,999 sevens.
+  Hence a(12) > 2.67·10^40000.
+- **Other sources.** A web search finds the same 2.67·10^30000 (30,000 digits) bound cited by Wikipedia and by
+  J. D. Cook's blog (Jun 2025). The search is not exhaustive: unindexed or private work cannot be excluded.
