@@ -26,7 +26,8 @@ Baseline snapshot of a research session (19–20 Oct 2026). Start with `docs/SES
 README.md            this file
 Makefile             top-level build/test entry points (make, make test)
 MANIFEST.sha256      SHA-256 of all record files (logs, proofs, exhaustive lists)
-scripts/             smoke test, coverage check, manifest and release-tarball helpers
+scripts/             smoke test, coverage check, manifest and release-tarball helpers, WSL2 + CUDA setup
+validation_pc/       validation logs of the desktop PC (session 3)
 CLAUDE.md            working rules for Claude Code sessions (read before changing anything)
 HANDOFF_PROMPT.md    prompt used to start the follow-up session
 docs/                summary, results ledger, roadmap, method notes, literature, result tables,

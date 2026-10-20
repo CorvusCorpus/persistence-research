@@ -1,0 +1,132 @@
+make: Entering directory '/tmp/tmp.lDnBx4poeU/work/gsieve'
+python3 gconst.py
+K1=12: P1=195312500 Q=244140625 W=108042893 affine-lift and suffix-collapse checks passed
+K1=13: P1=976562500 Q=1220703125 W=352183518 affine-lift and suffix-collapse checks passed
+eps=+1: 0 thread(s) mod 2^38: []
+eps=-1: 1 thread(s) mod 2^38: [235317736100]
+odd thread last 40 digits: 9313975971735999337397515773773193359375
+odd-thread planted check passed
+#define K12_P1 195312500ULL
+#define K12_Q 244140625ULL
+#define K12_P2 47683715820312500ULL
+#define K12_Q2 59604644775390625ULL
+#define K12_MU3 21544119915983107ULL
+#define K12_MU7 34654393049221985ULL
+#define K12_W 108042893ULL
+#define K12_Y0 1347526534800636ULL
+#define K12_X1 81787109376ULL
+#define K12_TEN 1000000000000ULL
+#define K12_TWO 4096ULL
+#define K13_P1 976562500ULL
+#define K13_Q 1220703125ULL
+#define K13_P2 1192092895507812500ULL
+#define K13_Q2 1490116119384765625ULL
+#define K13_MU3 164595267376920607ULL
+#define K13_MU7 82338108869534485ULL
+#define K13_W 352183518ULL
+#define K13_Y0 1192429777141512659ULL
+#define K13_X1 81787109376ULL
+#define K13_TEN 10000000000000ULL
+#define K13_TWO 8192ULL
+#define L2 5553023288523357132ULL
+#define L3 8801333677940798499ULL
+#define L5 12893720785186194484ULL
+#define L7 15589307261336549707ULL
+#define OF3 27267475107ULL
+#define OF7 116511985354ULL
+#define OTHREAD 235317736100ULL
+
+cc -O3 -march=x86-64 -Wall -Wno-unused-function -DKK=13 -o gsieve_k13 gsieve.c -lgmp -lm -lpthread
+gsieve.c:184:98: warning: ‘POS’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:184:82: warning: ‘H0’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:184:61: warning: ‘AB’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O3 -march=x86-64 -Wall -Wno-unused-function -DKK=12 -o gsieve_k12 gsieve.c -lgmp -lm -lpthread
+gsieve.c:184:98: warning: ‘POS’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:184:82: warning: ‘H0’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:184:61: warning: ‘AB’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O3 -march=x86-64 -Wall -Wno-unused-function -DKK=13 -DNL=7 -o gsieve_k13_nl7 gsieve.c -lgmp -lm -lpthread
+gsieve.c:184:98: warning: ‘POS’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:184:82: warning: ‘H0’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:184:61: warning: ‘AB’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O3 -march=x86-64 -Wall -Wno-unused-function -DKK=12 -DNL=7 -o gsieve_k12_nl7 gsieve.c -lgmp -lm -lpthread
+gsieve.c:184:98: warning: ‘POS’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:184:82: warning: ‘H0’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:184:61: warning: ‘AB’ defined but not used [-Wunused-variable]
+  184 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O2 -Wall -o val_kernel val_kernel.c
+./val_kernel
+(1) floor(v*M4/2^45) == v/10^4 for all v < 2^31: OK
+(2) K=12 split of xh = h0 + 2^K Y: all Y < 5^K (h0 = 0, 1, 2^K-1) + 2^26 random pairs: OK
+(2) K=13 split of xh = h0 + 2^K Y: all Y < 5^K (h0 = 0, 1, 2^K-1) + 2^26 random pairs: OK
+kernel arithmetic: OK
+python3 tiny.py 131
+numbers checked below 10^131: 4483467; G-members: 1117; largest has 49 digits
+matches the known list: True (known 1117)
+python3 val_dump.py 13 G 150 ./gsieve_k13
+DONE mode=main dm=G N=150 N0=-1 c=[0,151) K=13 NL=14 variant=scalar points=332946 s1=22867 s2=1271 s3=539 s4=0 gmp=0 full=0 members=0 time=0.01 threads=4 wall=0.00
+region points (python) = 332946
+S2: C=1271 python=1271 OK
+R3=732 R4=539 S4=0: top-table and limb-engine decisions verified
+python3 val_dump.py 13 E 150 ./gsieve_k13
+DONE mode=main dm=E N=150 N0=-1 c=[0,151) K=13 NL=14 variant=scalar points=332946 s1=93766 s2=23458 s3=15668 s4=0 gmp=0 full=0 members=0 time=0.01 threads=4 wall=0.00
+region points (python) = 332946
+S2: C=23458 python=23458 OK
+R3=7790 R4=15668 S4=0: top-table and limb-engine decisions verified
+python3 val_dump.py 12 E 150 ./gsieve_k12
+DONE mode=main dm=E N=150 N0=-1 c=[0,151) K=12 NL=14 variant=scalar points=336158 s1=105037 s2=29314 s3=19544 s4=1 gmp=1 full=1 members=1 time=0.01 threads=4 wall=0.00
+region points (python) = 336158
+S2: C=29314 python=29314 OK
+R3=9770 R4=19543 S4=1: top-table and limb-engine decisions verified
+MEMBER form=0 a=25 b=227 c=28 digits=140
+python3 val_dump.py 12 G 150 ./gsieve_k12
+DONE mode=main dm=G N=150 N0=-1 c=[0,151) K=12 NL=14 variant=scalar points=336158 s1=28902 s2=2024 s3=843 s4=0 gmp=0 full=0 members=0 time=0.01 threads=4 wall=0.00
+region points (python) = 336158
+S2: C=2024 python=2024 OK
+R3=1181 R4=843 S4=0: top-table and limb-engine decisions verified
+python3 val_e2e.py ./gsieve_k13_nl7 160 7
+DONE mode=main dm=E N=160 N0=-1 c=[0,161) K=13 NL=7 variant=scalar points=3238569 s1=914094 s2=231347 s3=153979 s4=3187 gmp=3187 full=3187 members=173 time=0.04 threads=4 wall=0.01
+DONE mode=direct dm=E N=160 N0=-1 c=[0,161) K=13 NL=7 variant=scalar points=506565 s1=0 s2=0 s3=0 s4=1916 gmp=1916 full=1916 members=59 time=0.03 threads=4 wall=0.01
+DONE mode=odd dm=E N=160 N0=-1 c=[0,161) K=13 NL=7 variant=scalar points=1197824 s1=0 s2=0 s3=0 s4=5081 gmp=5081 full=5081 members=82 time=0.30 threads=4 wall=0.07
+expected 314  found 314  missing 0  extra 0
+E-mode end-to-end: exact match
+python3 val_e2e.py ./gsieve_k12_nl7 160 7
+DONE mode=main dm=E N=160 N0=-1 c=[0,161) K=12 NL=7 variant=scalar points=3276220 s1=1027588 s2=289355 s3=192553 s4=3234 gmp=3234 full=3234 members=180 time=0.04 threads=4 wall=0.01
+DONE mode=direct dm=E N=160 N0=-1 c=[0,161) K=12 NL=7 variant=scalar points=468914 s1=0 s2=0 s3=0 s4=1759 gmp=1759 full=1759 members=52 time=0.02 threads=4 wall=0.01
+DONE mode=odd dm=E N=160 N0=-1 c=[0,161) K=12 NL=7 variant=scalar points=1197824 s1=0 s2=0 s3=0 s4=5081 gmp=5081 full=5081 members=82 time=0.27 threads=4 wall=0.07
+expected 314  found 314  missing 0  extra 0
+E-mode end-to-end: exact match
+python3 val_direct_odd.py ./gsieve_k13_nl7 13 160 7
+DONE mode=direct dm=G N=160 N0=-1 c=[0,161) K=13 NL=7 variant=scalar points=506565 s1=0 s2=0 s3=0 s4=2 gmp=2 full=2 members=0 time=0.01 threads=4 wall=0.00
+DONE mode=odd dm=G N=160 N0=-1 c=[0,161) K=13 NL=7 variant=scalar points=637948 s1=7320 s2=0 s3=0 s4=0 gmp=0 full=0 members=0 time=0.00 threads=4 wall=0.00
+direct: points 506565, C survivors 2, python 2 OK
+odd b<=39: points 637948, C survivors 0, python 0 OK
+thread: brute-force points 559876, all-odd-40 points 0, thread candidates 0
+G-mode direct/odd/thread decisions verified
+python3 val_prodrow.py 36000 35500 ./gsieve_k13
+DONE mode=main dm=G N=36000 N0=-1 c=[35500,35501) K=13 NL=14 variant=scalar points=725700 s1=49936 s2=2752 s3=1100 s4=0 gmp=0 full=0 members=0 time=0.00 threads=4 wall=0.00
+c=35500: region points 725700, S2 C=2752 python=2752 OK
+R3 sample verified (300 of 1652), R4=1100 S4=0 verified
+make: Leaving directory '/tmp/tmp.lDnBx4poeU/work/gsieve'

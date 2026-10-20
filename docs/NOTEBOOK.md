@@ -376,3 +376,106 @@ gap of 1.3. Commit: the one that adds this entry. Audit kit: `audit/ref_sieve.py
   - Until it runs, the reference has checked only regions in which the G-mode direct and odd survivor sets
     are empty. So the vacuous-thread gap of 1.3 is not yet closed.
   - Next step at home: `audit/run_audit.sh`.
+
+---
+
+## 2026-10-20 · Session 3 (desktop PC) · Step 1: environment and validation
+
+All runs in this entry use the committed code of `c471a35` (`gsieve.c` SHA-256 `3f4827dc…`). Logs are in
+`validation_pc/` (index in its `README.md`). Times are UTC.
+
+### D.1 Environment
+- **Machine:** Windows 11 Home 10.0.26200 with WSL 3.0.3.0 (kernel 6.18.54.1-microsoft-standard-WSL2).
+- **CPU:** Intel Core i7-12700F (Alder Lake): 8 P-cores with hyper-threading plus 4 E-cores, so 20 logical CPUs.
+  16 GB RAM, of which the WSL VM gets 7.7 GB.
+  - `grep -o 'avx512[a-z_]*\|avx2\|bmi2' /proc/cpuinfo | sort -u` gives avx2 and bmi2 (also fma, avx_vnni).
+  - There is no AVX-512, so the default chain-sieve build is the `avx2` variant.
+- **GPU:** RTX 3060 Ti: compute capability 8.6, 38 SMs, 8 GB GDDR6 on a 256-bit bus (448 GB/s), 3 MB L2,
+  PCIe 4.0 x16.
+  - Driver 610.88 (CUDA 13.3); `nvidia-smi` works inside WSL.
+  - It also drives the Windows desktop, which uses 1–2 GB of its memory.
+- **WSL distribution `persistence`** (new, dedicated; the user's own Ubuntu 20.04 distribution is untouched).
+  - Image: `ubuntu-24.04.5-wsl-amd64.wsl` from releases.ubuntu.com. Its SHA-256 `bb415d82…` equals the one in
+    Microsoft's distribution manifest.
+  - Installed with `wsl --install --from-file … --name persistence --no-launch`, then set up by the new
+    `scripts/setup_wsl_cuda.sh`, run as root.
+  - Toolchain: gcc 13.3.0, GNU Make 4.3, GMP 6.3.0, MPFR 4.2.1.
+  - Python 3.12.3 in the venv `/opt/venv`, with python-flint 0.9.0, mpmath 1.4.1 and numpy 2.5.4.
+  - CUDA 13.3 (`nvcc` V13.3.73) and Nsight Compute 2026.2.1, from NVIDIA's wsl-ubuntu repository. The keyring
+    package was checked against the repository index.
+  - Same OS release, compiler, python-flint and mpmath as the cloud container of session 2 (which had Python 3.13).
+- **How commands are run.** The repository stays on the Windows file system, and everything runs through a login
+  shell: `wsl -d persistence -u root --cd <repo> --exec bash -lc '<command>'`.
+  - The login shell puts the venv and CUDA on `PATH`.
+  - `--exec` stops an outer shell from expanding `$VARIABLES`, which `wsl -- …` does.
+- **Line endings (fixed in this commit).** Git for Windows checks text files out with CRLF (`core.autocrlf=true`).
+  That breaks `sha256sum -c MANIFEST.sha256`, since the logs are hashed with LF, and it breaks the bash scripts and
+  Makefile recipes under WSL.
+  - New `.gitattributes` (`* text=auto eol=lf`). The 195 text files were rewritten from their index blobs.
+  - `git diff` is empty and `git add --renormalize .` changes nothing, so the content is identical to the commits.
+
+### D.2 Build: `make`
+- All helpers, `zf7` and the four gsieve binaries build. The default variant is `avx2`.
+- The only warnings are the pre-existing ones: unused `z` in the AVX2 `scan`, and unused `LO`.
+- Binary hashes are in `validation_pc/binaries.sha256`, e.g. `gsieve_k13` = `gsieve_k13_avx2` = `46f8308b…`.
+
+### D.3 `make test`
+- **Outcome:** `ALL TESTS PASSED`, 72 s wall (`validation_pc/make_test.log`).
+- This covers `val_kernel`, `tiny.py` (1,117 = known list), `val_dump` at K = 12, 13 in G and E modes, and E-mode end
+  to end at 314/314 for both K.
+- It also covers the direct/odd/thread brute force at N = 160, the production row c = 35500, the base-10 smoke test,
+  the manifest (all record files intact) and the coverage of both production runs.
+
+### D.4 `make test-prod`
+`main N=36000 N0=-1 c=[7540,7898): points=858547070292 s1=58998835763 s2=3243476704 s3=1296156297 s4=0 gmp=0
+full=0 members=0 | variant=avx2 threads=20 wall=25s | prod time=235.10s -> MATCH`.
+
+All eight counters equal the IFMA production binary's DONE line. The cloud machine took 132 s on 4 threads.
+
+### D.5 `cd work/gsieve && ./val_all.sh ../../validation_pc`
+**ALL CHECKS PASSED** in 307 s (19:47–19:52). The cloud run took about 15 min.
+- **A:** suites for avx2 and scalar at T = 4, and for the default build at T = 1.
+- **B:** strict-ISA builds. `-march=haswell` selects avx2 and `-march=x86-64` selects scalar; neither contains an
+  AVX-512 instruction.
+- **C:** five production slices against exact arithmetic (N = 36000: c = 34200, 33000; shell n0 = 36000:
+  c = 39500, 38200, 35990).
+- **D:** cross-variant dumps on eight regions.
+
+### D.6 Benchmark: `python3 work/gsieve/bench.py`
+Main path G, table build excluded, best of 2 (`validation_pc/bench.txt`).
+
+| workload | variant | T | wall s | 10⁹ points/s | ns/point/thread |
+|---|---|---|---|---|---|
+| c ∈ [7540, 7560), 4.85·10¹⁰ points | avx2 | 1 | 8.29 | 5.86 | 0.171 |
+| | avx2 | 2 | 4.26 | 11.39 | 0.176 |
+| | avx2 | 4 | 2.25 | 21.57 | 0.185 |
+| | scalar | 1 | 26.27 | 1.85 | 0.541 |
+| | scalar | 4 | 7.23 | 6.71 | 0.596 |
+| c ∈ [7540, 7740), 4.82·10¹¹ points | avx2 | 8 | 17.49 | 27.58 | 0.290 |
+| | avx2 | 12 | 15.25 | 31.63 | 0.379 |
+| | avx2 | 16 | 13.88 | 34.75 | 0.460 |
+| | avx2 | 20 | 13.85 | 34.82 | 0.574 |
+| | scalar | 20 | 38.58 | 12.50 | 1.600 |
+
+- s1 and s2 are identical in every run.
+- **Per thread:** one P-core runs avx2 2.4× faster than the cloud's avx512 thread (0.171 vs 0.415 ns/point). It is
+  1.6× faster than one core of the IFMA production machine (0.274).
+- **Whole machine:** 3.5·10¹⁰ points/s. Beyond 8 threads, hyper-threads and E-cores add little.
+- **For task 4:** with the CPU alone, the shells 40,000 → 100,000 (about 9.4·10¹⁴ points) would take about 7.5 h.
+
+### D.7 `audit/run_audit.sh` (independent reference, task 5 kit)
+- **Outcome:** `AUDIT: reference agrees with work/gsieve/gsieve_k13 on every region`, in 68 s with 20 jobs
+  (`validation_pc/audit.txt`).
+- The constants and lemmas check out, and the full small regions agree in G and E modes, with members.
+- The production slices agree: main N = 36000 (c = 35500, 34200) and shell (c = 39500, 35990), and direct
+  (c = 35000, 20000, 1000).
+- Odd slices and thread ranges that contain real thread candidates agree:
+  - odd N = 36000, c = 153, 1058, 2164, 29958, and shell c = 1787, 36343: one candidate each;
+  - thread ranges c ∈ [0, 400) (1 candidate), [1000, 1400) (2) and shell [1700, 1800) (1).
+  - Every candidate was checked digit by digit, and with `--full` its full chain membership (none is a member).
+- **This closes the audit gap of 1.3 and 5.2:** the reference has now checked non-empty thread-candidate sets.
+
+### D.8 Status after step 1
+- Every check passes on this PC with the committed code.
+- No result in `docs/RESULTS.md` changes status. The 10^40000 claim keeps its evidence. The odd-thread bookkeeping
+  is now independently audited on regions that contain candidates.

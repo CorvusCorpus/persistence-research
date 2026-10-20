@@ -22,3 +22,4 @@ __pycache__/
 work/gsieve/prod_logs.tar.gz
 # release tarballs (make logs-tarball)
 dist/
+work/gsieve/*.o

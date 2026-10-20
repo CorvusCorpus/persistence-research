@@ -1,0 +1,4 @@
+./gsieve_k13:1: variant=avx2 lines=8288347 sha256=28ba9fd32e5447fa counters=('57835776', '16318067', '4144173', '2757123', '77', '77', '77', '1') (13s)
+./gsieve_k13_avx2:4: variant=avx2 lines=8288347 sha256=28ba9fd32e5447fa counters=('57835776', '16318067', '4144173', '2757123', '77', '77', '77', '1') (7s)
+./gsieve_k13_scalar:4: variant=scalar lines=8288347 sha256=28ba9fd32e5447fa counters=('57835776', '16318067', '4144173', '2757123', '77', '77', '77', '1') (6s)
+identical dumps and counters across 3 binaries for: main E 400 0 401

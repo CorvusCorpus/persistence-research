@@ -1,0 +1,26 @@
+== audit/run_audit.sh start 2026-10-20T20:04:48Z commit c471a35 bin work/gsieve/gsieve_k13 46f8308b714e3475 jobs 20
+ALL CONSTANTS AND LEMMAS OK
+main G 150 0 151 --full                                        points=332946 s1=22867 survivors=1271 members=0 [] (1s)
+main E 150 0 151 --full                                        points=332946 s1=93766 survivors=23458 members=0 [] (5s)
+direct G 160 0 161 --full                                      points=119028 s1=0 survivors=0 members=0 [] (0s)
+direct E 160 0 161 --full                                      points=119028 s1=0 survivors=421 members=1 [(0, 25, 227, 28)] (0s)
+odd G 160 0 161 --full                                         points=118888 s1=7320 survivors=0 members=0 [] (0s)
+odd E 160 0 161 --full                                         points=145720 s1=0 survivors=637 members=0 [] (0s)
+main G 36000 35500 35501 --full                                points=725700 s1=49936 survivors=2752 members=0 [] (18s)
+main G 36000 34200 34201                                       points=9632000 s1=660237 survivors=36502 (4s)
+main G 40000 39500 39501 n0=36000 --full                       points=725700 s1=49625 survivors=2731 members=0 [] (21s)
+main G 40000 35990 35991 n0=36000                              points=48044000 s1=3297147 survivors=181475 (13s)
+direct G 36000 35000 35001 --full                              points=51801 s1=0 survivors=1 members=0 [] (0s)
+direct G 36000 20000 20001 --full                              points=831801 s1=0 survivors=7 members=0 [] (1s)
+direct G 36000 1000 1001 --full                                points=1819801 s1=0 survivors=16 members=0 [] (0s)
+odd G 36000 153 154 --full                                     points=2794544 s1=35808 survivors=1 members=0 [] (1s)
+odd G 36000 1058 1059 --full                                   points=2723955 s1=34902 survivors=1 members=0 [] (1s)
+odd G 36000 2164 2165 --full                                   points=2637687 s1=33796 survivors=1 members=0 [] (0s)
+odd G 36000 29958 29959 --full                                 points=469755 s1=6002 survivors=1 members=0 [] (0s)
+odd G 40000 1787 1788 n0=36000 --full                          points=312000 s1=38174 survivors=1 members=0 [] (1s)
+odd G 40000 36343 36344 n0=36000 --full                        points=283725 s1=3618 survivors=1 members=0 [] (0s)
+thread G 36000 0 400 --jobs 20 --full                          points=0 s1=14304400 survivors=1 members=0 [] (1s)
+thread G 36000 1000 1400 --jobs 20 --full                      points=0 s1=13904400 survivors=2 members=0 [] (1s)
+thread G 40000 1700 1800 n0=36000 --jobs 20 --full             points=0 s1=3821100 survivors=1 members=0 [] (0s)
+AUDIT: reference agrees with work/gsieve/gsieve_k13 on every region
+== run_audit.sh exit=0 wall=68s end 2026-10-20T20:05:56Z

@@ -1,0 +1,30 @@
+== val_all.sh started 2026-10-20T19:47:24Z
+== start Tue Oct 20 19:47:24 UTC 2026 commit c471a35 gsieve.c 3f4827dc3aa9a1b7
+variants: avx2 scalar; default build: variant=avx2
+A suite V=avx2 T=4 exit=0 32s
+A suite V=scalar T=4 exit=0 30s
+A suite default build T=1 exit=0 54s
+B suite -march=haswell exit=0 35s
+  variant variant=avx2 AVX-512 instructions: 0
+B suite -march=x86-64 exit=0 32s
+  variant variant=scalar AVX-512 instructions: 0
+C val_prodrow N=36000 c=34200 n0=-1 exit=0 4s
+  c=34200: region points 9632000, S2 C=36502 python=36502 OK
+C val_prodrow N=36000 c=33000 n0=-1 exit=0 8s
+  c=33000: region points 26853200, S2 C=101290 python=101290 OK
+C val_prodrow N=40000 c=39500 n0=36000 exit=0 2s
+  c=39500: region points 725700, S2 C=2731 python=2731 OK
+C val_prodrow N=40000 c=38200 n0=36000 exit=0 3s
+  c=38200: region points 9632000, S2 C=36628 python=36628 OK
+C val_prodrow N=40000 c=35990 n0=36000 exit=0 14s
+  c=35990: region points 48044000, S2 C=181475 python=181475 OK
+D xvariant [main G 1000 0 1001] exit=0 17s
+D xvariant [main E 400 0 401] exit=0 26s
+D xvariant [main G 36000 20000 20001] exit=0 16s
+D xvariant [main G 40000 35990 36000 n0=36000] exit=0 11s
+D xvariant [direct G 3000 0 3001] exit=0 6s
+D xvariant [direct E 400 0 401] exit=0 0s
+D xvariant [odd G 3000 0 3001] exit=0 3s
+D xvariant [odd E 400 0 401] exit=0 8s
+== end Tue Oct 20 19:52:31 UTC 2026: ALL CHECKS PASSED
+== val_all.sh exit=0 wall=307s

@@ -1,0 +1,4 @@
+# Check out every text file with LF line endings on every platform. The record files (production logs, proof
+# JSON) are hashed in MANIFEST.sha256, and the shell scripts and Makefiles run under Linux or WSL; a CRLF
+# checkout (core.autocrlf=true, the Git for Windows default) breaks both.
+* text=auto eol=lf

@@ -1,0 +1,12 @@
+== make test-prod start 2026-10-20T19:46:45Z commit c471a35 nproc 20
+make -C work/gsieve all
+make[1]: Entering directory '/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/gsieve'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/gsieve'
+make -C work/gsieve test-prod V=
+make[1]: Entering directory '/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/gsieve'
+python3 val_proddone.py ./gsieve_k13 20 --only main:7540:7898 logs/prod_N36000_n0-1_main_0_7898.log
+main N=36000 N0=-1 c=[7540,7898): points=858547070292 s1=58998835763 s2=3243476704 s3=1296156297 s4=0 gmp=0 full=0 members=0 | variant=avx2 threads=20 wall=25s | prod time=235.10s -> MATCH
+all counters match the production DONE lines
+make[1]: Leaving directory '/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/gsieve'
+== make test-prod exit=0 wall=25s end 2026-10-20T19:47:10Z
