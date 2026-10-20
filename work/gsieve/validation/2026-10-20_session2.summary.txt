@@ -6,3 +6,7 @@ A suite V=scalar T=4 exit=0 71s
 A suite default build T=1 exit=0 134s
 B suite -march=haswell exit=0 95s
   variant variant=avx2 AVX-512 instructions: 0
+B suite -march=x86-64 exit=0 72s
+  variant variant=scalar AVX-512 instructions: 0
+C val_prodrow N=36000 c=34200 n0=-1 exit=0 14s
+  c=34200: region points 9632000, S2 C=36502 python=36502 OK

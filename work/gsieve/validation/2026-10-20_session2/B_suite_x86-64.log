@@ -126,3 +126,7 @@ odd b<=39: points 637948, C survivors 0, python 0 OK
 thread: brute-force points 559876, all-odd-40 points 0, thread candidates 0
 G-mode direct/odd/thread decisions verified
 python3 val_prodrow.py 36000 35500 ./gsieve_k13
+DONE mode=main dm=G N=36000 N0=-1 c=[35500,35501) K=13 NL=14 variant=scalar points=725700 s1=49936 s2=2752 s3=1100 s4=0 gmp=0 full=0 members=0 time=0.00 threads=4 wall=0.00
+c=35500: region points 725700, S2 C=2752 python=2752 OK
+R3 sample verified (300 of 1652), R4=1100 S4=0 verified
+make: Leaving directory '/tmp/tmp.283uBA2mII/work/gsieve'
