@@ -1,0 +1,61 @@
+./gsieve_k13_cuda:1: variant=cuda lines=7362948 sha256=b6e53003aeb87517 counters=('974621376', '66975374', '3681474', '1473546', '0', '0', '0', '0') (8s)
+./gsieve_k13_cuda:8: variant=cuda lines=7362948 sha256=b6e53003aeb87517 counters=('974621376', '66975374', '3681474', '1473546', '0', '0', '0', '0') (5s)
+./gsieve_k13_avx2:8: variant=avx2 lines=7362948 sha256=b6e53003aeb87517 counters=('974621376', '66975374', '3681474', '1473546', '0', '0', '0', '0') (4s)
+./gsieve_k13_scalar:8: variant=scalar lines=7362948 sha256=b6e53003aeb87517 counters=('974621376', '66975374', '3681474', '1473546', '0', '0', '0', '0') (4s)
+identical dumps and counters across 4 binaries for: main G 1000 0 1001
+[main G 1000 0 1001] exit=0
+./gsieve_k13_cuda:1: variant=cuda lines=8288347 sha256=28ba9fd32e5447fa counters=('57835776', '16318067', '4144173', '2757123', '77', '77', '77', '1') (16s)
+./gsieve_k13_cuda:8: variant=cuda lines=8288347 sha256=28ba9fd32e5447fa counters=('57835776', '16318067', '4144173', '2757123', '77', '77', '77', '1') (9s)
+./gsieve_k13_avx2:8: variant=avx2 lines=8288347 sha256=28ba9fd32e5447fa counters=('57835776', '16318067', '4144173', '2757123', '77', '77', '77', '1') (6s)
+./gsieve_k13_scalar:8: variant=scalar lines=8288347 sha256=28ba9fd32e5447fa counters=('57835776', '16318067', '4144173', '2757123', '77', '77', '77', '1') (5s)
+identical dumps and counters across 4 binaries for: main E 400 0 401
+[main E 400 0 401] exit=0
+./gsieve_k13_cuda:1: variant=cuda lines=5802666 sha256=3e772f1d5cee3e9f counters=('767216200', '52722947', '2901333', '1157827', '0', '0', '0', '0') (7s)
+./gsieve_k13_cuda:8: variant=cuda lines=5802666 sha256=3e772f1d5cee3e9f counters=('767216200', '52722947', '2901333', '1157827', '0', '0', '0', '0') (4s)
+./gsieve_k13_avx2:8: variant=avx2 lines=5802666 sha256=3e772f1d5cee3e9f counters=('767216200', '52722947', '2901333', '1157827', '0', '0', '0', '0') (4s)
+./gsieve_k13_scalar:8: variant=scalar lines=5802666 sha256=3e772f1d5cee3e9f counters=('767216200', '52722947', '2901333', '1157827', '0', '0', '0', '0') (4s)
+identical dumps and counters across 4 binaries for: main G 36000 20000 20001
+[main G 36000 20000 20001] exit=0
+./gsieve_k13_cuda:1: variant=cuda lines=3619058 sha256=3459b098cb256b7c counters=('479360448', '32936989', '1809529', '723129', '0', '0', '0', '0') (6s)
+./gsieve_k13_cuda:8: variant=cuda lines=3619058 sha256=3459b098cb256b7c counters=('479360448', '32936989', '1809529', '723129', '0', '0', '0', '0') (3s)
+./gsieve_k13_avx2:8: variant=avx2 lines=3619058 sha256=3459b098cb256b7c counters=('479360448', '32936989', '1809529', '723129', '0', '0', '0', '0') (3s)
+./gsieve_k13_scalar:8: variant=scalar lines=3619058 sha256=3459b098cb256b7c counters=('479360448', '32936989', '1809529', '723129', '0', '0', '0', '0') (2s)
+identical dumps and counters across 4 binaries for: main G 40000 35990 36000 n0=36000
+[main G 40000 35990 36000 n0=36000] exit=0
+./gsieve_k13_cuda:1: variant=cuda lines=18335002 sha256=553a608c80a4dbf0 counters=('2428520460', '166886522', '9167501', '3662966', '0', '0', '0', '0') (14s)
+./gsieve_k13_cuda:8: variant=cuda lines=18335002 sha256=553a608c80a4dbf0 counters=('2428520460', '166886522', '9167501', '3662966', '0', '0', '0', '0') (10s)
+./gsieve_k13_avx2:8: variant=avx2 lines=18335002 sha256=553a608c80a4dbf0 counters=('2428520460', '166886522', '9167501', '3662966', '0', '0', '0', '0') (11s)
+./gsieve_k13_scalar:8: variant=scalar lines=18335002 sha256=553a608c80a4dbf0 counters=('2428520460', '166886522', '9167501', '3662966', '0', '0', '0', '0') (12s)
+identical dumps and counters across 4 binaries for: main G 36000 7540 7541
+[main G 36000 7540 7541] exit=0
+./gsieve_k13_cuda:1: variant=cuda lines=9485098 sha256=4c397b5d2c1abafb counters=('1256032000', '86313951', '4742549', '1895872', '0', '0', '0', '0') (9s)
+./gsieve_k13_cuda:8: variant=cuda lines=9485098 sha256=4c397b5d2c1abafb counters=('1256032000', '86313951', '4742549', '1895872', '0', '0', '0', '0') (5s)
+./gsieve_k13_avx2:8: variant=avx2 lines=9485098 sha256=4c397b5d2c1abafb counters=('1256032000', '86313951', '4742549', '1895872', '0', '0', '0', '0') (5s)
+./gsieve_k13_scalar:8: variant=scalar lines=9485098 sha256=4c397b5d2c1abafb counters=('1256032000', '86313951', '4742549', '1895872', '0', '0', '0', '0') (5s)
+identical dumps and counters across 4 binaries for: main G 40000 11824 11826 n0=36000
+[main G 40000 11824 11826 n0=36000] exit=0
+./gsieve_k13_cuda:1: variant=cuda lines=1645 sha256=50048ca56e8f6902 counters=('232962108', '0', '0', '0', '1645', '1645', '93', '0') (4s)
+./gsieve_k13_cuda:8: variant=cuda lines=1645 sha256=50048ca56e8f6902 counters=('232962108', '0', '0', '0', '1645', '1645', '93', '0') (1s)
+./gsieve_k13_avx2:8: variant=avx2 lines=1645 sha256=50048ca56e8f6902 counters=('232962108', '0', '0', '0', '1645', '1645', '93', '0') (1s)
+./gsieve_k13_scalar:8: variant=scalar lines=1645 sha256=50048ca56e8f6902 counters=('232962108', '0', '0', '0', '1645', '1645', '93', '0') (1s)
+identical dumps and counters across 4 binaries for: direct G 3000 0 3001
+[direct G 3000 0 3001] exit=0
+./gsieve_k13_cuda:1: variant=cuda lines=13413 sha256=ad01962777c996f3 counters=('3571908', '0', '0', '0', '13412', '13412', '13412', '1') (0s)
+./gsieve_k13_cuda:8: variant=cuda lines=13413 sha256=ad01962777c996f3 counters=('3571908', '0', '0', '0', '13412', '13412', '13412', '1') (0s)
+./gsieve_k13_avx2:8: variant=avx2 lines=13413 sha256=ad01962777c996f3 counters=('3571908', '0', '0', '0', '13412', '13412', '13412', '1') (0s)
+./gsieve_k13_scalar:8: variant=scalar lines=13413 sha256=ad01962777c996f3 counters=('3571908', '0', '0', '0', '13412', '13412', '13412', '1') (0s)
+identical dumps and counters across 4 binaries for: direct E 400 0 401
+[direct E 400 0 401] exit=0
+./gsieve_k13_cuda:1: variant=cuda lines=0 sha256=e3b0c44298fc1c14 counters=('345911607', '4383760', '0', '0', '0', '0', '0', '0') (2s)
+./gsieve_k13_cuda:8: variant=cuda lines=0 sha256=e3b0c44298fc1c14 counters=('345911607', '4383760', '0', '0', '0', '0', '0', '0') (0s)
+./gsieve_k13_avx2:8: variant=avx2 lines=0 sha256=e3b0c44298fc1c14 counters=('345911607', '4383760', '0', '0', '0', '0', '0', '0') (0s)
+./gsieve_k13_scalar:8: variant=scalar lines=0 sha256=e3b0c44298fc1c14 counters=('345911607', '4383760', '0', '0', '0', '0', '0', '0') (0s)
+identical dumps and counters across 4 binaries for: odd G 3000 0 3001
+[odd G 3000 0 3001] exit=0
+./gsieve_k13_cuda:1: variant=cuda lines=84369 sha256=9a2cd2ca6b4e0599 counters=('20104838', '0', '0', '0', '84369', '84369', '84369', '0') (5s)
+./gsieve_k13_cuda:8: variant=cuda lines=84369 sha256=9a2cd2ca6b4e0599 counters=('20104838', '0', '0', '0', '84369', '84369', '84369', '0') (1s)
+./gsieve_k13_avx2:8: variant=avx2 lines=84369 sha256=9a2cd2ca6b4e0599 counters=('20104838', '0', '0', '0', '84369', '84369', '84369', '0') (1s)
+./gsieve_k13_scalar:8: variant=scalar lines=84369 sha256=9a2cd2ca6b4e0599 counters=('20104838', '0', '0', '0', '84369', '84369', '84369', '0') (1s)
+identical dumps and counters across 4 binaries for: odd E 400 0 401
+[odd E 400 0 401] exit=0
+wall 185s

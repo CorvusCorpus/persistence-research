@@ -1,0 +1,21 @@
+== kerneltest 2026-10-20T20:11:59Z commit 21a0f1f+uncommitted gsieve.c 6043fff87a697bca gsieve_cuda.cu c7edd7af088c3e02
+gpu: NVIDIA GeForce RTX 3060 Ti (cc 8.6, 38 SMs), K=13 tables 1.123 GB in device memory, verified; 6.34 GB free
+kerneltest K=13 dm=G part 1: 1024 lift indices x 67108864 table entries = 68719476736 stage-2 decisions in 1271892 segments; s1 68719476736, survivors 3777953151; mismatches 0
+kerneltest K=13 part 2: 1048576 random (e, j) against 2^E mod 10^26: last 13 digits allowed 560212, last 26 digits allowed 31033; mismatches 0
+KERNEL TEST PASSED
+-- K=13 G NJ=1024 seed=1: exit=0 wall=154s
+gpu: NVIDIA GeForce RTX 3060 Ti (cc 8.6, 38 SMs), K=13 tables 4.039 GB in device memory, verified; 3.42 GB free
+kerneltest K=13 dm=E part 1: 16 lift indices x 275439346 table entries = 4407029536 stage-2 decisions in 19805 segments; s1 4407029536, survivors 1120182275; mismatches 0
+kerneltest K=13 part 2: 1048576 random (e, j) against 2^E mod 10^26: last 13 digits allowed 672362, last 26 digits allowed 170920; mismatches 0
+KERNEL TEST PASSED
+-- K=13 E NJ=16 seed=2: exit=0 wall=29s
+gpu: NVIDIA GeForce RTX 3060 Ti (cc 8.6, 38 SMs), K=12 tables 0.272 GB in device memory, verified; 7.19 GB free
+kerneltest K=12 dm=G part 1: 256 lift indices x 16777216 table entries = 4294967296 stage-2 decisions in 63823 segments; s1 4294967296, survivors 295161092; mismatches 0
+kerneltest K=12 part 2: 1048576 random (e, j) against 2^E mod 10^24: last 12 digits allowed 569643, last 24 digits allowed 39242; mismatches 0
+KERNEL TEST PASSED
+-- K=12 G NJ=256 seed=3: exit=0 wall=12s
+gpu: NVIDIA GeForce RTX 3060 Ti (cc 8.6, 38 SMs), K=12 tables 0.894 GB in device memory, verified; 6.57 GB free
+kerneltest K=12 dm=E part 1: 16 lift indices x 61208743 table entries = 979339888 stage-2 decisions in 3889 segments; s1 979339888, survivors 276595471; mismatches 0
+kerneltest K=12 part 2: 1048576 random (e, j) against 2^E mod 10^24: last 12 digits allowed 688988, last 24 digits allowed 194378; mismatches 0
+KERNEL TEST PASSED
+-- K=12 E NJ=16 seed=4: exit=0 wall=6s

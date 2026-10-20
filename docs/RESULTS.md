@@ -13,7 +13,7 @@ both a 5 and an even digit (set G).
 
 | # | Claim | Status | Evidence |
 |---|---|---|---|
-| 1.1 | Every chain number x with m(x) ≤ 40,000 is one of 1,117 known numbers (largest: 4613824623662469877463718941499166849983276122112, 49 digits). | COMPUTATIONAL | `work/gsieve/`: 6.4067·10^13 candidates, logs in `work/gsieve/logs/`, `aggregate.py` shows full coverage |
+| 1.1 | Every chain number x with m(x) ≤ 40,000 is one of 1,117 known numbers (largest: 4613824623662469877463718941499166849983276122112, 49 digits). | COMPUTATIONAL | `work/gsieve/`: 6.4067·10^13 candidates, logs in `work/gsieve/logs/`, `aggregate.py` shows full coverage. Re-executed in full twice (20 Oct 2026, session 3) with the independent GPU implementation of stages 1–2 on another machine: every counter and every per-c count equal (`validation_pc/task3_cuda/`) |
 | 1.2 | No number below 10^40000 has multiplicative persistence ≥ 12 (any final digit). Previous record: a(12) > 2.67·10^30000 (T. Peters, OEIS A003001, 2023). | THEOREM given 1.1 | proof in `docs/CHAIN_SIEVE.md` (corollary) |
 | 1.3 | The 1,117 chain numbers have persistence ≤ 10; the only ones with persistence 10 are 4996238671872 and 937638166841712. | COMPUTATIONAL | `work/gsieve/G_small.json` + check in summary |
 | 1.4 | Exact branching: for even 7-smooth x divisible by 2^k, the number of admissible k-digit endings (no 0, no 5) is exactly 4^k (out of 4·5^(k−1) residues). | THEOREM (short proof) + checked k ≤ 8 and k = 13 | `docs/CHAIN_SIEVE.md` L2 |

@@ -30,8 +30,12 @@ Computer-assisted research on multiplicative persistence. Current state is summa
 - Linux, gcc ≥ 11, GMP, MPFR (`libgmp-dev`, `libmpfr-dev`), Python ≥ 3.10 with `python-flint` and `mpmath`.
 - The chain sieve (`work/gsieve/gsieve.c`) builds on any x86-64. The build picks the best stage-2 variant
   the target supports: `ifma` (AVX-512 IFMA, the original production build), `avx512` (AVX-512 F/DQ/BW/VL),
-  `avx2`, then `scalar`. All four make identical decisions (`docs/CHAIN_SIEVE.md`). A CUDA port is
-  ROADMAP P2.
+  `avx2`, then `scalar`. All four make identical decisions (`docs/CHAIN_SIEVE.md`).
+- The CUDA variant (stages 1–2 of the main path on the GPU) builds with `make -C work/gsieve cuda`
+  (nvcc, CUDA 13). It makes the same decisions as the CPU variants and is validated by `val_cuda.sh`.
+- Desktop PC (Windows 11, RTX 3060 Ti): use the WSL2 distribution `persistence` (`scripts/setup_wsl_cuda.sh`).
+  - Run commands as `wsl -d persistence -u root --cd <repo> --exec bash -lc '<command>'`.
+  - The login shell puts the venv and CUDA on `PATH`. `--exec` stops an outer shell from expanding `$VARIABLES`.
 - Build with `make` (repository root). Test with `make test`, or `make -C work/gsieve test [V=variant]`.
   Run scripts from `work/` (base-10 and small-base code) or `work/gsieve/` (chain sieve), because they use
   relative paths. Log every run in `docs/NOTEBOOK.md`.
@@ -49,6 +53,12 @@ Computer-assisted research on multiplicative persistence. Current state is summa
 - **Production-scale regression.** `python3 val_proddone.py EXE THREADS [--only mode:c0:c1] LOG...` re-runs
   complete logged invocations and compares every counter with the production DONE line.
   `compare_cdone.py N N0 DIR_A DIR_B` compares per-c counts of two log sets.
+  `rerun_production.sh DIR EXE THREADS shell|base|both` re-runs the whole logged 10^40000 computation.
+- **CUDA variant.** `./val_cuda.sh LOGDIR` runs its whole validation: kernel tests, suite, production slices,
+  cross-variant dumps and a logged invocation.
+  - `./gsieve_k13_cuda kerneltest G|E NJ SEED` checks the GPU's stage-1/2 decisions on the whole table for NJ lift
+    indices, and on 2^20 random points against 2^E mod 10^26.
+  - `EXE=./gsieve_k13_cuda prod.py ...` runs production with it.
 - **Base-10 node.** `python3 prove_cum.py NODE ...`. Resumable via `ckptC/` and `bagresC/`.
   `runner4.py` runs node lists.
 - **Small bases.** `python3 prove_cum_b.py BASE DEPTH [digits...]`.
@@ -63,3 +73,13 @@ Computer-assisted research on multiplicative persistence. Current state is summa
 - **Long jobs.** Use checkpointed drivers. When waiting on appended logs, never match old completion lines.
 - **Memory locality.** Large random-access tables cost TLB/L2 misses. Use huge pages and keep hot tables
   small; measure before optimising (the stage breakdown benchmarks used `-DBENCH*` flags).
+- **Windows checkouts.** Git for Windows checks out CRLF. `.gitattributes` forces LF: the record hashes and the
+  shell scripts need it.
+- **WSL `/tmp` is wiped** when the distribution stops between commands. Keep scratch files on disk (e.g.
+  `/root/scratch`), and never compare files without checking that they exist.
+- **Non-ECC memory.** GeForce memory and desktop RAM have no ECC.
+  - The CUDA variant re-checks its tables every minute and writes results only after a passed check (fail-stop).
+  - Double-check new production with an independent run (another variant or a second pass), and compare the
+    counters (`compare_cdone.py`, DONE lines).
+- **CUDA copies.** A pageable `cudaMemcpy` may return before its DMA lands. Synchronize before reading the data back
+  on another stream.

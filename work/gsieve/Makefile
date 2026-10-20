@@ -39,6 +39,23 @@ $(foreach v,$(VARIANTS),$(eval $(call VRULES,$(v))))
 
 variants: $(foreach v,$(RUNNABLE),$(BINS:%=%_$(v)))
 
+# CUDA variant: stages 1-2 of the main path on an NVIDIA GPU (gsieve_cuda.cu), stages 3+ and the direct and odd
+# paths are the CPU code. `make cuda` builds gsieve_k13_cuda ...; `make test V=cuda` runs the suite on them,
+# `./gsieve_k13_cuda kerneltest G 1024 1` checks the kernel against host computations, and `./val_cuda.sh LOGDIR`
+# runs the whole CUDA validation. Not part of `make all` (needs nvcc). CUDA_ARCH=sm_86 is the RTX 3060 Ti.
+NVCC      ?= nvcc
+CUDA_ARCH ?= sm_86
+NVFLAGS   ?= -O3 -arch=$(CUDA_ARCH)
+CUDA_HOME ?= $(patsubst %/bin/nvcc,%,$(shell command -v $(NVCC) 2>/dev/null))
+CUDALIBS   = -L$(CUDA_HOME)/lib64 -lcudart_static -ldl -lrt -lstdc++
+gsieve_cuda_k13.o: gsieve_cuda.cu gsieve_cuda.h gconst.h ; $(NVCC) $(NVFLAGS) -DKK=13 -c -o $@ gsieve_cuda.cu
+gsieve_cuda_k12.o: gsieve_cuda.cu gsieve_cuda.h gconst.h ; $(NVCC) $(NVFLAGS) -DKK=12 -c -o $@ gsieve_cuda.cu
+gsieve_k13_cuda:     gsieve.c gconst.h gsieve_cuda.h gsieve_cuda_k13.o ; $(CC) $(CFLAGS) -DS2_CUDA -DKK=13 -o $@ gsieve.c gsieve_cuda_k13.o $(LIBS) $(CUDALIBS)
+gsieve_k12_cuda:     gsieve.c gconst.h gsieve_cuda.h gsieve_cuda_k12.o ; $(CC) $(CFLAGS) -DS2_CUDA -DKK=12 -o $@ gsieve.c gsieve_cuda_k12.o $(LIBS) $(CUDALIBS)
+gsieve_k13_nl7_cuda: gsieve.c gconst.h gsieve_cuda.h gsieve_cuda_k13.o ; $(CC) $(CFLAGS) -DS2_CUDA -DKK=13 -DNL=7 -o $@ gsieve.c gsieve_cuda_k13.o $(LIBS) $(CUDALIBS)
+gsieve_k12_nl7_cuda: gsieve.c gconst.h gsieve_cuda.h gsieve_cuda_k12.o ; $(CC) $(CFLAGS) -DS2_CUDA -DKK=12 -DNL=7 -o $@ gsieve.c gsieve_cuda_k12.o $(LIBS) $(CUDALIBS)
+cuda: $(BINS:%=%_cuda)
+
 gconst.h: gconst.py
 	python3 gconst.py
 
@@ -62,6 +79,6 @@ test-prod: gsieve_k13$(SFX)
 	python3 val_proddone.py ./gsieve_k13$(SFX) $(NPROC) --only main:7540:7898 logs/prod_N36000_n0-1_main_0_7898.log
 
 clean:
-	rm -f $(BINS) $(foreach v,$(VARIANTS),$(BINS:%=%_$(v))) val_kernel
+	rm -f $(BINS) $(foreach v,$(VARIANTS) cuda,$(BINS:%=%_$(v))) gsieve_cuda_k12.o gsieve_cuda_k13.o val_kernel
 
-.PHONY: all variants test test-prod clean
+.PHONY: all variants cuda test test-prod clean

@@ -1,0 +1,4 @@
+gpu: NVIDIA GeForce RTX 3060 Ti (cc 8.6, 38 SMs), K=12 tables 0.894 GB in device memory, verified; 6.57 GB free
+kerneltest K=12 dm=E part 1: 16 lift indices x 61208743 table entries = 979339888 stage-2 decisions in 3889 segments; s1 979339888, survivors 276595471; mismatches 0
+kerneltest K=12 part 2: 1048576 random (e, j) against 2^E mod 10^24: last 12 digits allowed 688988, last 24 digits allowed 194378; mismatches 0
+KERNEL TEST PASSED

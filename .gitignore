@@ -23,3 +23,5 @@ work/gsieve/prod_logs.tar.gz
 # release tarballs (make logs-tarball)
 dist/
 work/gsieve/*.o
+# raw re-run logs of the validation runs (committed as .tar.xz archives)
+validation_pc/**/rerun_*/

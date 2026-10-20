@@ -35,8 +35,9 @@
 //   S2_AVX512  AVX-512 F/DQ/BW/VL without IFMA: floor(v/10^4) by exact 32x32-bit multiply-shift
 //   S2_AVX2    AVX2: the same exact arithmetic on 4 lanes; survivors extracted with movemask
 //   SCALAR     portable reference: per-candidate % and /
+//   S2_CUDA    stages 1-2 on an NVIDIA GPU (gsieve_cuda.cu), the S2_AVX512/S2_AVX2 integer arithmetic; only by request
 // Default: the first one the compiler target supports. All later stages are shared.
-#if !defined(SCALAR) && !defined(S2_IFMA) && !defined(S2_AVX512) && !defined(S2_AVX2)
+#if !defined(SCALAR) && !defined(S2_IFMA) && !defined(S2_AVX512) && !defined(S2_AVX2) && !defined(S2_CUDA)
 #if defined(__AVX512F__) && defined(__AVX512DQ__) && defined(__AVX512BW__) && defined(__AVX512VL__) && defined(__AVX512IFMA__)
 #define S2_IFMA
 #elif defined(__AVX512F__) && defined(__AVX512DQ__) && defined(__AVX512BW__) && defined(__AVX512VL__)
@@ -55,9 +56,11 @@
 #define VARIANT "avx2"
 #elif defined(SCALAR)
 #define VARIANT "scalar"
+#elif defined(S2_CUDA)
+#define VARIANT "cuda"
 #endif
-#if defined(SCALAR) + defined(S2_IFMA) + defined(S2_AVX512) + defined(S2_AVX2) != 1
-#error choose exactly one of SCALAR, S2_IFMA, S2_AVX512, S2_AVX2
+#if defined(SCALAR) + defined(S2_IFMA) + defined(S2_AVX512) + defined(S2_AVX2) + defined(S2_CUDA) != 1
+#error choose exactly one of SCALAR, S2_IFMA, S2_AVX512, S2_AVX2, S2_CUDA
 #endif
 
 #ifndef KK
@@ -548,6 +551,13 @@ static inline void scan(u64 s, u64 e, u64 j, i64 delta, u64 b, u64 c, u64 tb, co
 #endif
     later_stages(np, delta, b, c, tb, M);
 }
+#elif defined(S2_CUDA)
+// The CUDA variant runs the main path through main_piece() (below), which makes the same later_stages() calls for
+// GPU-computed survivors; main_c() and this scan() are never called there.
+static inline void scan(u64 s, u64 e, u64 j, i64 delta, u64 b, u64 c, u64 tb, const u32 *M) {
+    (void)s; (void)e; (void)j; (void)delta; (void)b; (void)c; (void)tb; (void)M;
+    fprintf(stderr, "scan() is not used by the CUDA variant\n"); exit(1);
+}
 #endif
 // stages 3-5 for the stage-2 survivors in PBUF (bit positions, ascending)
 static inline void later_stages(u64 np, i64 delta, u64 b, u64 c, u64 tb, const u32 *M) {
@@ -747,7 +757,326 @@ static void *worker(void *arg) {
     return NULL;
 }
 
+#ifdef S2_CUDA
+// ---------------- main path of the CUDA variant: stages 1-2 on the GPU (gsieve_cuda.cu), stages 3+ unchanged ----------------
+// Work unit: a piece = rows b0 <= b < b1 of one c, about PIECE region points (GSIEVE_PIECE); every c has at least one
+// piece. Workers take pieces in increasing order. For its piece a worker computes the row segments as main_c() does
+// (the same region bounds, lam, j, r and wrap at P1), runs stages 1-2 of all of them in one launch on its own CUDA
+// stream, then walks the segments in row order: counter s1, and one later_stages() call per segment with the GPU's
+// survivor positions in PBUF -- the calls scan() makes in the CPU variants, with the same arguments and buffer
+// contents. Pieces are written in increasing c and piece order, so dumps and logs equal the CPU variants'.
+#include "gsieve_cuda.h"
+static u64 PIECE = 1ULL << 29, NPIECE, NEXTP, MAXROWS;
+static u64 *PSTART;                               // the pieces of c are PSTART[c - C0] .. PSTART[c - C0 + 1] - 1
+static u64 *PDONE;                                // per c: pieces handed to the reporter
+static u64 *MAXEP;                                // per c: the latest epoch in which one of its pieces finished
+typedef struct { char *buf; size_t len; } prec_t;
+static prec_t *PREC;                              // per piece: its dump/MEMBER output until it is written
+static u64 nrows_c(u64 c) { i64 v = 6 * NN - 6 * (i64)c - 2 * AMIN; return v < 0 ? 0 : (u64)(v / 3) + 1; }
+static void plan_pieces(void) {
+    if (getenv("GSIEVE_PIECE")) PIECE = strtoull(getenv("GSIEVE_PIECE"), 0, 10);
+    if (PIECE < 1) PIECE = 1;
+    u64 nc = C1 > C0 ? C1 - C0 : 0, tot = 0;
+    PSTART = malloc((nc + 1) * sizeof *PSTART); PDONE = calloc(nc + 1, sizeof *PDONE); MAXEP = calloc(nc + 1, sizeof *MAXEP);
+    if (!PSTART || !PDONE || !MAXEP) { fprintf(stderr, "alloc failed\n"); exit(1); }
+    MAXROWS = 1;
+    for (u64 i = 0; i < nc; i++) {
+        u64 c = C0 + i, nr = nrows_c(c), np = 1;
+        if (nr) {                                 // approximate region points of c; only sizes the pieces
+            double dn = (double)NN - (double)c, d0 = N0 > (i64)c ? (double)N0 - (double)c : 0, est = 3 * (dn * dn - d0 * d0);
+            if (est > (double)PIECE) np = (u64)(est / (double)PIECE) + 1;
+            if (np > nr) np = nr;
+            if ((nr + np - 1) / np > MAXROWS) MAXROWS = (nr + np - 1) / np;
+        }
+        PSTART[i] = tot; tot += np;
+    }
+    PSTART[nc] = tot; NPIECE = tot;
+    if (!(PREC = calloc(tot + 1, sizeof *PREC))) { fprintf(stderr, "alloc failed\n"); exit(1); }
+}
+static void pow37_limbs(u32 *M, u64 b, u64 c) {   // M = 3^b 7^c mod 10^(9 NL) in base-1e9 limbs (= pow7_limbs for b = 0)
+    mpz_ui_pow_ui(gm, 10, 9 * NL); mpz_set_ui(gt, 7); mpz_powm_ui(gx, gt, c, gm);
+    mpz_set_ui(gt, 3); mpz_powm_ui(gt, gt, b, gm); mpz_mul(gx, gx, gt); mpz_mod(gx, gx, gm);
+    for (int i = 0; i < NL; i++) M[i] = (u32)mpz_fdiv_q_ui(gx, gx, E9);
+}
+static int ovf_cmp(const void *x, const void *y) {
+    const govf_t *p = x, *q = y;
+    return p->seg != q->seg ? (p->seg < q->seg ? -1 : 1) : (p->seq < q->seq ? -1 : p->seq > q->seq);
+}
+// append n GPU survivors of segment k to PBUF, checking that they are strictly increasing positions in [s, e) and
+// no more than the segment's s1 (a violation means a GPU fault: stop rather than continue)
+static void take(const gctx_t *g, u64 k, u64 off, u64 n, u64 s1, u64 *np, u64 *lo) {
+    for (u64 q = 0; q < n; q++) {
+        u64 p = g->h_pos[off + q];
+        if (*np >= s1 || p < *lo || p >= g->h_seg[k].e) { fprintf(stderr, "GPU survivor list of segment %llu is inconsistent\n", (unsigned long long)k); exit(1); }
+        PBUF[(*np)++] = p; *lo = p + 1;
+    }
+}
+static void main_piece(gctx_t *g, i64 *sdel, u64 *srow, u64 c, u64 b0, u64 b1) {
+    if (6 * NN - 6 * (i64)c - 2 * AMIN < 0) return;
+    // pass 1: the segments of rows b0 <= b < b1, computed as in main_c()
+    u64 lam = (u64)(((u128)c * MU7 + (u128)b0 * MU3) % P2), ns = 0;
+    for (i64 b = (i64)b0; b < (i64)b1; b++) {
+        i64 ahi = (6 * NN - 3 * b - 6 * (i64)c) / 2;
+        double need = (XMIN - b * LG3 - c * LG7) / LG2;
+        i64 alo = need > AMIN ? (i64)ceil(need - 1e-6) : AMIN;
+        if (N0 >= 0 && 6 * N0 - 3 * b - 6 * (i64)c >= 0) { i64 t0 = (6 * N0 - 3 * b - 6 * (i64)c) / 2 + 1; if (t0 > alo) alo = t0; }
+        if (alo <= ahi) {
+            u64 len = (u64)(ahi - alo + 1);
+            cnt[0] += len;
+            u64 e2 = lam + (u64)alo; if (e2 >= P2) e2 -= P2;
+            u64 j = e2 / P1, r = e2 % P1;
+            if (r + len <= P1) { g->h_seg[ns] = (gseg_t){ (u32)r, (u32)(r + len), (u32)j }; sdel[ns] = alo - (i64)r; srow[ns++] = (u64)b; }
+            else {
+                g->h_seg[ns] = (gseg_t){ (u32)r, (u32)P1, (u32)j }; sdel[ns] = alo - (i64)r; srow[ns++] = (u64)b;
+                u64 j2 = j + 1; if (j2 == QQ) j2 = 0;
+                g->h_seg[ns] = (gseg_t){ 0, (u32)(r + len - P1), (u32)j2 }; sdel[ns] = alo + (i64)(P1 - r); srow[ns++] = (u64)b;
+            }
+        }
+        lam += MU3; if (lam >= P2) lam -= P2;
+    }
+    if (!ns) return;
+    gpu_run(g, ns);
+    // pass 2: the segments in row order, with tb and M stepped along the rows as in main_c()
+    u64 novf = g->h_ctr[1], oi = 0, nsurv = 0, brow = b0, tb = c * L7 + b0 * L3;
+    u32 M[NL]; pow37_limbs(M, b0, c);
+    if (novf > 1) qsort(g->h_ovf, novf, sizeof *g->h_ovf, ovf_cmp);
+    for (u64 k = 0; k < ns; k++) {
+        for (; brow < srow[k]; brow++) { tb += L3; mulsmall(M, 3); }
+        u64 s1 = g->h_s1[k], np = 0, lo = g->h_seg[k].s;
+        for (; oi < novf && g->h_ovf[oi].seg == k; oi++) take(g, k, g->h_ovf[oi].off, g->h_ovf[oi].cnt, s1, &np, &lo);
+        take(g, k, g->h_off[k], g->h_cnt[k], s1, &np, &lo);
+        nsurv += np;
+        if (s1 == 0) continue;                    // scan() returns before counting when r1 <= r0
+        cnt[1] += s1;
+#ifdef BENCH2
+        cnt[2] += np; continue;                   // benchmark of stages 1-2 alone (as BENCH2 in the CPU variants)
+#endif
+        later_stages(np, sdel[k], srow[k], c, tb, M);
+    }
+    if (nsurv != g->h_ctr[0] || oi != novf) { fprintf(stderr, "GPU survivor count mismatch (c=%llu)\n", (unsigned long long)c); exit(1); }
+}
+// Fail-stop table checks. GeForce memory (and a desktop's RAM) has no ECC. The tables are never written after they
+// are built, so a memory fault that changes them persists until a check finds it. Every GSIEVE_VERIFY seconds (default
+// 60) and at the end, verify_tables() compares the device tables with their host copies and re-hashes the host tables
+// that stages 3+ read. Pieces are stamped with the epoch in which they finished; c is written only once every piece of
+// it finished before a check that then passed. A failed check stops the program, so nothing computed after the
+// previous passed check is ever written: the log can be resumed from its last CDONE line.
+static u64 EPOCH = 1, VEPOCH = 1, HOSTHASH, NCHECK;   // pieces of epoch e may be written once VEPOCH > e
+static int VSTOP, VINTERVAL = 60;
+static u64 host_tables_hash(void) {
+    u64 h = fnv(1469598103934665603ULL, TOP, ((1ULL << TB) / 64 + 1) * 8);
+    h = fnv(h, T2, (3 * (u64)NN + 3) * sizeof *T2); h = fnv(h, T2H, (3 * (u64)NN + 3) * sizeof *T2H);
+    h = fnv(h, FL1, sizeof FL1); h = fnv(h, FL2, sizeof FL2); h = fnv(h, FL3, sizeof FL3); h = fnv(h, FL4, sizeof FL4);
+    h = fnv(h, FL5, sizeof FL5); h = fnv(h, OK4B, sizeof OK4B); h = fnv(h, OK5B, sizeof OK5B);
+    return h;
+}
+static void flush_ready(void);
+static void verify_tables(void) {
+    u64 e = __atomic_fetch_add(&EPOCH, 1, __ATOMIC_SEQ_CST);    // pieces finishing from now on belong to epoch e + 1
+    if (gpu_verify_tables() || host_tables_hash() != HOSTHASH) {
+        fprintf(stderr, "TABLE CHECK FAILED (memory fault?): stopping; nothing computed since the previous check was written\n");
+        exit(3);
+    }
+    pthread_mutex_lock(&REPMU);
+    VEPOCH = e + 1; NCHECK++;
+    flush_ready();
+    pthread_mutex_unlock(&REPMU);
+}
+static void *verifier(void *arg) {
+    (void)arg;
+    while (!__atomic_load_n(&VSTOP, __ATOMIC_SEQ_CST)) {
+        for (int i = 0; i < 10 * VINTERVAL && !__atomic_load_n(&VSTOP, __ATOMIC_SEQ_CST); i++) { struct timespec ts = { 0, 100000000 }; nanosleep(&ts, NULL); }
+        if (!__atomic_load_n(&VSTOP, __ATOMIC_SEQ_CST)) verify_tables();
+    }
+    return NULL;
+}
+// with REPMU held: write, in increasing c, every c whose pieces are all done and covered by a passed check
+static void flush_ready(void) {
+    while (NEXTREP < C1 && REC[NEXTREP - C0].ready && MAXEP[NEXTREP - C0] < VEPOCH) {
+        crec_t *q = &REC[NEXTREP - C0]; size_t any = 0;
+        for (u64 pp = PSTART[NEXTREP - C0]; pp < PSTART[NEXTREP - C0 + 1]; pp++) {
+            if (PREC[pp].len) fwrite(PREC[pp].buf, 1, PREC[pp].len, stdout);
+            any |= PREC[pp].len; free(PREC[pp].buf); PREC[pp].buf = NULL;
+        }
+        for (int k = 0; k < 8; k++) TOT[k] += q->d[k];
+        if (PROG) printf("CDONE %llu points=%llu s4=%llu members=%llu\n", (unsigned long long)NEXTREP, (unsigned long long)TOT[0], (unsigned long long)TOT[4], (unsigned long long)TOT[7]);
+        if (PROG || any) fflush(stdout);
+        NEXTREP++;
+    }
+}
+// per-piece version of report(): the counters of c are summed over its pieces; c is written (its pieces in order, then
+// its CDONE line) once all of its pieces and all smaller c are done and a table check covers them
+static void report_piece(u64 c, u64 p, char *buf, size_t len, const u64 *d) {
+    u64 ep = __atomic_load_n(&EPOCH, __ATOMIC_SEQ_CST);    // the piece is finished: its tables were read before this
+    pthread_mutex_lock(&REPMU);
+    crec_t *r = &REC[c - C0];
+    for (int k = 0; k < 8; k++) r->d[k] += d[k];
+    PREC[p].buf = buf; PREC[p].len = len;
+    if (ep > MAXEP[c - C0]) MAXEP[c - C0] = ep;
+    if (++PDONE[c - C0] == PSTART[c - C0 + 1] - PSTART[c - C0]) r->ready = 1;
+    flush_ready();
+    pthread_mutex_unlock(&REPMU);
+}
+static void *worker_cuda(void *arg) {
+    (void)arg;
+    mpz_init(gx); mpz_init(gm); mpz_init(gt);
+    size_t n = (3 * (size_t)NN + 64) * 8;
+    u64 segcap = 2 * MAXROWS + 2;
+    PBUF = malloc(n); PA = malloc(n); PBIN = malloc(n);
+    i64 *sdel = malloc(segcap * sizeof *sdel); u64 *srow = malloc(segcap * sizeof *srow);
+    if (!PBUF || !PA || !PBIN || !sdel || !srow) { fprintf(stderr, "alloc failed\n"); exit(1); }
+    gctx_t *g = gpu_ctx_new(segcap, PIECE / 128 + 65536);
+    OBC = 1 << 16; OB = malloc(OBC);
+    for (;;) {
+        u64 p = __atomic_fetch_add(&NEXTP, 1, __ATOMIC_RELAXED);
+        if (p >= NPIECE) break;
+        u64 lo = 0, hi = C1 - C0;                 // find c: PSTART[lo] <= p < PSTART[hi]
+        while (hi - lo > 1) { u64 mid = lo + (hi - lo) / 2; if (PSTART[mid] <= p) lo = mid; else hi = mid; }
+        u64 c = C0 + lo, k = p - PSTART[lo], np = PSTART[lo + 1] - PSTART[lo], nr = nrows_c(c);
+        u64 snap[8], d[8]; memcpy(snap, cnt, sizeof snap);
+        OBN = 0;
+        main_piece(g, sdel, srow, c, nr * k / np, nr * (k + 1) / np);
+        for (int q = 0; q < 8; q++) d[q] = cnt[q] - snap[q];
+        if (OBN) { report_piece(c, p, OB, OBN, d); OBC = 1 << 16; OB = malloc(OBC); }
+        else report_piece(c, p, NULL, 0, d);
+        if (!OB) { fprintf(stderr, "alloc failed\n"); exit(1); }
+    }
+    free(OB); free(sdel); free(srow); gpu_ctx_free(g);
+    free(PBUF); free(PA); free(PBIN);
+    mpz_clear(gx); mpz_clear(gm); mpz_clear(gt);
+    return NULL;
+}
+
+// ---------------- kerneltest: the GPU's stages 1-2 against host computations that share nothing with the kernel ----------------
+// usage: gsieve_k13_cuda kerneltest G|E NJ [SEED] [threads=T]
+//  (1) Whole table, NJ lift indices j (0, 1, 5^K - 1, then random ones). The range [0, P1) is cut into segments of
+//      random lengths (a quarter of them 1..128 long). Each segment's s1 must be the number of set bits of BM in it,
+//      and its survivors must be exactly its set bits e, in increasing order, whose digits K+1..2K are allowed by the
+//      SCALAR formula: y = 2^(e - 2K) mod 5^(2K) by doubling, alo = y % 5^K, ahi = y / 5^K, h0 = 2^K alo / 5^K,
+//      Y = (ahi + (alo W % 5^K) j) % 5^K, xh = h0 + 2^K Y. (The device tables AB/H0 and the Montgomery form are not used.)
+//  (2) The definition. 2^20 random (e, j), half of them with e a set bit: the one-position segment [e, e + 1) must
+//      have s1 = 1 iff the last K digits of 2^E are allowed, and the survivor e iff the last 2K digits are, where
+//      E = e + P1 j (+ P2 if that is < 2K) and 2^E mod 10^(2K) (zero padded) is computed with GMP.
+typedef struct { void (*fn)(u64, u64, int); u64 lo, hi; int t; } pfor_t;
+static void *pfor_run(void *a) { pfor_t *p = a; p->fn(p->lo, p->hi, p->t); return NULL; }
+static void pfor(u64 n, int nth, void (*fn)(u64, u64, int)) {    // fn(lo, hi, t) on nth equal parts of [0, n)
+    pthread_t *tid = malloc(nth * sizeof *tid); pfor_t *pf = malloc(nth * sizeof *pf);
+    for (int t = 0; t < nth; t++) {
+        pf[t] = (pfor_t){ fn, n * (u64)t / (u64)nth, n * (u64)(t + 1) / (u64)nth, t };
+        if (pthread_create(&tid[t], NULL, pfor_run, &pf[t])) { fprintf(stderr, "pthread_create failed\n"); exit(1); }
+    }
+    for (int t = 0; t < nth; t++) pthread_join(tid[t], NULL);
+    free(tid); free(pf);
+}
+static u64 *KT_Y, KT_NG, KT_J, KT_OFF[1025];
+static u32 *KT_PE;
+static uint8_t *KT_DEC;
+static u64 sm64(u64 *s) { u64 z = (*s += 0x9E3779B97F4A7C15ULL); z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ULL; z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL; return z ^ (z >> 31); }
+static void kt_count(u64 lo, u64 hi, int t) { u64 n = 0; for (u64 w = lo; w < hi; w++) n += __builtin_popcountll(BM[w]); KT_OFF[t + 1] = n; }
+static void kt_fill(u64 lo, u64 hi, int t) {     // the set bits e of words [lo, hi), with y = 2^(e - 2K) mod 5^(2K)
+    u64 i = KT_OFF[t], e1 = hi * 64 < P1 ? hi * 64 : P1, y = pow2mod(Y0, lo * 64, Q2);
+    for (u64 e = lo * 64; e < e1; e++) {
+        if ((BM[e >> 6] >> (e & 63)) & 1) { KT_PE[i] = (u32)e; KT_Y[i] = y; i++; }
+        y <<= 1; if (y >= Q2) y -= Q2;
+    }
+}
+static void kt_decide(u64 lo, u64 hi, int t) {   // the SCALAR stage-2 decision at lift index KT_J
+    (void)t;
+    for (u64 i = lo; i < hi; i++) {
+        u64 y = KT_Y[i], alo = y % QQ, ahi = y / QQ, h0 = (TWOK * alo) / QQ, beta = (alo * WW) % QQ;
+        u64 Y = (ahi + beta * KT_J) % QQ, xh = h0 + TWOK * Y;
+        KT_DEC[i] = !bad_of(flK(xh), C_EVEN);
+    }
+}
+static u64 kt_lb(u64 e) { u64 lo = 0, hi = KT_NG; while (lo < hi) { u64 m = lo + (hi - lo) / 2; if (KT_PE[m] < e) lo = m + 1; else hi = m; } return lo; }
+// the GPU's survivors of segment k (early chunks, then the final chunk) into v; returns their number
+static u64 kt_gather(const gctx_t *g, u64 k, u64 *oi, u64 *v, u64 cap) {
+    u64 n = 0;
+    for (; *oi < g->h_ctr[1] && g->h_ovf[*oi].seg == k; (*oi)++)
+        for (u64 q = 0; q < g->h_ovf[*oi].cnt; q++) { if (n < cap) v[n] = g->h_pos[g->h_ovf[*oi].off + q]; n++; }
+    for (u64 q = 0; q < g->h_cnt[k]; q++) { if (n < cap) v[n] = g->h_pos[g->h_off[k] + q]; n++; }
+    return n;
+}
+static int kerneltest(u64 nj, u64 seed, int nth) {
+    u64 nw = (P1 + 63) / 64, sd = seed, segcap = 1 << 20, vcap = 1 << 22;
+    if (nth > 1024) nth = 1024;
+    pfor(nw, nth, kt_count);
+    KT_OFF[0] = 0; for (int t = 0; t < nth; t++) KT_OFF[t + 1] += KT_OFF[t];
+    KT_NG = KT_OFF[nth];
+    KT_Y = malloc(KT_NG * 8); KT_PE = malloc(KT_NG * 4); KT_DEC = malloc(KT_NG);
+    u64 *v = malloc(vcap * 8);
+    if (!KT_Y || !KT_PE || !KT_DEC || !v) { fprintf(stderr, "alloc failed\n"); return 1; }
+    pfor(nw, nth, kt_fill);
+    gctx_t *g = gpu_ctx_new(segcap, 1 << 22);
+    u64 bad1 = 0, nseg1 = 0, ns1 = 0, nsv1 = 0;
+    for (u64 q = 0; q < nj; q++) {                // part 1
+        u64 j = q == 0 ? 0 : q == 1 ? 1 : q == 2 ? QQ - 1 : sm64(&sd) % QQ, ns = 0, pos = 0, oi = 0;
+        KT_J = j; pfor(KT_NG, nth, kt_decide);
+        while (pos < P1) {
+            u64 r = sm64(&sd), len = (r & 3) == 0 ? 1 + (r >> 2) % 128 : 1 + (r >> 2) % (1 << 21);
+            u64 e = (pos + len < P1 && ns + 1 < segcap) ? pos + len : P1;
+            g->h_seg[ns++] = (gseg_t){ (u32)pos, (u32)e, (u32)j }; pos = e;
+        }
+        gpu_run(g, ns);
+        if (g->h_ctr[1] > 1) qsort(g->h_ovf, g->h_ctr[1], sizeof *g->h_ovf, ovf_cmp);
+        for (u64 k = 0; k < ns; k++) {
+            u64 i0 = kt_lb(g->h_seg[k].s), i1 = kt_lb(g->h_seg[k].e), n = kt_gather(g, k, &oi, v, vcap), m = 0, ok = g->h_s1[k] == i1 - i0;
+            for (u64 i = i0; i < i1 && ok; i++) if (KT_DEC[i]) { ok = m < n && m < vcap && v[m] == KT_PE[i]; m++; }
+            ok = ok && m == n;
+            if (!ok && bad1++ < 5) fprintf(stderr, "part 1 mismatch: j=%llu segment [%u, %u) s1 gpu %u host %llu, survivors gpu %llu host >= %llu\n",
+                    (unsigned long long)j, g->h_seg[k].s, g->h_seg[k].e, g->h_s1[k], (unsigned long long)(i1 - i0), (unsigned long long)n, (unsigned long long)m);
+            ns1 += g->h_s1[k]; nsv1 += n;
+        }
+        if (oi != g->h_ctr[1]) bad1++;
+        nseg1 += ns;
+    }
+    printf("kerneltest K=%d dm=%c part 1: %llu lift indices x %llu table entries = %llu stage-2 decisions in %llu segments; s1 %llu, survivors %llu; mismatches %llu\n",
+           KK, DM == 0 ? 'G' : DM == 1 ? 'E' : 'P', (unsigned long long)nj, (unsigned long long)KT_NG, (unsigned long long)(nj * KT_NG),
+           (unsigned long long)nseg1, (unsigned long long)ns1, (unsigned long long)nsv1, (unsigned long long)bad1);
+    u64 n2 = segcap, bad2 = 0, e1c = 0, e2c = 0, oi = 0;   // part 2
+    for (u64 k = 0; k < n2; k++) {
+        u64 e = (sm64(&sd) & 1) ? KT_PE[sm64(&sd) % KT_NG] : sm64(&sd) % P1, j = sm64(&sd) % QQ;
+        g->h_seg[k] = (gseg_t){ (u32)e, (u32)(e + 1), (u32)j };
+    }
+    gpu_run(g, n2);
+    if (g->h_ctr[1] > 1) qsort(g->h_ovf, g->h_ctr[1], sizeof *g->h_ovf, ovf_cmp);
+    mpz_t x, m10; mpz_init(x); mpz_init(m10); mpz_ui_pow_ui(m10, 10, 2 * KK);
+    char buf[64];
+    for (u64 k = 0; k < n2; k++) {
+        u64 e = g->h_seg[k].s, E = e + P1 * (u64)g->h_seg[k].j; if (E < 2 * KK) E += P2;
+        mpz_set_ui(x, 2); mpz_powm_ui(x, x, E, m10); mpz_get_str(buf, 10, x);
+        int L = (int)strlen(buf); uint8_t fk = 0, f2k = 0;
+        for (int p = 0; p < 2 * KK; p++) { uint8_t f = dflags(p < L ? buf[L - 1 - p] - '0' : 0); if (p < KK) fk |= f; f2k |= f; }
+        u64 x1 = !bad_of(fk, C_EVEN), x2 = x1 && !bad_of(f2k, C_EVEN), n = kt_gather(g, k, &oi, v, vcap);
+        int ok = g->h_s1[k] == x1 && n == x2 && (!x2 || v[0] == e);
+        if (!ok && bad2++ < 5) fprintf(stderr, "part 2 mismatch: e=%llu j=%u: s1 gpu %u def %llu, survivors gpu %llu def %llu\n",
+                (unsigned long long)e, g->h_seg[k].j, g->h_s1[k], (unsigned long long)x1, (unsigned long long)n, (unsigned long long)x2);
+        e1c += x1; e2c += x2;
+    }
+    if (oi != g->h_ctr[1]) bad2++;
+    printf("kerneltest K=%d part 2: %llu random (e, j) against 2^E mod 10^%d: last %d digits allowed %llu, last %d digits allowed %llu; mismatches %llu\n",
+           KK, (unsigned long long)n2, 2 * KK, KK, (unsigned long long)e1c, 2 * KK, (unsigned long long)e2c, (unsigned long long)bad2);
+    printf(bad1 + bad2 ? "KERNEL TEST FAILED\n" : "KERNEL TEST PASSED\n");
+    mpz_clear(x); mpz_clear(m10); gpu_ctx_free(g); free(v); free(KT_Y); free(KT_PE); free(KT_DEC);
+    return bad1 + bad2 ? 1 : 0;
+}
+#endif
+
 int main(int argc, char **argv) {
+#ifdef S2_CUDA
+    if (argc >= 5 && !strcmp(argv[1], "kerneltest")) {       // kerneltest G|E NJ SEED [threads=T] (see kerneltest())
+        DM = argv[2][0] == 'G' ? 0 : argv[2][0] == 'E' ? 1 : 2;
+        BADEVEN = DM == 0 ? (F_ZERO | F_FIVE) : DM == 1 ? F_ZERO : 0;
+        int nth = getenv("GSIEVE_THREADS") ? atoi(getenv("GSIEVE_THREADS")) : 1;
+        for (int i = 5; i < argc; i++) if (!strncmp(argv[i], "threads=", 8)) nth = atoi(argv[i] + 8);
+        if (nth < 1) nth = 1;
+        build_fl(FL1, 1); build_fl(FL2, 2); build_fl(FL3, 3); build_fl(FL4, 4); build_fl(FL5, 5);
+        build_bitmap(nth);
+        gpu_init(BM, RK, (P1 + 63) / 64, AB, H0, POS, NGOOD, OK4B, DM);
+        free(AB); free(H0); free(POS); AB = NULL; H0 = NULL; POS = NULL;
+        return kerneltest(strtoull(argv[3], 0, 10), strtoull(argv[4], 0, 10), nth);
+    }
+#endif
     if (argc < 6) { fprintf(stderr, "usage: gsieve mode(main|direct|odd) G|E|P N c0 c1 [dump] [nogmp] [prog] [n0=M] [threads=T]\n"); return 1; }
     const char *mode = argv[1];
     DM = argv[2][0] == 'G' ? 0 : argv[2][0] == 'E' ? 1 : 2;
@@ -769,6 +1098,12 @@ int main(int argc, char **argv) {
 #ifdef S2_AVX2
         build_pack4();
 #endif
+#ifdef S2_CUDA
+        gpu_init(BM, RK, (P1 + 63) / 64, AB, H0, POS, NGOOD, OK4B, DM);    // digit-26 check: DM 0 = G, 1 = E, 2 = P
+        HOSTHASH = host_tables_hash();                                      // (the host copies stay, for the checks)
+        if (getenv("GSIEVE_VERIFY")) VINTERVAL = atoi(getenv("GSIEVE_VERIFY"));
+        if (VINTERVAL < 1) VINTERVAL = 1;
+#endif
         clock_gettime(CLOCK_MONOTONIC, &w1);
         fprintf(stderr, "tables: K=%d variant=%s good=%llu (density %.5f) build %.1fs (wall, %d threads)\n", KK, VARIANT, (unsigned long long)NGOOD,
                 (double)NGOOD / P1, (double)(w1.tv_sec - w0.tv_sec) + 1e-9 * (double)(w1.tv_nsec - w0.tv_nsec), NTH);
@@ -782,8 +1117,23 @@ int main(int argc, char **argv) {
     REC = calloc(c1 > c0 ? c1 - c0 : 1, sizeof *REC);
     pthread_t *tid = malloc(NTH * sizeof *tid);
     if (!REC || !tid) { fprintf(stderr, "alloc failed\n"); return 1; }
-    for (int i = 0; i < NTH; i++) if (pthread_create(&tid[i], NULL, worker, NULL)) { fprintf(stderr, "pthread_create failed\n"); return 1; }
+    void *(*wfn)(void *) = worker;
+#ifdef S2_CUDA
+    pthread_t vtid;
+    if (CFN == main_c) {
+        plan_pieces(); wfn = worker_cuda;
+        if (pthread_create(&vtid, NULL, verifier, NULL)) { fprintf(stderr, "pthread_create failed\n"); return 1; }
+    }
+#endif
+    for (int i = 0; i < NTH; i++) if (pthread_create(&tid[i], NULL, wfn, NULL)) { fprintf(stderr, "pthread_create failed\n"); return 1; }
     for (int i = 0; i < NTH; i++) pthread_join(tid[i], NULL);
+#ifdef S2_CUDA
+    if (CFN == main_c) {                                   // a last check covers every remaining piece
+        __atomic_store_n(&VSTOP, 1, __ATOMIC_SEQ_CST); pthread_join(vtid, NULL);
+        verify_tables();
+        fprintf(stderr, "table checks passed: %llu (device tables against host copies, host tables against their hash)\n", (unsigned long long)NCHECK);
+    }
+#endif
     if (NEXTREP != c1 && c1 > c0) { fprintf(stderr, "reporter incomplete\n"); return 1; }
     if (PROG && c1 > c0) { printf("CDONE %llu points=%llu s4=%llu members=%llu\n", (unsigned long long)(c1 - 1), (unsigned long long)TOT[0], (unsigned long long)TOT[4], (unsigned long long)TOT[7]); fflush(stdout); }
     double el = (double)(clock() - t0) / CLOCKS_PER_SEC;

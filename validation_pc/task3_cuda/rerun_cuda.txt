@@ -1,0 +1,51 @@
+== rerun_production.sh ../../validation_pc/task3_cuda/rerun_cuda ./gsieve_k13_cuda 20 both  start 2026-10-20T20:23:40Z commit 21a0f1f+uncommitted gsieve.c 6043fff87a697bca gsieve_cuda.cu c7edd7af088c3e02 binary 20c241da044bb575
+direct N=40000 N0=36000 c=[0,40001): points=7903308000 s1=0 s2=0 s3=0 s4=58082 gmp=58082 full=0 members=0 | variant=cuda threads=20 wall=23s | prod time=202.44s -> MATCH
+main N=40000 N0=36000 c=[0,11824): points=9103628672000 s1=625596614214 s2=34392589263 s3=13743965103 s4=4 gmp=4 full=0 members=0 | variant=cuda threads=20 wall=51s | prod time=2849.96s -> MATCH
+main N=40000 N0=36000 c=[11824,40001): points=8233380032000 s1=565793590538 s2=31104908440 s3=12430099649 s4=2 gmp=2 full=0 members=0 | variant=cuda threads=20 wall=50s | prod time=2524.00s -> MATCH
+odd N=40000 N0=36000 c=[0,40001): points=11850072000 s1=798440760 s2=0 s3=0 s4=11 gmp=11 full=0 members=0 | variant=cuda threads=20 wall=20s | prod time=100.87s -> MATCH
+all counters match the production DONE lines
+main: c covered 40001/40001, missing []
+direct: c covered 40001/40001, missing []
+odd: c covered 40001/40001, missing []
+  direct_members = 0
+  direct_points = 7903308000
+  direct_s4 = 58082
+  main_members = 0
+  main_points = 17337008704000
+  main_s4 = 6
+  odd_members = 0
+  odd_points = 11850072000
+  odd_s4 = 11
+points total: 17356762084000
+members: none
+main: boundaries 39993 vs 40001, compared at 39993; totals {'points': 17337008704000, 's4': 6, 'members': 0} vs {'points': 17337008704000, 's4': 6, 'members': 0}; all equal
+direct: boundaries 39993 vs 40001, compared at 39993; totals {'points': 7903308000, 's4': 58082, 'members': 0} vs {'points': 7903308000, 's4': 58082, 'members': 0}; all equal
+odd: boundaries 40001 vs 40001, compared at 40001; totals {'points': 11850072000, 's4': 11, 'members': 0} vs {'points': 11850072000, 's4': 11, 'members': 0}; all equal
+per-c counts identical
+direct N=36000 N0=-1 c=[11381,36001): points=15754215548 s1=0 s2=0 s3=0 s4=114910 gmp=114910 full=0 members=0 | variant=cuda threads=20 wall=30s | prod time=399.03s -> MATCH
+main N=36000 N0=-1 c=[7540,7898): points=858547070292 s1=58998835763 s2=3243476704 s3=1296156297 s4=0 gmp=0 full=0 members=0 | variant=cuda threads=20 wall=6s | prod time=235.10s -> MATCH
+main N=36000 N0=-1 c=[7898,36001): points=22174620327420 s1=1523828282820 s2=83772740917 s3=33477512278 s4=4 gmp=4 full=0 members=0 | variant=cuda threads=20 wall=119s | prod time=6256.82s -> MATCH
+odd N=36000 N0=-1 c=[0,10544): points=25255402876 s1=323584816 s2=0 s3=0 s4=21 gmp=21 full=0 members=0 | variant=cuda threads=20 wall=18s | prod time=205.69s -> MATCH
+odd N=36000 N0=-1 c=[10544,36001): points=25234602731 s1=323011944 s2=0 s3=0 s4=9 gmp=9 full=0 members=0 | variant=cuda threads=20 wall=21s | prod time=205.90s -> MATCH
+all counters match the production DONE lines
+DONE mode=main dm=G N=36000 N0=-1 c=[0,7540) K=13 NL=14 variant=cuda points=23593028383664 s1=1621300584398 s2=89131891400 s3=35618843108 s4=7 gmp=7 full=0 members=0 time=2346.34 threads=20 wall=119.26
+DONE mode=direct dm=G N=36000 N0=-1 c=[0,11381) K=13 NL=14 variant=cuda points=17935037560 s1=0 s2=0 s3=0 s4=131256 gmp=131256 full=93 members=0 time=589.65 threads=20 wall=30.72
+main: c covered 36001/36001, missing []
+direct: c covered 36001/36001, missing []
+odd: c covered 36001/36001, missing []
+  direct_members = 0
+  direct_points = 33689253108
+  direct_s4 = 246166
+  main_members = 0
+  main_points = 46626195781376
+  main_s4 = 11
+  odd_members = 0
+  odd_points = 50490005607
+  odd_s4 = 30
+points total: 46710375040091
+members: none
+main: boundaries 35993 vs 36001, compared at 35993; totals {'points': 46626195781376, 's4': 11, 'members': 0} vs {'points': 46626195781376, 's4': 11, 'members': 0}; all equal
+direct: boundaries 35993 vs 36001, compared at 35993; totals {'points': 33689253108, 's4': 246166, 'members': 0} vs {'points': 33689253108, 's4': 246166, 'members': 0}; all equal
+odd: boundaries 36001 vs 36001, compared at 36001; totals {'points': 50490005607, 's4': 30, 'members': 0} vs {'points': 50490005607, 's4': 30, 'members': 0}; all equal
+per-c counts identical
+== exit=0 wall=492s end 2026-10-20T20:31:52Z

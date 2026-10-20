@@ -1,0 +1,100 @@
+== final validation start 2026-10-20T20:42:06Z commit 21a0f1f+uncommitted gsieve.c 6273ada826d413aa gsieve_cuda.cu 4d94556a30d3c1a8 gsieve_cuda.h afd01d38cf130a17
+== (1) ./val_cuda.sh ../../validation_pc/task3_cuda/val_cuda
+== start Tue Oct 20 20:42:06 UTC 2026 commit 21a0f1f gsieve.c 6273ada826d413aa gsieve_cuda.cu 4d94556a30d3c1a8
+gpu: NVIDIA GeForce RTX 3060 Ti, 610.88, 8192 MiB; CPU variants: avx2 scalar
+K kerneltest K=13 G NJ=1024 exit=0 159s
+  mismatches 0 mismatches 0 
+K kerneltest K=13 E NJ=16 exit=0 22s
+  mismatches 0 mismatches 0 
+K kerneltest K=12 G NJ=256 exit=0 12s
+  mismatches 0 mismatches 0 
+K kerneltest K=12 E NJ=16 exit=0 6s
+  mismatches 0 mismatches 0 
+A suite V=cuda T=1 exit=0 60s
+A suite V=cuda T=8 exit=0 37s
+C val_prodrow N=36000 c=34200 n0=-1 exit=0 4s
+  c=34200: region points 9632000, S2 C=36502 python=36502 OK
+C val_prodrow N=36000 c=33000 n0=-1 exit=0 8s
+  c=33000: region points 26853200, S2 C=101290 python=101290 OK
+C val_prodrow N=36000 c=30000 n0=-1 exit=0 29s
+  c=30000: region points 107706200, S2 C=406909 python=406909 OK
+C val_prodrow N=36000 c=25000 n0=-1 exit=0 99s
+  c=25000: region points 362461200, S2 C=1368616 python=1368616 OK
+C val_prodrow N=40000 c=39500 n0=36000 exit=0 3s
+  c=39500: region points 725700, S2 C=2731 python=2731 OK
+C val_prodrow N=40000 c=38200 n0=36000 exit=0 4s
+  c=38200: region points 9632000, S2 C=36628 python=36628 OK
+C val_prodrow N=40000 c=35990 n0=36000 exit=0 14s
+  c=35990: region points 48044000, S2 C=181475 python=181475 OK
+C val_prodrow N=40000 c=30000 n0=36000 exit=0 52s
+  c=30000: region points 191804000, S2 C=722769 python=722769 OK
+D xvariant [main G 1000 0 1001] exit=0 24s
+D xvariant [main E 400 0 401] exit=0 43s
+D xvariant [main G 36000 20000 20001] exit=0 21s
+D xvariant [main G 40000 35990 36000 n0=36000] exit=0 15s
+D xvariant [main G 36000 7540 7541] exit=0 49s
+D xvariant [main G 40000 11824 11826 n0=36000] exit=0 25s
+D xvariant [direct G 3000 0 3001] exit=0 5s
+D xvariant [direct E 400 0 401] exit=0 1s
+D xvariant [odd G 3000 0 3001] exit=0 3s
+D xvariant [odd E 400 0 401] exit=0 8s
+P val_proddone main:7540:7898 exit=0 7s
+  variant=cuda threads=20 wall=7s | prod time=235.10s -> MATCH
+== end Tue Oct 20 20:54:04 UTC 2026: ALL CHECKS PASSED
+== val_cuda.sh exit=0
+== (2) ./val_all.sh ../../validation_pc/task3_cuda/val_all
+== start Tue Oct 20 20:54:04 UTC 2026 commit 21a0f1f gsieve.c 6273ada826d413aa
+variants: avx2 scalar; default build: variant=avx2
+A suite V=avx2 T=4 exit=0 34s
+A suite V=scalar T=4 exit=0 31s
+A suite default build T=1 exit=0 54s
+B suite -march=haswell exit=0 35s
+  variant variant=avx2 AVX-512 instructions: 0
+B suite -march=x86-64 exit=0 33s
+  variant variant=scalar AVX-512 instructions: 0
+C val_prodrow N=36000 c=34200 n0=-1 exit=0 4s
+  c=34200: region points 9632000, S2 C=36502 python=36502 OK
+C val_prodrow N=36000 c=33000 n0=-1 exit=0 9s
+  c=33000: region points 26853200, S2 C=101290 python=101290 OK
+C val_prodrow N=40000 c=39500 n0=36000 exit=0 1s
+  c=39500: region points 725700, S2 C=2731 python=2731 OK
+C val_prodrow N=40000 c=38200 n0=36000 exit=0 4s
+  c=38200: region points 9632000, S2 C=36628 python=36628 OK
+C val_prodrow N=40000 c=35990 n0=36000 exit=0 14s
+  c=35990: region points 48044000, S2 C=181475 python=181475 OK
+D xvariant [main G 1000 0 1001] exit=0 19s
+D xvariant [main E 400 0 401] exit=0 29s
+D xvariant [main G 36000 20000 20001] exit=0 16s
+D xvariant [main G 40000 35990 36000 n0=36000] exit=0 12s
+D xvariant [direct G 3000 0 3001] exit=0 6s
+D xvariant [direct E 400 0 401] exit=0 0s
+D xvariant [odd G 3000 0 3001] exit=0 3s
+D xvariant [odd E 400 0 401] exit=0 8s
+== end Tue Oct 20 20:59:16 UTC 2026: ALL CHECKS PASSED
+== val_all.sh exit=0
+== (3) rerun_production.sh ../../validation_pc/task3_cuda/rerun_cuda_final ./gsieve_k13_cuda 20 both (binary 7fcff6cf105dee0d)
+== rerun exit=0 wall=479s
+direct N=40000 N0=36000 c=[0,40001): points=7903308000 s1=0 s2=0 s3=0 s4=58082 gmp=58082 full=0 members=0 | variant=cuda threads=20 wall=25s | prod time=202.44s -> MATCH
+main N=40000 N0=36000 c=[0,11824): points=9103628672000 s1=625596614214 s2=34392589263 s3=13743965103 s4=4 gmp=4 full=0 members=0 | variant=cuda threads=20 wall=52s | prod time=2849.96s -> MATCH
+main N=40000 N0=36000 c=[11824,40001): points=8233380032000 s1=565793590538 s2=31104908440 s3=12430099649 s4=2 gmp=2 full=0 members=0 | variant=cuda threads=20 wall=52s | prod time=2524.00s -> MATCH
+odd N=40000 N0=36000 c=[0,40001): points=11850072000 s1=798440760 s2=0 s3=0 s4=11 gmp=11 full=0 members=0 | variant=cuda threads=20 wall=20s | prod time=100.87s -> MATCH
+all counters match the production DONE lines
+main: c covered 40001/40001, missing []
+direct: c covered 40001/40001, missing []
+odd: c covered 40001/40001, missing []
+points total: 17356762084000
+members: none
+per-c counts identical
+direct N=36000 N0=-1 c=[11381,36001): points=15754215548 s1=0 s2=0 s3=0 s4=114910 gmp=114910 full=0 members=0 | variant=cuda threads=20 wall=29s | prod time=399.03s -> MATCH
+main N=36000 N0=-1 c=[7540,7898): points=858547070292 s1=58998835763 s2=3243476704 s3=1296156297 s4=0 gmp=0 full=0 members=0 | variant=cuda threads=20 wall=6s | prod time=235.10s -> MATCH
+main N=36000 N0=-1 c=[7898,36001): points=22174620327420 s1=1523828282820 s2=83772740917 s3=33477512278 s4=4 gmp=4 full=0 members=0 | variant=cuda threads=20 wall=110s | prod time=6256.82s -> MATCH
+odd N=36000 N0=-1 c=[0,10544): points=25255402876 s1=323584816 s2=0 s3=0 s4=21 gmp=21 full=0 members=0 | variant=cuda threads=20 wall=18s | prod time=205.69s -> MATCH
+odd N=36000 N0=-1 c=[10544,36001): points=25234602731 s1=323011944 s2=0 s3=0 s4=9 gmp=9 full=0 members=0 | variant=cuda threads=20 wall=25s | prod time=205.90s -> MATCH
+all counters match the production DONE lines
+main: c covered 36001/36001, missing []
+direct: c covered 36001/36001, missing []
+odd: c covered 36001/36001, missing []
+points total: 46710375040091
+members: none
+per-c counts identical
+== end 2026-10-20T21:07:15Z

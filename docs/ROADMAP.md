@@ -31,8 +31,18 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
 1. **Port stage 1 (bitmap scan) and stage 2 (affine lift) to CUDA.**
    - One thread block per row segment; the bitmap and AB/H0/POS tables live in device memory (≈1 GB).
    - Emit stage-2 survivors (positions) to the host, where stages 3–5 run unchanged.
+   - DONE in session 3: `gsieve_cuda.cu`, variant `cuda` (`make cuda`), with fail-stop table checks for non-ECC
+     memory (`docs/CHAIN_SIEVE.md`, "CUDA variant").
 2. **Validation:** the GPU stage-2 survivor sets must equal the CPU sets exactly on test regions (several
    c-slices at N = 36,000, and E-mode at N = 160). Measure throughput.
+   - DONE in session 3 (`docs/NOTEBOOK.md`, task 3), all by `val_cuda.sh`:
+     - kernel tests on the whole table;
+     - the suite (E mode 314/314);
+     - eight production slices against exact arithmetic;
+     - cross-variant dumps;
+     - a full re-run of the logged 10^40000 production, with every counter and per-c count equal.
+   - Throughput: 1.45–2.1·10¹¹ points/s, 4.7–6× the CPU. Stages 3–5 on the CPU limit it; stage 3 on the GPU would
+     gain at most about 1.3×.
 3. **Extend in shells** with `n0`, archiving logs at each step: 40,000 → 50,000 → 60,000 → … → 100,000.
    - Acceptance: `aggregate.py N n0` shows full coverage of every path, no members, and survival rates
      that match theory.

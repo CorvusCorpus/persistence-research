@@ -479,3 +479,122 @@ Main path G, table build excluded, best of 2 (`validation_pc/bench.txt`).
 - Every check passes on this PC with the committed code.
 - No result in `docs/RESULTS.md` changes status. The 10^40000 claim keeps its evidence. The odd-thread bookkeeping
   is now independently audited on regions that contain candidates.
+
+---
+
+## 2026-10-20 · Session 3 (desktop PC) · Task 3: CUDA port of stages 1–2
+
+Same machine and WSL distribution as step 1 (D.1). Base commit `21a0f1f`; the code is in the commit that adds this
+entry. Logs are in `validation_pc/task3_cuda/`.
+
+### 3.1 What was built
+- **`work/gsieve/gsieve_cuda.cu` and `gsieve_cuda.h`:** stages 1–2 of the main path on the GPU.
+  - The kernel takes one block of 256 threads per row segment, and computes the rank range [r0, r1) from RK/BM.
+  - Stage-2 arithmetic is the `S2_AVX512`/`S2_AVX2` integer arithmetic: a Montgomery multiply mod 5^K, and
+    ⌊v/10⁴⌋ = (v·M₄)>>45 on split operands below 2³¹. No floating point.
+  - Survivors are compacted in index order through shared memory.
+  - Early chunks are written past 2048 survivors per segment, and buffers grow (with a re-launch) on overflow, so
+    nothing is dropped.
+  - Compile-time checks of QINV, M₄ and Q < 2³¹. ptxas reports 40 registers, no spills, 13.7 KB of shared memory,
+    so occupancy is full.
+- **`gsieve.c`, variant `S2_CUDA` (`make cuda` builds `gsieve_k1{3,2}[_nl7]_cuda`).**
+  - Pieces: rows b₀ ≤ b < b₁ of one c, about 2²⁹ points each. The row segments are computed with `main_c`'s code, the
+    GPU runs one launch per piece, then the same `later_stages()` calls follow.
+  - A per-piece reporter writes in (c, piece) order. The direct and odd paths and stages 3–5 are unchanged.
+  - Host checks on every launch: survivors strictly increasing inside their segment, at most s1 of them, and totals
+    equal to the device counters.
+- **Fail-stop table checks.** The device tables are uploaded once and compared with the host copies at upload,
+  every `GSIEVE_VERIFY` (60) seconds and at the end. The host tables of stages 3–5 are re-hashed at each check.
+  - Output is written only for pieces that finished before a passed check, and a failed check stops the program.
+  - The reason is that GeForce memory and the desktop's RAM have no ECC.
+  - The first version of the upload check reported a mismatch on the 1.2 KB window mask. A pageable `cudaMemcpy`
+    had returned before its DMA landed, and the check read the data back on another stream. Fixed with a device
+    synchronization.
+- **`kerneltest` mode** of the CUDA build, `val_cuda.sh` (the whole CUDA validation), and a `-DBENCH2` path in
+  `main_piece` for benchmarks.
+- **CPU variants:** unchanged apart from `main()` choosing the worker function.
+
+### 3.2 Validation of the GPU stages (binary before the fail-stop checks, then the final binary in 3.4)
+1. **Kernel tests** (`kerneltest`, `validation_pc/task3_cuda/kerneltest.txt`).
+   - Whole table, decisions against the SCALAR formula: y = 2^(e−2K) mod 5^2K recomputed by doubling, with `%` and
+     `/`, and neither AB/H0 nor the Montgomery form used. Segments have random lengths (a quarter of them 1–128).
+   - Random points against the definition: 2²⁰ random (e, j), each against 2^E mod 10^2K computed with GMP.
+   - Zero mismatches in every build:
+
+     | build | stage-2 decisions | segments |
+     |---|---|---|
+     | K = 13 G | 6.87·10¹⁰ (1024 lift indices × 67,108,864 entries) | 1,271,892 |
+     | K = 13 E | 4.4·10⁹ | 19,805 |
+     | K = 12 G | 4.3·10⁹ | 63,823 |
+     | K = 12 E | 9.8·10⁸ | 3,889 |
+
+   - E mode, with about 25% stage-2 survival, exercises the early chunks and the buffer growth with re-launch.
+2. **Validation suite** (`make test V=cuda`) at T = 1 and T = 8: every check passes. E mode end to end finds
+   314/314 for K = 13 and K = 12, and every stage decision is verified (`suite_cuda_T*.log`).
+3. **Production slices against exact arithmetic** (`val_prodrow.py` with the CUDA binary, `prodrow_*.log`): the
+   stage-2 survivor sets are identical and the limb-engine decisions are verified, 7.6·10⁸ points in all.
+   - N = 36000: c = 34200, 33000, 30000, 25000.
+   - Shell n0 = 36000: c = 39500, 38200, 35990, 30000.
+4. **Cross-variant dumps** (`val_xvariant.py`, `xvariant.txt`): CUDA at T = 1 and T = 8, avx2 and scalar give
+   identical sorted dumps and counters on ten regions.
+   - The regions include the c values 7540 (2.4·10⁹ points, five pieces) and 11824–11825 of the shell.
+   - Unsorted, the CUDA dumps at N = 150 and N = 1000 (7,363,950 lines) and every CDONE line are byte-identical to
+     avx2.
+5. **Full re-run of the logged production** (`rerun_production.sh … ./gsieve_k13_cuda 20 both`, 492 s,
+   `rerun_cuda.txt`).
+   - Every complete invocation of the base run and the shell reproduces all eight DONE counters; the killed ranges
+     main [0, 7540) and direct [0, 11381) were also re-run.
+   - `aggregate.py`: full coverage of every path, 46,710,375,040,091 and 17,356,762,084,000 points (equal to the
+     ledger), no members.
+   - `compare_cdone.py`: per-c counts identical at all 35,993 + 39,993 shared boundaries.
+   - **So the whole 10^40000 computation (6.4·10¹³ candidates) has now been re-executed**, with an independent
+     implementation of stages 1–2 (GPU), on another machine, and with identical results. Session 2 had re-executed
+     about 1.4% of it.
+
+### 3.3 Benchmark (`validation_pc/task3_cuda/bench_cuda.txt`)
+Main path G, table build excluded.
+
+| workload | T | cuda 10⁹ points/s | avx2 10⁹ points/s |
+|---|---|---|---|
+| N = 36000, c ∈ [7540, 7740) (4.8·10¹¹ points) | 1 / 2 / 4 / 8 | 23.6 / 50.0 / 93.8 / 129 | 5.9 / 11.4 / 21.6 / 27.6 |
+| same | 12 / 16 / 20 | 154 / 164 / 169 (209 in a single run) | 31.6 / 34.7 / 34.8 |
+| shell N = 50000, n0 = 40000, c ∈ [0, 200) | 20 | 155 | 32.2 |
+| shell N = 100000, n0 = 90000, c ∈ [0, 100) | 20 | 145 | 30.7 |
+
+- **The pre-port estimate** was 5·10¹⁰–2·10¹¹ points/s. Measured: 1.45–2.1·10¹¹, 4.7–6× the CPU.
+- **GPU ceiling.** Stages 1–2 alone (`-DBENCH2`) run at 2.6–2.8·10¹¹ points/s. The full pipeline reaches 60–75% of
+  that, so the CPU's stages 3–5 limit it.
+- **CPU cost on one P-core** (avx2 `-DBENCH2`/`-DBENCH3` builds), per stage-2 survivor: stage 3 costs 3.3 ns and
+  stages 4–5 cost 14 ns. On the cloud machine it was about 40 ns in all.
+- **Decision: stage 3 stays on the CPU** (task instruction: ask before deviating if it would help). It is under 20%
+  of the CPU work, so moving it would gain at most about 1.3×.
+- **Nsight Compute** needs the Windows setting "allow access to GPU performance counters" (`ERR_NVGPUCTRPERM`). It was
+  not changed; the benchmarks above use timing builds instead.
+- **Task 4 estimate:** about 9.4·10¹⁴ main-path points from 40,000 to 100,000. That is about 1.7 h on the GPU
+  pipeline plus about 0.2 h for the direct and odd paths, against about 8.6 h on the CPU alone.
+
+### 3.4 Final validation of the binaries to be used for task 4
+- **Sources:** `gsieve.c` `6273ada8…`, `gsieve_cuda.cu` `4d94556a…`, `gsieve_cuda.h` `afd01d38…` (in the commit that
+  adds this entry).
+- **Binaries** (all hashes in `validation_pc/task3_cuda/val_cuda/binaries.sha256`):
+  - `gsieve_k13_cuda` = `7fcff6cf…`, built with nvcc 13.3 `-O3 -arch=sm_86` and gcc 13.3 `-O3 -march=native`, linked
+    statically to cudart.
+  - The CPU binaries rebuilt from the same source are byte-identical to the step-1 builds (`gsieve_k13` =
+    `46f8308b…`). So the CUDA changes leave the CPU variants untouched, and their step-1 validation carries over.
+- **Runs** (20:42–21:07 UTC, `validation_pc/task3_cuda/final_validation.out`): all three pass.
+  1. `./val_cuda.sh` (12 min): **ALL CHECKS PASSED**.
+     - Kernel tests: 0 mismatches in all four builds, part 1 and part 2.
+     - Suite V=cuda at T = 1 and T = 8.
+     - Eight production slices against exact arithmetic.
+     - Ten cross-variant regions.
+     - The logged invocation main [7540, 7898): MATCH, 7 s.
+  2. `./val_all.sh` (CPU variants, 5 min): **ALL CHECKS PASSED**.
+  3. `rerun_production.sh … ./gsieve_k13_cuda 20 both` (479 s): the whole logged 10^40000 computation again.
+     - Every complete invocation MATCHes; the killed ranges were re-run.
+     - Coverage is complete with 46,710,375,040,091 + 17,356,762,084,000 points and no members, and the per-c counts
+       are identical.
+     - Logs: `rerun_cuda_final.tar.xz` (SHA-256 `f9d4e0d6…`, with the per-file hashes in `rerun_cuda_final.sha256`).
+- **Status:** no result in `docs/RESULTS.md` changes status. Claim 1.1 gains a complete independent re-execution
+  (GPU stages 1–2, twice) as evidence; it stays COMPUTATIONAL.
+- **For task 4.** Production uses `gsieve_k13_cuda` `7fcff6cf…`. This desktop has no ECC memory: the fail-stop table
+  checks guard the tables, and an independent second pass guards against the remaining transient faults.

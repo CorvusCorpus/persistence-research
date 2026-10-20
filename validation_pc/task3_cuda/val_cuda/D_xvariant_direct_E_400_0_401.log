@@ -1,0 +1,5 @@
+./gsieve_k13_cuda:1: variant=cuda lines=13413 sha256=ad01962777c996f3 counters=('3571908', '0', '0', '0', '13412', '13412', '13412', '1') (0s)
+./gsieve_k13_cuda:8: variant=cuda lines=13413 sha256=ad01962777c996f3 counters=('3571908', '0', '0', '0', '13412', '13412', '13412', '1') (0s)
+./gsieve_k13_avx2:8: variant=avx2 lines=13413 sha256=ad01962777c996f3 counters=('3571908', '0', '0', '0', '13412', '13412', '13412', '1') (0s)
+./gsieve_k13_scalar:8: variant=scalar lines=13413 sha256=ad01962777c996f3 counters=('3571908', '0', '0', '0', '13412', '13412', '13412', '1') (0s)
+identical dumps and counters across 4 binaries for: direct E 400 0 401

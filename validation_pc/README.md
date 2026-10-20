@@ -13,3 +13,16 @@ Step 1 (20 Oct 2026, commit `c471a35`, binaries built from `gsieve.c` `3f4827dcâ
 | `audit.txt` | `audit/run_audit.sh` |
 
 Later steps keep their logs in subdirectories.
+
+`task3_cuda/` (task 3, CUDA variant; `docs/NOTEBOOK.md` 3.1â€“3.4):
+
+| file | run |
+|---|---|
+| `kerneltest.txt`, `suite_cuda_T{1,8}.log`, `prodrow_*.log`, `xvariant.txt` | first checks of the CUDA build (3.2) |
+| `rerun_cuda.txt`, `rerun_cuda.tar.xz` | full re-run of the logged production with the first CUDA build (3.2) |
+| `bench_cuda.txt` | benchmarks (3.3) |
+| `final_validation.out`, `val_cuda/`, `val_all/` | `val_cuda.sh` and `val_all.sh` on the final binaries (3.4) |
+| `rerun_cuda_final.txt`, `rerun_cuda_final.tar.xz` | full re-run of the logged production with the final CUDA binary (3.4) |
+
+The `.tar.xz` archives hold the re-run logs in `aggregate.py` format. Unpack one with `tar -xJf`, then run, for
+example, `python3 work/gsieve/aggregate.py 36000 -1 validation_pc/task3_cuda/rerun_cuda_final`.

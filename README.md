@@ -51,7 +51,9 @@ make                  # CPU helpers, zf7, chain sieve (best stage-2 variant for 
 make test             # chain-sieve validation suite + base-10 smoke test + record/coverage checks
 make records-check    # SHA-256 manifest of the record files + production-log coverage
 make logs-tarball     # dist/persistence-logs-<commit>.tar.xz for a GitHub release
+make -C work/gsieve cuda   # optional: CUDA variant of the chain sieve (stages 1-2 on an NVIDIA GPU, CUDA 13)
 ```
+On Windows, `scripts/setup_wsl_cuda.sh` sets up a WSL2 distribution with all of the above, CUDA included.
 Individual pieces, from `work/gsieve/`: `make test` (validation suite),
 `python3 aggregate.py 36000 -1 logs` (base run coverage), `python3 aggregate.py 40000 36000 logs`
 (extension shell coverage). Re-deriving a base-10 node from scratch: `scripts/smoke_base10.py NODE ...`

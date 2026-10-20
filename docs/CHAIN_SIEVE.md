@@ -82,6 +82,9 @@ later stages are shared, and all four make the same decisions.
 | `avx512` | AVX-512 F/DQ/BW/VL | 32×32-bit multiply-shift on split operands (below) | `vpcompressq` |
 | `avx2` | AVX2 | the same | permutation-table left-pack |
 | `scalar` | any C compiler | `%` and `/` | — |
+| `cuda` (session 3, `make cuda`) | NVIDIA GPU, CUDA 13 | the same, on the GPU | warp ballot + scan, in index order |
+
+The `cuda` variant is described in its own section below.
 
 **Exact division without IFMA.** This uses the standard multiply-shift division by an invariant integer
 (Granlund–Montgomery 1994). Let M₄ = ⌈2⁴⁵/10⁴⌉ = 3,518,437,209 < 2³², so M₄·10⁴ − 2⁴⁵ = 1168.
@@ -114,6 +117,70 @@ They take c values from an atomic counter in increasing order. Each worker hands
   - `threads=` and `wall=` are appended to the DONE line, and `variant=` is inserted after `NL=`.
 - `prod.py` worker `ALL` runs every path in one process (`THREADS`, `EXE` environment variables).
 
+## CUDA variant (session 3, 20 Oct 2026)
+
+`gsieve_k13_cuda` (`make cuda`; `-DS2_CUDA`, device code in `gsieve_cuda.cu`) runs stages 1–2 of the main path
+on an NVIDIA GPU. Everything else is the CPU code of the other variants, unchanged: the region bounds, stages 3–5
+(`later_stages`), the direct and odd paths, the reporter and the output format.
+
+**Work flow.**
+- **Pieces.** A piece is rows b₀ ≤ b < b₁ of one c, about 2²⁹ region points (`GSIEVE_PIECE`). Every c has at
+  least one piece.
+- **Workers.** The worker threads (`threads=T`) take pieces in increasing order, each with its own CUDA stream and
+  buffers. For its piece, a worker computes the row segments with the code of `main_c` (region bounds, λ, j, r, the
+  wrap at P1) and runs stages 1–2 of all of them in one launch.
+- **What the GPU returns.** Per segment: s1 = r1 − r0, and the bit positions of the stage-2 survivors in
+  increasing order. That is exactly the content of `PBUF` in the CPU variants.
+- **Later stages.** The worker walks the segments in row order. It makes the same `later_stages()` calls as `scan()`
+  in the CPU variants, with the same arguments; tb and M follow the rows as in `main_c` (M at b₀ is
+  3^b₀·7^c mod 10^126 by GMP).
+- **Output.** Pieces are written in increasing (c, piece) order, so dumps and logs are byte-identical to the CPU
+  variants'. Only the DONE line's timing fields and variant name differ.
+
+**Kernel.** One block of 256 threads per row segment.
+- **Stage 1.** The block's first thread computes the rank range [r0, r1) from RK and BM, as the CPU variants do.
+- **Stage 2.** For each index i in [r0, r1):
+  - Y = (A_hi + β·j) mod 5^K, by one Montgomery multiplication (QINV = −5^−K mod 2³²);
+  - the K-digit block xh = h0 + 2^K·Y is checked 4 digits at a time, with ⌊v/10⁴⌋ = (v·M₄) >> 45 on the split
+    Y = 10⁴·sq + r.
+  - This is the integer arithmetic of `S2_AVX512`/`S2_AVX2`: every divided value is < 2³¹, and there is no
+    floating point.
+- **Compaction.** Survivors are compacted in increasing i by warp ballots and one warp-level scan per tile of 1024
+  indices, through shared memory, and written per segment.
+- **No silent drops.** A segment with more than 2048 survivors writes earlier chunks as extra records. A launch with
+  more survivors than its buffer holds grows the buffer and runs again.
+- **Host checks on every launch.** Survivors must be strictly increasing positions inside their segment, at most s1
+  of them, and the totals must equal the device counters. Any violation stops the program.
+- 40 registers per thread, no spills, 13.7 KB of shared memory per block: full occupancy on sm_86.
+
+**Fail-stop table checks (non-ECC memory).** GeForce memory and the desktop's RAM have no ECC.
+- **Upload.** The tables BM, RK, AB, H0, POS and the window mask (1.12 GB for K = 13, mode G) are uploaded once and
+  compared byte for byte with the host copies, which stay allocated.
+- **Periodic checks.** Every `GSIEVE_VERIFY` seconds (default 60), and once more at the end, the device tables are
+  compared with the host copies again. The host tables that stages 3–5 read (TOP, T2, digit-flag tables) are
+  re-hashed.
+- **Why this suffices.** The tables are never written after the upload, so a memory fault that changes them
+  persists until a check finds it.
+- **What gets written.** Each piece is stamped with the epoch in which it finished. A c is written only after every
+  one of its pieces finished before a check that then passed. A failed check stops the program, so a log never
+  contains results computed after the last passed check, and `prod.py` resumes from its last CDONE line.
+- **What it does not cover.** Transient faults in registers, shared memory or transfers; an independent second run
+  catches those.
+
+**Throughput** (RTX 3060 Ti + i7-12700F, 20 threads, main path G, table build excluded):
+
+| workload | cuda, 10⁹ points/s | avx2 (CPU only) | ratio |
+|---|---|---|---|
+| N = 36,000, c ∈ [7540, 7740), 4.8·10¹¹ points | 169–209 | 34.8 | 4.9–6.0 |
+| shell N = 50,000, n0 = 40,000, c ∈ [0, 200), 5.4·10¹¹ points | 155 | 32.2 | 4.8 |
+| shell N = 100,000, n0 = 90,000, c ∈ [0, 100), 5.7·10¹¹ points | 145 | 30.7 | 4.7 |
+
+- **The CPU limits the pipeline.** Stages 1–2 alone (`-DBENCH2`) run at 2.6–2.8·10¹¹ points/s on the GPU.
+- **CPU cost on one P-core**, per stage-2 survivor: stage 3 (leading-digit table) 3.3 ns, stages 4–5 14 ns.
+- **Stage 3 stays on the CPU.** Moving it to the GPU would gain at most about 1.3×.
+- **Estimate for N = 10⁵.** The main path of all shells 40,000 → 100,000 (about 9.4·10¹⁴ points) takes about
+  1.7 h. The direct and odd paths take about 0.2 h on the CPU.
+
 ## Validation
 
 - Stage decisions (bitmap+lift, leading-digit rejections, limb engine) compared one by one with exact
@@ -138,6 +205,19 @@ They take c values from an atomic counter in increasing order. Each worker hands
   - **Cross-variant dumps.** Every variant and thread count produces identical dumps and counters on eight
     regions of up to 10⁹ points.
   - **Threads.** T = 4 output is byte-identical to T = 1, and table fingerprints are equal for every T.
+- **Session 3 (20 Oct 2026): CUDA variant**, on the desktop (i7-12700F without AVX-512, RTX 3060 Ti). Details are in
+  `docs/NOTEBOOK.md`, task 3; logs in `validation_pc/task3_cuda/`.
+  - **Kernel tests.** The GPU's stage-1/2 decisions agree with independent host computations: on every table entry
+    for 1024 lift indices (6.9·10¹⁰ decisions), and on 2²⁰ random points each against 2^E mod 10²⁶ (GMP).
+  - **Suite.** It passes for the CUDA build at T = 1 and T = 8, with E mode end to end at 314/314.
+  - **Production slices.** Eight slices (7.6·10⁸ points) have stage-2 survivor sets equal to exact arithmetic.
+  - **Dumps.** The dumps equal those of avx2 and scalar on ten regions, and are byte-identical in order (CDONE lines
+    included).
+  - **The whole logged computation (6.4·10¹³ candidates) was re-executed twice** with the CUDA variant. Every
+    counter of every invocation and every per-c count equals the production logs.
+  - **Step 1 on the desktop.** On the same commit, the CPU suite (`val_all.sh`), `make test-prod` and the
+    independent reference (`audit/run_audit.sh`, now including regions that contain real odd-thread candidates) all
+    pass.
 
 ## Production runs
 
