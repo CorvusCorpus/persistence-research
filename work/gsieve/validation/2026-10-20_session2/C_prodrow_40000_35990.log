@@ -1,0 +1,1 @@
+DONE mode=main dm=G N=40000 N0=36000 c=[35990,35991) K=13 NL=14 variant=avx512 points=48044000 s1=3297147 s2=181475 s3=72267 s4=0 gmp=0 full=0 members=0 time=0.10 threads=4 wall=0.11

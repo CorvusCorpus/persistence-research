@@ -10,3 +10,9 @@ B suite -march=x86-64 exit=0 72s
   variant variant=scalar AVX-512 instructions: 0
 C val_prodrow N=36000 c=34200 n0=-1 exit=0 14s
   c=34200: region points 9632000, S2 C=36502 python=36502 OK
+C val_prodrow N=36000 c=33000 n0=-1 exit=0 24s
+  c=33000: region points 26853200, S2 C=101290 python=101290 OK
+C val_prodrow N=40000 c=39500 n0=36000 exit=0 10s
+  c=39500: region points 725700, S2 C=2731 python=2731 OK
+C val_prodrow N=40000 c=38200 n0=36000 exit=0 11s
+  c=38200: region points 9632000, S2 C=36628 python=36628 OK
