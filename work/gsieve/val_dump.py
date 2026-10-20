@@ -1,8 +1,9 @@
 # Validate main-path stage decisions of gsieve against exact big-integer arithmetic.
+# usage: val_dump.py K G|E|P N [exe]   (exe defaults to ./gsieve_k<K>)
 import subprocess, sys, math
 K = int(sys.argv[1]); dm = sys.argv[2]; N = int(sys.argv[3]); NL = 14
 XMIN = 9 * NL + 4; AMIN = 2 * K
-exe = f"./gsieve_k{K}"
+exe = sys.argv[4] if len(sys.argv) > 4 else f"./gsieve_k{K}"
 out = subprocess.run([exe, "main", dm, str(N), "0", str(N + 1), "dump"], capture_output=True, text=True, check=True).stdout
 S = {k: set() for k in ("S2", "R3", "R4", "S4")}; members = []; done = None
 for line in out.splitlines():

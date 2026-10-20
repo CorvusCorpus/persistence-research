@@ -28,18 +28,27 @@ Computer-assisted research on multiplicative persistence. Current state is summa
 
 ## Environment
 - Linux, gcc ≥ 11, GMP, MPFR (`libgmp-dev`, `libmpfr-dev`), Python ≥ 3.10 with `python-flint` and `mpmath`.
-- The chain sieve (`work/gsieve/gsieve.c`) needs AVX-512 (F, DQ, BW, VL, IFMA, VBMI2) and BMI2. On other
-  CPUs an AVX2 port is needed (ROADMAP P1); a CUDA port is ROADMAP P2.
-- Build with `cd work && make`. Test with `make -C work/gsieve test`. Run scripts from `work/` (base-10
-  and small-base code) or `work/gsieve/` (chain sieve), because they use relative paths.
+- The chain sieve (`work/gsieve/gsieve.c`) builds on any x86-64. The build picks the best stage-2 variant
+  the target supports: `ifma` (AVX-512 IFMA, the original production build), `avx512` (AVX-512 F/DQ/BW/VL),
+  `avx2`, then `scalar`. All four make identical decisions (`docs/CHAIN_SIEVE.md`). A CUDA port is
+  ROADMAP P2.
+- Build with `make` (repository root). Test with `make test`, or `make -C work/gsieve test [V=variant]`.
+  Run scripts from `work/` (base-10 and small-base code) or `work/gsieve/` (chain sieve), because they use
+  relative paths. Log every run in `docs/NOTEBOOK.md`.
 
 ## Key commands
-- **Chain sieve production.** `cd work/gsieve && python3 prod.py N A|B BUDGET_SECONDS [N0]`. Worker A and
-  worker B split the work; `N0` restricts to the shell N0 < m ≤ N.
+- **Chain sieve production.** `cd work/gsieve && python3 prod.py N A|B|ALL BUDGET_SECONDS [N0]`.
+  - Worker A and worker B split the work between two processes; `ALL` runs every path in one process with
+    `THREADS` threads (default: all CPUs).
+  - `N0` restricts to the shell N0 < m ≤ N.
+  - `EXE` selects the binary.
   - Use `JOBS=mode:c0:c1,...` to override the job list (keep the original c-ranges when resuming).
   - Coverage check: `python3 aggregate.py N N0 [logdir]`.
-- **Single run.** `./gsieve_k13 main|direct|odd G N c0 c1 [prog] [n0=M] [dump]`. G = chain mode,
-  E = zero-free mode (validation), P = permissive.
+- **Single run.** `./gsieve_k13 main|direct|odd G N c0 c1 [prog] [n0=M] [dump] [threads=T]`. G = chain mode,
+  E = zero-free mode (validation), P = permissive. Output does not depend on T.
+- **Production-scale regression.** `python3 val_proddone.py EXE THREADS [--only mode:c0:c1] LOG...` re-runs
+  complete logged invocations and compares every counter with the production DONE line.
+  `compare_cdone.py N N0 DIR_A DIR_B` compares per-c counts of two log sets.
 - **Base-10 node.** `python3 prove_cum.py NODE ...`. Resumable via `ckptC/` and `bagresC/`.
   `runner4.py` runs node lists.
 - **Small bases.** `python3 prove_cum_b.py BASE DEPTH [digits...]`.

@@ -8,14 +8,12 @@
 #   make records-check  SHA-256 manifest of the record files + coverage of the production logs
 #   make manifest       regenerate MANIFEST.sha256 (only after adding new records; review the diff)
 #   make logs-tarball   release tarball of all run logs in dist/ (for a GitHub release)
+#   make test-prod      re-run a logged production invocation and compare every counter (~2 min, 4 cores)
 #
-# Chain-sieve build variant. The production main path (gsieve.c default) uses AVX-512 IFMA; on CPUs
-# without avx512ifma the only buildable variant is the scalar reference path (-DSCALAR). Override with
-#   make GSIEVE_VARIANT=-DSCALAR   or   make GSIEVE_VARIANT=
-HAVE_IFMA      := $(shell grep -qw avx512ifma /proc/cpuinfo 2>/dev/null && echo 1)
-GSIEVE_VARIANT ?= $(if $(HAVE_IFMA),,-DSCALAR)
-GSIEVE_CFLAGS  ?= -O3 -march=native -Wall -Wno-unused-function $(GSIEVE_VARIANT)
-PYTHON         ?= python3
+# Chain sieve: gsieve.c selects the best stage-2 variant the compiler target supports (ifma > avx512 >
+# avx2 > scalar; see work/gsieve/Makefile). `make gsieve-test V=avx2` validates one specific variant.
+V      ?=
+PYTHON ?= python3
 
 all: helpers gsieve
 
@@ -23,11 +21,13 @@ helpers:
 	$(MAKE) -C work helpers
 
 gsieve:
-	@echo "gsieve build: CFLAGS='$(GSIEVE_CFLAGS)'"
-	$(MAKE) -C work/gsieve CFLAGS="$(GSIEVE_CFLAGS)"
+	$(MAKE) -C work/gsieve all
 
 gsieve-test: gsieve
-	$(MAKE) -C work/gsieve test CFLAGS="$(GSIEVE_CFLAGS)"
+	$(MAKE) -C work/gsieve test V=$(V)
+
+test-prod: gsieve
+	$(MAKE) -C work/gsieve test-prod V=$(V)
 
 smoke: helpers
 	$(PYTHON) scripts/smoke_base10.py 98 147
@@ -49,4 +49,4 @@ logs-tarball:
 clean:
 	$(MAKE) -C work clean
 
-.PHONY: all helpers gsieve gsieve-test smoke records-check test manifest logs-tarball clean
+.PHONY: all helpers gsieve gsieve-test test-prod smoke records-check test manifest logs-tarball clean

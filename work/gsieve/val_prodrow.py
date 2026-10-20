@@ -1,9 +1,13 @@
-# Spot-check the production binary at production scale: one full c-slice at N=36000.
+# Spot-check the production binary at production scale: one full c-slice (e.g. N=36000, or a shell N0 < m <= N).
+# usage: val_prodrow.py N c [exe] [n0]   (exe defaults to ./gsieve_k13; n0 restricts to the shell as gsieve n0=)
 import subprocess, sys, math, random
 from mpmath import mp, mpf, log10 as mlog10, floor as mfloor, power
 mp.dps = 60
 N, c = int(sys.argv[1]), int(sys.argv[2]); K = 13; NL = 14; XMIN = 9 * NL + 4; AMIN = 26
-out = subprocess.run(["./gsieve_k13", "main", "G", str(N), str(c), str(c + 1), "dump"], capture_output=True, text=True, check=True).stdout
+exe = sys.argv[3] if len(sys.argv) > 3 else "./gsieve_k13"
+N0 = int(sys.argv[4]) if len(sys.argv) > 4 else -1
+out = subprocess.run([exe, "main", "G", str(N), str(c), str(c + 1), "dump"] + ([f"n0={N0}"] if N0 >= 0 else []),
+                     capture_output=True, text=True, check=True).stdout
 S = {k: set() for k in ("S2", "R3", "R4", "S4")}
 for line in out.splitlines():
     p = line.split()
@@ -16,6 +20,7 @@ for b in range((6 * N - 6 * c - 2 * AMIN) // 3 + 1):
     ahi = (6 * N - 3 * b - 6 * c) // 2
     need = (XMIN - b * LG3 - c * LG7) / LG2
     alo = math.ceil(need - 1e-6) if need > AMIN else AMIN
+    if N0 >= 0 and 6 * N0 - 3 * b - 6 * c >= 0: alo = max(alo, (6 * N0 - 3 * b - 6 * c) // 2 + 1)
     if alo > ahi: continue
     x = pow(2, alo, m26) * pow(3, b, m26) * p7 % m26
     for a in range(alo, ahi + 1):
@@ -23,6 +28,8 @@ for b in range((6 * N - 6 * c - 2 * AMIN) // 3 + 1):
         s = str(x).zfill(26)
         if '0' not in s and '5' not in s: exp.add((a, b, c))
         x = 2 * x % m26
+done = [l for l in out.splitlines() if l.startswith("DONE")][0]
+assert f" points={n} " in done, "point count mismatch"
 print(f"c={c}: region points {n}, S2 C={len(S['S2'])} python={len(exp)}", "OK" if exp == S['S2'] else "MISMATCH")
 assert exp == S['S2']
 assert S['R3'] | S['R4'] | S['S4'] == S['S2']

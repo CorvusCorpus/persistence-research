@@ -11,6 +11,8 @@ work/csrc/bottom
 work/zf7
 work/gsieve/gsieve_k1[23]
 work/gsieve/gsieve_k1[23]_nl7
+work/gsieve/gsieve_k1[23]_*
+work/gsieve/val_kernel
 work/gsieve/gs_*
 # python
 __pycache__/

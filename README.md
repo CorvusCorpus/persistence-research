@@ -40,12 +40,13 @@ work/                original working directory (flat layout; run scripts from h
   base{3,4,6}_cum.json, trees_b6_D800.json                        small-base proofs and data
   ckpt*/, bagres*/   checkpoints of paused base-10 runs (122472, 131712, 24192)
   logs/              run logs, sieve outputs
-  gsieve/            chain sieve: gsieve.c (AVX-512), constants, drivers, validation, logs/
+  gsieve/            chain sieve: gsieve.c (ifma/avx512/avx2/scalar variants, pthreads), constants,
+                     drivers, validation, logs/
 ```
 
 ## Quick start (Linux; gcc, GMP, MPFR, Python 3 with python-flint and mpmath)
 ```
-make                  # CPU helpers, zf7, chain sieve (scalar variant if the CPU lacks AVX-512 IFMA)
+make                  # CPU helpers, zf7, chain sieve (best stage-2 variant for this CPU)
 make test             # chain-sieve validation suite + base-10 smoke test + record/coverage checks
 make records-check    # SHA-256 manifest of the record files + production-log coverage
 make logs-tarball     # dist/persistence-logs-<commit>.tar.xz for a GitHub release

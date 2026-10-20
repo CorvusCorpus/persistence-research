@@ -70,6 +70,50 @@ b ≡ t − a·f3 − c·f7 (mod 2^38). Every such number ends in
 Form i with a < 26: three 18-digit limbs stepped along b. Form iii: b ≤ 39 stepped along a with an
 18-digit filter; b ≥ 40 via L4. Numbers below 10^131: exhaustive (4,483,467 numbers).
 
+## Implementation variants and threads (session 2, 20 Oct 2026)
+
+**Stage-2 variants.** The main-path stage 2 (bitmap scan, affine lift, check of digits 14–26) exists in four
+compile-time variants (`gsieve.c`, macros `S2_*`; the build picks the first one the target supports). All
+later stages are shared, and all four make the same decisions.
+
+| variant | needs | ⌊v/10⁴⌋ | survivor compaction |
+|---|---|---|---|
+| `ifma` (production build of 19–20 Oct) | AVX-512 F/DQ/BW/VL + IFMA | `vpmadd52huq` with ⌈2⁶⁰/10⁴⌉ (exact for v < 3.8·10¹⁴) | `vpcompressq` |
+| `avx512` | AVX-512 F/DQ/BW/VL | 32×32-bit multiply-shift on split operands (below) | `vpcompressq` |
+| `avx2` | AVX2 | the same | permutation-table left-pack |
+| `scalar` | any C compiler | `%` and `/` | — |
+
+**Exact division without IFMA.** This uses the standard multiply-shift division by an invariant integer
+(Granlund–Montgomery 1994). Let M₄ = ⌈2⁴⁵/10⁴⌉ = 3,518,437,209 < 2³², so M₄·10⁴ − 2⁴⁵ = 1168.
+
+- *Lemma.* ⌊v·M₄/2⁴⁵⌋ = ⌊v/10⁴⌋ for 0 ≤ v < 2⁴⁵/1168 ≈ 3.0·10¹⁰.
+- *Proof.* Write v = 10⁴q + r with 0 ≤ r < 10⁴. Then v·M₄/2⁴⁵ = q + r/10⁴ + 1168·v/(10⁴·2⁴⁵). The last two
+  terms are ≥ 0 and their sum is < 1 when 1168·v < 2⁴⁵. ∎
+- *Applying it to the 13-digit block.* The block xh = h₀ + 2ᴷ·Y can reach 2⁴⁴, so it is never divided
+  directly.
+  - Write Y = 10⁴·s + r (Y < 5ᴷ < 2³¹) and w = h₀ + 2ᴷ·r < 2ᴷ·10⁴.
+  - Then xh = 2ᴷ·10⁴·s + w, so xh mod 10⁴ = w mod 10⁴ and ⌊xh/10⁴⌋ = 2ᴷ·s + ⌊w/10⁴⌋.
+  - The quotients that follow (< 10⁹, then < 10⁵) are divided with the same M₄.
+  - Every divided value is therefore < 2³¹, and v·M₄ < 2⁶³.
+- *Exhaustive check.* `val_kernel.c` checks the lemma for every v < 2³¹, and the split for every Y < 5ᴷ
+  (K = 12, 13) together with 2²⁶ random (Y, h₀) pairs.
+
+**Threads.** With `threads=T` (or `GSIEVE_THREADS=T`), T workers share one copy of the tables (1.1 GB).
+They take c values from an atomic counter in increasing order. Each worker hands its per-c results
+(dump and MEMBER lines, counter deltas) to a reporter, which writes them in increasing c.
+
+- CDONE lines therefore keep their meaning: cumulative counts of the invocation over every c up to the one
+  reported. So `prod.py` resume and `aggregate.py` work unchanged.
+- The output is byte-identical for every T, apart from the timing fields of the DONE line.
+- The tables are also built by T threads, over word-aligned chunks of exponents. They are the same for
+  every T: `GSIEVE_TABLE_HASH=1` prints a fingerprint.
+- Differences from the single-threaded program of 19–20 Oct:
+  - Every c now gets a CDONE line. Before, a c with an empty main or direct region had none, and in E and
+    P modes no c on the odd path had one. The final duplicate CDONE line is kept.
+  - `time=` is now the CPU time of all threads.
+  - `threads=` and `wall=` are appended to the DONE line, and `variant=` is inserted after `NL=`.
+- `prod.py` worker `ALL` runs every path in one process (`THREADS`, `EXE` environment variables).
+
 ## Validation
 
 - Stage decisions (bitmap+lift, leading-digit rejections, limb engine) compared one by one with exact

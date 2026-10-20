@@ -19,11 +19,12 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
    - Acceptance: all scripts print OK / exact match.
 
 ## P1 — portability and speed of the chain sieve (CPU)
-1. **AVX2 fallback** for CPUs without AVX-512 (most consumer Intel).
+1. **AVX2 fallback** for CPUs without AVX-512 (most consumer Intel). DONE in session 2: `avx512` (no IFMA)
+   and `avx2` variants with exact integer division (see `docs/NOTEBOOK.md`, task 2).
    - Acceptance: identical stage counts and S2/R3/R4 sets on `val_dump.py` and `val_prodrow.py`, against
      the AVX-512 build or brute force.
 2. **Multithreading** (pthreads) sharing one copy of the tables, with per-thread c-blocks and checkpoint
-   lines.
+   lines. DONE in session 2: dynamic per-c scheduling, per-c output written in c order.
 3. **Optional K = 14 tables** (≈4.7 GB shared) for about 20% less work. Re-validate.
 
 ## P2 — CUDA port (RTX 3060 Ti) and the 10^5-digit record
