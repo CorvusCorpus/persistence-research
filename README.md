@@ -24,9 +24,13 @@ Baseline snapshot of a research session (19–20 Oct 2026). Start with `docs/SES
 ## Layout
 ```
 README.md            this file
+Makefile             top-level build/test entry points (make, make test)
+MANIFEST.sha256      SHA-256 of all record files (logs, proofs, exhaustive lists)
+scripts/             smoke test, coverage check, manifest and release-tarball helpers
 CLAUDE.md            working rules for Claude Code sessions (read before changing anything)
 HANDOFF_PROMPT.md    prompt used to start the follow-up session
-docs/                summary, results ledger, roadmap, method notes, literature, result tables
+docs/                summary, results ledger, roadmap, method notes, literature, result tables,
+                     NOTEBOOK.md (dated log of every run: command, flags, commit, timing, outcome)
 work/                original working directory (flat layout; run scripts from here)
   *.py               provers, drivers, validation scripts (base 10 and small bases)
   csrc/*.c           C inner loops (MPFR/GMP); `make` builds them
@@ -41,13 +45,16 @@ work/                original working directory (flat layout; run scripts from h
 
 ## Quick start (Linux; gcc, GMP, MPFR, Python 3 with python-flint and mpmath)
 ```
-cd work && make                    # builds csrc helpers, zf7 and gsieve
-make -C gsieve test                # chain-sieve validation suite (needs AVX-512 CPU)
-python3 gsieve/aggregate.py 36000 -1 gsieve/logs         # base run coverage
-python3 gsieve/aggregate.py 40000 36000 gsieve/logs      # extension shell coverage
+make                  # CPU helpers, zf7, chain sieve (scalar variant if the CPU lacks AVX-512 IFMA)
+make test             # chain-sieve validation suite + base-10 smoke test + record/coverage checks
+make records-check    # SHA-256 manifest of the record files + production-log coverage
+make logs-tarball     # dist/persistence-logs-<commit>.tar.xz for a GitHub release
 ```
-Re-deriving a base-10 node from scratch: run in a copy whose `bagres*/` and `ckpt*/` are empty, and move
-that node's `proofC_*.json` aside, e.g. `python3 prove_cum.py 98 147`.
+Individual pieces, from `work/gsieve/`: `make test` (validation suite),
+`python3 aggregate.py 36000 -1 logs` (base run coverage), `python3 aggregate.py 40000 36000 logs`
+(extension shell coverage). Re-deriving a base-10 node from scratch: `scripts/smoke_base10.py NODE ...`
+(runs `prove_cum.py` in a scratch copy with empty `bagres*/` and `ckpt*/`). Every run is logged in
+`docs/NOTEBOOK.md`.
 
 ## Caveats
 Computer-assisted and not peer reviewed. The trees rely on Matveev's theorem; everything relies on the

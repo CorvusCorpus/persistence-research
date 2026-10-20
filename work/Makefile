@@ -7,6 +7,9 @@ HELPERS = csrc/topc csrc/topc3 csrc/bottomc csrc/bottomc2 csrc/bottomc3 csrc/top
 
 all: $(HELPERS) zf7 gsieve
 
+# everything except the chain sieve (which needs AVX-512 IFMA unless built with -DSCALAR)
+helpers: $(HELPERS) zf7
+
 csrc/topc:     csrc/top.c     ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
 csrc/topc3:    csrc/top3.c    ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
 csrc/bottomc:  csrc/bottom.c  ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
@@ -27,4 +30,4 @@ clean:
 	rm -f $(HELPERS) zf7
 	$(MAKE) -C gsieve clean
 
-.PHONY: all gsieve clean
+.PHONY: all helpers gsieve clean

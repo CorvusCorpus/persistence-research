@@ -18,3 +18,5 @@ __pycache__/
 # bundles
 *.zip
 work/gsieve/prod_logs.tar.gz
+# release tarballs (make logs-tarball)
+dist/
