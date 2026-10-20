@@ -17,10 +17,11 @@ for m in main direct odd; do for dm in G E; do
     n=$([ $m = main ] && echo 150 || echo 160); run $m $dm $n 0 $((n + 1)) --full
 done; done
 # production slices of the logged runs (N = 36000, and the shell 36000 < m <= 40000 with n0)
+# --full (all digits of every survivor, ~14 ms per 30,000-digit number) only where the survivor count is small
 run main G 36000 35500 35501 --full
-run main G 36000 34200 34201 --full
+run main G 36000 34200 34201
 run main G 40000 39500 39501 n0=36000 --full
-run main G 40000 35990 35991 n0=36000 --full
+run main G 40000 35990 35991 n0=36000
 SLICES_DIRECT="35000 20000 1000"; SLICES_ODD="153"     # c=153 holds the thread candidate (2490, 20092, 153)
 for c in $SLICES_DIRECT; do run direct G 36000 $c $((c + 1)) --full; done
 for c in $SLICES_ODD; do run odd G 36000 $c $((c + 1)) --full; done

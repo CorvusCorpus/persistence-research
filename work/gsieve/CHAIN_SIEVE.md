@@ -127,6 +127,17 @@ They take c values from an atomic counter in increasing order. Each worker hands
   exact arithmetic (val_prodrow.py): stage-2 survivor sets identical, all limb-engine decisions and a
   sample of leading-digit rejections verified. Odd-thread candidates verified to end in the 40-digit thread.
 - Survival rates over the full runs match theory to 4 significant figures (0.06872, 0.05497).
+- **Session 2 (20 Oct 2026): new stage-2 variants and threads**, on a CPU without IFMA (details in
+  `docs/NOTEBOOK.md`, task 2).
+  - **Production counters.** The avx512, avx2 and scalar variants each reproduce all eight counters of the
+    logged production invocation main N = 36,000, c ∈ [7540, 7898): 8.6·10¹¹ points, s1 through members.
+  - **Suites.** The validation suite passes for every variant, at T = 1 and T = 4, and for strict
+    `-march=haswell` (AVX2-only) and `-march=x86-64` builds, which contain no AVX-512 instructions.
+  - **Production slices** (c = 34,200 and 33,000 of N = 36,000; c = 39,500, 38,200 and 35,990 of the shell
+    N = 40,000 with n0 = 36,000): the stage-2 survivor sets equal exact arithmetic.
+  - **Cross-variant dumps.** Every variant and thread count produces identical dumps and counters on eight
+    regions of up to 10⁹ points.
+  - **Threads.** T = 4 output is byte-identical to T = 1, and table fingerprints are equal for every T.
 
 ## Production runs
 
