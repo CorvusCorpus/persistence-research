@@ -1,0 +1,469 @@
+node 61236: 15 digit multisets
+  bag (2, 6, 7, 9, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 4, 7, 9, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 6, 6, 7, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 7, 9, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 3, 6, 7, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 3, 4, 7, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 3, 6, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 3, 3, 7, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 3, 3, 3, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 3, 3, 3, 4, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 3, 3, 3, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 3, 3, 3, 3, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 3, 3, 3, 3, 3, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 3, 3, 3, 3, 3, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 3, 3, 3, 3, 3, 3, 7): resuming top={0: 87, 1: 87, 2: 87, 3: 87} bot={10: 2, 9: 87, 8: 87, 7: 87, 6: 87} partial=None
+  bag (2, 2, 3, 3, 3, 3, 3, 3, 3, 7): k=10 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 112788535, bottom solves 65142020, survivor runs 25953, proofs 55, 310s)
+node 61236: all 7-smooth y with digit product 61236: [9633792]   (310s)
+node 11664: 35 digit multisets
+  bag (2, 8, 9, 9, 9): k=5 tmax=9 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 2} -> every solution has L <= 101 (top cases 9349, bottom solves 1914, survivor runs 4, proofs 15, 0s)
+  bag (4, 4, 9, 9, 9): k=5 tmax=3 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 2} -> every solution has L <= 101 (top cases 5416, bottom solves 1096, survivor runs 2, proofs 15, 0s)
+  bag (3, 6, 8, 9, 9): k=5 tmax=18 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 2} -> every solution has L <= 101 (top cases 16957, bottom solves 3542, survivor runs 13, proofs 15, 0s)
+  bag (4, 6, 6, 9, 9): k=5 tmax=22 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 2} -> every solution has L <= 101 (top cases 10574, bottom solves 2184, survivor runs 6, proofs 15, 0s)
+  bag (6, 6, 6, 6, 9): k=5 tmax=16 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 2} -> every solution has L <= 101 (top cases 4191, bottom solves 826, survivor runs 1, proofs 15, 0s)
+  bag (2, 2, 4, 9, 9, 9): k=6 tmax=21 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 40291, bottom solves 49753, survivor runs 17, proofs 21, 0s)
+  bag (2, 3, 3, 8, 9, 9): k=6 tmax=22 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 69988, bottom solves 108064, survivor runs 34, proofs 21, 1s)
+  bag (2, 2, 6, 6, 9, 9): k=6 tmax=21 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 45171, bottom solves 62271, survivor runs 11, proofs 21, 0s)
+  bag (2, 3, 4, 6, 9, 9): k=6 tmax=23 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 104565, bottom solves 183695, survivor runs 44, proofs 21, 1s)
+  bag (3, 3, 4, 4, 9, 9): k=6 tmax=15 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 45171, bottom solves 62271, survivor runs 24, proofs 21, 0s)
+  bag (3, 3, 3, 6, 8, 9): k=6 tmax=26 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 65108, bottom solves 88343, survivor runs 30, proofs 21, 1s)
+  bag (2, 3, 6, 6, 6, 9): k=6 tmax=26 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 65108, bottom solves 88343, survivor runs 29, proofs 21, 0s)
+  bag (3, 3, 4, 6, 6, 9): k=6 tmax=29 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 69988, bottom solves 108064, survivor runs 31, proofs 21, 1s)
+  bag (3, 3, 6, 6, 6, 6): k=6 tmax=29 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 20354, bottom solves 18879, survivor runs 17, proofs 21, 0s)
+  bag (2, 2, 2, 2, 9, 9, 9): k=7 tmax=30 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 207070, bottom solves 80352, survivor runs 28, proofs 28, 1s)
+  bag (2, 2, 2, 3, 6, 9, 9): k=7 tmax=26 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1016906, bottom solves 425586, survivor runs 154, proofs 28, 4s)
+  bag (2, 2, 3, 3, 4, 9, 9): k=7 tmax=28 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1185967, bottom solves 503424, survivor runs 177, proofs 28, 4s)
+  bag (2, 3, 3, 3, 3, 8, 9): k=7 tmax=23 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 828245, bottom solves 338122, survivor runs 127, proofs 28, 3s)
+  bag (2, 2, 3, 3, 6, 6, 9): k=7 tmax=37 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1185967, bottom solves 503424, survivor runs 212, proofs 28, 4s)
+  bag (2, 3, 3, 3, 4, 6, 9): k=7 tmax=30 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1691346, bottom solves 720188, survivor runs 261, proofs 28, 6s)
+  bag (3, 3, 3, 3, 4, 4, 9): k=7 tmax=17 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 472327, bottom solves 189570, survivor runs 69, proofs 28, 2s)
+  bag (3, 3, 3, 3, 3, 6, 8): k=7 tmax=24 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 342466, bottom solves 130984, survivor runs 83, proofs 28, 1s)
+  bag (2, 3, 3, 3, 6, 6, 6): k=7 tmax=36 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 491927, bottom solves 199196, survivor runs 122, proofs 28, 2s)
+  bag (3, 3, 3, 3, 4, 6, 6): k=7 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 472327, bottom solves 189570, survivor runs 100, proofs 28, 2s)
+  bag (2, 2, 2, 2, 3, 3, 9, 9): k=8 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 3274436, bottom solves 3013218, survivor runs 637, proofs 36, 17s)
+  bag (2, 2, 2, 3, 3, 3, 6, 9): k=8 tmax=33 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 5716252, bottom solves 5875922, survivor runs 1149, proofs 36, 32s)
+  bag (2, 2, 3, 3, 3, 3, 4, 9): k=8 tmax=30 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 5594312, bottom solves 5433391, survivor runs 1106, proofs 36, 30s)
+  bag (2, 3, 3, 3, 3, 3, 3, 8): k=8 tmax=25 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 1761512, bottom solves 1122564, survivor runs 357, proofs 36, 8s)
+  bag (2, 2, 3, 3, 3, 3, 6, 6): k=8 tmax=38 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 3274436, bottom solves 3013218, survivor runs 775, proofs 36, 17s)
+  bag (2, 3, 3, 3, 3, 3, 4, 6): k=8 tmax=38 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 4472030, bottom solves 3616759, survivor runs 1119, proofs 36, 22s)
+  bag (3, 3, 3, 3, 3, 3, 4, 4): k=8 tmax=23 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 954560, bottom solves 593045, survivor runs 176, proofs 36, 4s)
+  bag (2, 2, 2, 2, 3, 3, 3, 3, 9): k=9 tmax=33 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 19752804, bottom solves 12476588, survivor runs 3678, proofs 45, 89s)
+  bag (2, 2, 2, 3, 3, 3, 3, 3, 6): k=9 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 19522504, bottom solves 12237454, survivor runs 3837, proofs 45, 89s)
+  bag (2, 2, 3, 3, 3, 3, 3, 3, 4): k=9 tmax=26 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 17262924, bottom solves 10275151, survivor runs 3018, proofs 45, 79s)
+  bag (2, 2, 2, 2, 3, 3, 3, 3, 3, 3): k=10 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 46544678, bottom solves 27572104, survivor runs 10838, proofs 55, 242s)
+node 11664: all 7-smooth y with digit product 11664: [139968, 1492992, 2113929216]   (661s)
+node 18144: 32 digit multisets
+  bag (4, 7, 8, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (6, 6, 7, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 7, 8, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 7, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 6, 7, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 4, 7, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 6, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 4, 4, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 6, 6, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 6, 6, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (3, 4, 6, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 7, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 3, 7, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 6, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 4, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 3, 4, 4, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 3, 3, 6, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 3, 3, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 6, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 3, 4, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 3, 4, 4, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 7, 9, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 3, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 3, 3, 4, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 3, 3, 3, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 3, 3, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 3, 3, 4, 6, 7): resuming top={0: 87, 1: 87, 2: 87} bot={8: 2, 7: 87, 6: 87, 5: 87} partial=None
+  bag (2, 2, 3, 3, 3, 4, 6, 7): k=8 tmax=36 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 10915214, bottom solves 12964491, survivor runs 2379, proofs 36, 57s)
+  bag (2, 3, 3, 3, 3, 4, 4, 7): k=8 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 5594312, bottom solves 5433391, survivor runs 1152, proofs 36, 37s)
+  bag (2, 2, 2, 2, 2, 3, 3, 7, 9): k=9 tmax=38 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 45042752, bottom solves 29641011, survivor runs 8947, proofs 45, 217s)
+  bag (2, 2, 2, 2, 3, 3, 3, 6, 7): k=9 tmax=40 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 48223532, bottom solves 32559850, survivor runs 9984, proofs 45, 227s)
+  bag (2, 2, 2, 3, 3, 3, 3, 4, 7): k=9 tmax=35 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 48223532, bottom solves 32559850, survivor runs 9043, proofs 45, 222s)
+  bag (2, 2, 2, 2, 2, 3, 3, 3, 3, 7): k=10 tmax=36 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 135047769, bottom solves 90317502, survivor runs 32949, proofs 55, 681s)
+node 18144: all 7-smooth y with digit product 18144: [96768, 1382976, 913217421312]   (1442s)
+node 14336: 16 digit multisets
+  bag (4, 7, 8, 8, 8): k=5 tmax=21 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 2} -> every solution has L <= 101 (top cases 9349, bottom solves 1914, survivor runs 11, proofs 15, 0s)
+  bag (2, 2, 7, 8, 8, 8): k=6 tmax=20 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 40291, bottom solves 49753, survivor runs 21, proofs 21, 0s)
+  bag (2, 4, 4, 7, 8, 8): k=6 tmax=24 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 69988, bottom solves 108064, survivor runs 36, proofs 21, 1s)
+  bag (4, 4, 4, 4, 7, 8): k=6 tmax=19 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 35411, bottom solves 34834, survivor runs 22, proofs 21, 0s)
+  bag (2, 2, 2, 4, 7, 8, 8): k=7 tmax=25 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1016906, bottom solves 425586, survivor runs 180, proofs 28, 4s)
+  bag (2, 2, 4, 4, 4, 7, 8): k=7 tmax=29 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1016906, bottom solves 425586, survivor runs 179, proofs 28, 4s)
+  bag (2, 4, 4, 4, 4, 4, 7): k=7 tmax=27 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 342466, bottom solves 130984, survivor runs 61, proofs 28, 1s)
+  bag (2, 2, 2, 2, 2, 7, 8, 8): k=8 tmax=30 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 2517974, bottom solves 1953819, survivor runs 511, proofs 36, 14s)
+  bag (2, 2, 2, 2, 4, 4, 7, 8): k=8 tmax=36 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 5594312, bottom solves 5433391, survivor runs 1280, proofs 36, 30s)
+  bag (2, 2, 2, 4, 4, 4, 4, 7): k=8 tmax=33 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 2639914, bottom solves 2282278, survivor runs 557, proofs 36, 13s)
+  bag (2, 2, 2, 2, 2, 2, 4, 7, 8): k=9 tmax=34 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 31571600, bottom solves 19152618, survivor runs 6429, proofs 45, 146s)
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 7): k=9 tmax=37 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 19522504, bottom solves 12237454, survivor runs 3943, proofs 45, 87s)
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 7, 8): k=10 tmax=36 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 63900951, bottom solves 32126847, survivor runs 16826, proofs 55, 275s)
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 7): k=10 tmax=35 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 112788535, bottom solves 65142020, survivor runs 27527, proofs 55, 499s)
+node 14336: 16 digit multisets
+  bag (4, 7, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 7, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 7, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 7, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 7, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 7): resuming top={0: 160, 1: 160, 2: 160, 3: 160} bot={11: 2, 10: 160, 9: 160, 8: 160} partial=None
+node 14336: 16 digit multisets
+  bag (4, 7, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 7, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 7, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 7, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 7, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 7): resuming top={0: 87, 1: 87, 2: 87, 3: 87, 4: 87} bot={11: 2, 10: 87, 9: 87, 8: 87, 7: 87} partial=[6, 'bottom', 87, 12806091513983345190767494291418775552, 21]
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 7): k=11 tmax=43 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51, 5: 51} bot {6: 51, 7: 51, 8: 51, 9: 51, 10: 51, 11: 2} -> every solution has L <= 101 (top cases 330354081, bottom solves 101662871, survivor runs 97516, proofs 66, 397s)
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7): k=12 tmax=38 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51, 5: 51, 6: 51} bot {7: 51, 8: 51, 9: 51, 10: 51, 11: 51, 12: 2} -> every solution has L <= 101 (top cases 534809440, bottom solves 154966855, survivor runs 164939, proofs 78, 2459s)
+node 14336: all 7-smooth y with digit product 14336: []   (2856s)
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): k=5 tmax=16 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 2} -> every solution has L <= 101 (top cases 4191, bottom solves 826, survivor runs 4, proofs 15, 0s)
+  bag (4, 4, 8, 8, 8): k=5 tmax=18 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 2} -> every solution has L <= 101 (top cases 5416, bottom solves 1096, survivor runs 4, proofs 15, 0s)
+  bag (2, 2, 4, 8, 8, 8): k=6 tmax=19 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 40291, bottom solves 49753, survivor runs 16, proofs 21, 1s)
+  bag (2, 4, 4, 4, 8, 8): k=6 tmax=20 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 40291, bottom solves 49753, survivor runs 16, proofs 21, 0s)
+  bag (4, 4, 4, 4, 4, 8): k=6 tmax=20 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 15474, bottom solves 11163, survivor runs 8, proofs 21, 0s)
+  bag (2, 2, 2, 2, 8, 8, 8): k=7 tmax=25 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 207070, bottom solves 80352, survivor runs 39, proofs 28, 1s)
+  bag (2, 2, 2, 4, 4, 8, 8): k=7 tmax=37 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 602188, bottom solves 248156, survivor runs 122, proofs 28, 2s)
+  bag (2, 2, 4, 4, 4, 4, 8): k=7 tmax=31 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 472327, bottom solves 189570, survivor runs 94, proofs 28, 2s)
+  bag (2, 4, 4, 4, 4, 4, 4): k=7 tmax=18 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 116409, bottom solves 41018, survivor runs 23, proofs 28, 1s)
+  bag (2, 2, 2, 2, 2, 4, 8, 8): k=8 tmax=27 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 2517974, bottom solves 1953819, survivor runs 482, proofs 36, 13s)
+  bag (2, 2, 2, 2, 4, 4, 4, 8): k=8 tmax=35 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 2639914, bottom solves 2282278, survivor runs 617, proofs 36, 14s)
+  bag (2, 2, 2, 4, 4, 4, 4, 4): k=8 tmax=34 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 1076500, bottom solves 769408, survivor runs 237, proofs 36, 6s)
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): k=9 tmax=29 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 5631520, bottom solves 2981867, survivor runs 1107, proofs 45, 27s)
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): k=9 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 17262924, bottom solves 10275151, survivor runs 3302, proofs 45, 86s)
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): k=9 tmax=44 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 52, 6: 52, 7: 52, 8: 52, 9: 2} -> every solution has L <= 103 (top cases 7200200, bottom solves 4265984, survivor runs 1657, proofs 45, 36s)
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): k=10 tmax=37 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 63900951, bottom solves 32126847, survivor runs 17064, proofs 55, 316s)
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): k=10 tmax=37 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 44190823, bottom solves 24538870, survivor runs 11490, proofs 55, 226s)
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): k=11 tmax=34 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51, 5: 51} bot {6: 51, 7: 51, 8: 51, 9: 51, 10: 51, 11: 2} -> every solution has L <= 101 (top cases 77965422, bottom solves 38739315, survivor runs 21261, proofs 66, 422s)
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): k=11 tmax=38 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51, 5: 51} bot {6: 51, 7: 51, 8: 51, 9: 51, 10: 51, 11: 2} -> every solution has L <= 101 (top cases 173014724, bottom solves 97818567, survivor runs 48149, proofs 66, 989s)
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): resuming top={0: 51, 1: 51, 2: 51, 3: 51, 4: 51, 5: 51} bot={12: 2, 11: 51, 10: 51, 9: 51, 8: 51, 7: 51} partial=None
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): k=12 tmax=36 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51, 5: 51, 6: 51} bot {7: 51, 8: 51, 9: 51, 10: 51, 11: 51, 12: 2} -> every solution has L <= 101 (top cases 534809440, bottom solves 154966855, survivor runs 159022, proofs 78, 252s)
+Traceback (most recent call last):
+  File "/home/claude/persist/prove_cum.py", line 184, in <module>
+    Lmax, res = prove_bag(b, log=lambda x: print(x, flush=True))
+                ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/persist/prove_cum.py", line 147, in prove_bag
+    cache.clear(); cache[skey] = FastTop(XL, tm, G)
+                                 ~~~~~~~^^^^^^^^^^^
+  File "/home/claude/persist/prove_iter.py", line 53, in __init__
+    self.lat = TopLattice(XL, tm, G)
+               ~~~~~~~~~~^^^^^^^^^^^
+  File "/home/claude/persist/solver.py", line 66, in __init__
+    assert abs(v - m) < 0.51
+           ^^^^^^^^^^^^^^^^^
+AssertionError
+node 131712: 15 digit multisets
+  bag (6, 7, 7, 7, 8, 8): k=6 tmax=20 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 40291, bottom solves 49753, survivor runs 21, proofs 21, 0s)
+  bag (2, 3, 7, 7, 7, 8, 8): k=7 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1016906, bottom solves 425586, survivor runs 227, proofs 28, 4s)
+  bag (2, 4, 6, 7, 7, 7, 8): k=7 tmax=27 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1691346, bottom solves 720188, survivor runs 246, proofs 28, 6s)
+  bag (3, 4, 4, 7, 7, 7, 8): k=7 tmax=27 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1016906, bottom solves 425586, survivor runs 174, proofs 28, 4s)
+  bag (4, 4, 4, 6, 7, 7, 7): k=7 tmax=33 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 491927, bottom solves 199196, survivor runs 82, proofs 28, 2s)
+  bag (2, 2, 2, 6, 7, 7, 7, 8): k=8 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 5716252, bottom solves 5875922, survivor runs 1127, proofs 36, 33s)
+  bag (2, 2, 3, 4, 7, 7, 7, 8): k=8 tmax=33 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 10915214, bottom solves 12964491, survivor runs 2324, proofs 36, 68s)
+  bag (2, 2, 4, 4, 6, 7, 7, 7): k=8 tmax=39 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 6716594, bottom solves 7440143, survivor runs 1549, proofs 36, 41s)
+  bag (2, 3, 4, 4, 4, 7, 7, 7): k=8 tmax=31 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 5716252, bottom solves 5875922, survivor runs 1149, proofs 36, 33s)
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 160, 1: 160, 2: 160, 3: 160, 4: 160} bot={13: 2, 12: 160, 11: 160, 10: 160, 9: 160} partial=None
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None

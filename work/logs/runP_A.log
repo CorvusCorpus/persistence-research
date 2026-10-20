@@ -1,0 +1,48 @@
+node 8192: 21 digit multisets
+  bag (2, 8, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 8, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 4, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 4, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier (cumulative) -> L <= 103
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): resuming top={0: 123, 1: 123, 2: 123, 3: 123, 4: 123} bot={13: 2, 12: 123, 11: 123, 10: 123, 9: 123, 8: 123} partial=None
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): k=13 tmax=41 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51, 5: 51, 6: 51} bot {7: 87, 8: 51, 9: 51, 10: 51, 11: 51, 12: 51, 13: 2} -> every solution has L <= 138 (top cases 364376168, bottom solves 149150402, survivor runs 130312, proofs 90, 1374s)
+node 8192: all 7-smooth y with digit product 8192: []   (1374s)
+node 122472: 26 digit multisets
+  bag (3, 7, 8, 9, 9, 9): k=6 tmax=1 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 65108, bottom solves 88343, survivor runs 17, proofs 21, 1s)
+  bag (4, 6, 7, 9, 9, 9): k=6 tmax=6 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 65108, bottom solves 88343, survivor runs 23, proofs 21, 1s)
+  bag (6, 6, 6, 7, 9, 9): k=6 tmax=18 top {0: 51, 1: 51, 2: 51} bot {3: 51, 4: 51, 5: 51, 6: 2} -> every solution has L <= 101 (top cases 40291, bottom solves 49753, survivor runs 16, proofs 21, 1s)
+  bag (2, 2, 6, 7, 9, 9, 9): k=7 tmax=29 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1016906, bottom solves 425586, survivor runs 157, proofs 28, 5s)
+  bag (2, 3, 4, 7, 9, 9, 9): k=7 tmax=25 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1691346, bottom solves 720188, survivor runs 247, proofs 28, 8s)
+  bag (3, 3, 3, 7, 8, 9, 9): k=7 tmax=1 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1016906, bottom solves 425586, survivor runs 83, proofs 28, 5s)
+  bag (2, 3, 6, 6, 7, 9, 9): k=7 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1919207, bottom solves 826904, survivor runs 326, proofs 28, 9s)
+  bag (3, 3, 4, 6, 7, 9, 9): k=7 tmax=31 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1919207, bottom solves 826904, survivor runs 319, proofs 28, 9s)
+  bag (3, 3, 6, 6, 6, 7, 9): k=7 tmax=38 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 2} -> every solution has L <= 101 (top cases 1016906, bottom solves 425586, survivor runs 208, proofs 28, 5s)
+  bag (2, 2, 2, 3, 7, 9, 9, 9): k=8 tmax=30 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 5716252, bottom solves 5875922, survivor runs 1104, proofs 36, 37s)
+  bag (2, 2, 3, 3, 6, 7, 9, 9): k=8 tmax=35 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 12281376, bottom solves 15818281, survivor runs 2566, proofs 36, 92s)
+  bag (2, 3, 3, 3, 4, 7, 9, 9): k=8 tmax=34 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 10915214, bottom solves 12964491, survivor runs 2290, proofs 36, 87s)
+  bag (3, 3, 3, 3, 3, 7, 8, 9): k=8 tmax=1 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 4472030, bottom solves 3616759, survivor runs 312, proofs 36, 25s)
+  bag (2, 3, 3, 3, 6, 6, 7, 9): k=8 tmax=40 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 10915214, bottom solves 12964491, survivor runs 2578, proofs 36, 81s)
+  bag (3, 3, 3, 3, 4, 6, 7, 9): k=8 tmax=34 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 9427112, bottom solves 9744218, survivor runs 1986, proofs 36, 61s)
+  bag (3, 3, 3, 3, 6, 6, 6, 7): k=8 tmax=38 top {0: 51, 1: 51, 2: 51, 3: 51} bot {4: 51, 5: 51, 6: 51, 7: 51, 8: 2} -> every solution has L <= 101 (top cases 2639914, bottom solves 2282278, survivor runs 638, proofs 36, 18s)
+  bag (2, 2, 2, 3, 3, 3, 7, 9, 9): k=9 tmax=35 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 62846184, bottom solves 44243913, survivor runs 11403, proofs 45, 351s)
+  bag (2, 2, 3, 3, 3, 3, 6, 7, 9): k=9 tmax=41 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 102528484, bottom solves 72853265, survivor runs 20534, proofs 45, 572s)
+  bag (2, 3, 3, 3, 3, 3, 4, 7, 9): k=9 tmax=35 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 79514992, bottom solves 53608355, survivor runs 14715, proofs 45, 437s)
+  bag (3, 3, 3, 3, 3, 3, 3, 7, 8): k=9 tmax=1 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 10570512, bottom solves 5673667, survivor runs 859, proofs 45, 51s)
+  bag (2, 3, 3, 3, 3, 3, 6, 6, 7): k=9 tmax=46 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 54, 6: 54, 7: 54, 8: 54, 9: 2} -> every solution has L <= 105 (top cases 45042752, bottom solves 30516854, survivor runs 10346, proofs 45, 250s)
+  bag (3, 3, 3, 3, 3, 3, 4, 6, 7): k=9 tmax=40 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 31571600, bottom solves 19152618, survivor runs 6912, proofs 45, 161s)
+  bag (2, 2, 2, 3, 3, 3, 3, 3, 7, 9): k=10 tmax=37 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 347218433, bottom solves 256880580, survivor runs 84137, proofs 55, 2060s)

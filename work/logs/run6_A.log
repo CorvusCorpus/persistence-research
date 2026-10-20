@@ -1,0 +1,19 @@
+node 216: 12 digit multisets
+  bag (3, 8, 9): k=3 tmax=1 XL=7.56e+50 G=114 -> every solution has L <= 340 (top 76953, bottom 0, exact enumerations 462, 5s)
+  bag (4, 6, 9): k=3 tmax=4 XL=7.56e+50 G=114 -> every solution has L <= 340 (top 76953, bottom 0, exact enumerations 442, 5s)
+  bag (2, 2, 6, 9): k=4 tmax=12 XL=1.32e+69 G=151 -> every solution has L <= 601 (top 157950, bottom 6, exact enumerations 3551, 12s)
+  bag (2, 3, 4, 9): k=4 tmax=13 XL=1.32e+69 G=151 -> every solution has L <= 601 (top 270600, bottom 8, exact enumerations 6597, 23s)
+  bag (2, 2, 2, 3, 9): k=5 tmax=16 XL=2.99e+87 G=187 -> every solution has L <= 931 (top 242730, bottom 2610, exact enumerations 5605, 24s)
+  bag (3, 3, 3, 8): k=4 tmax=1 XL=1.32e+69 G=151 -> every solution has L <= 601 (top 67800, bottom 4, exact enumerations 1330, 5s)
+  bag (6, 6, 6): k=3 tmax=11 XL=7.56e+50 G=114 -> every solution has L <= 340 (top 12882, bottom 0, exact enumerations 149, 1s)
+  bag (2, 3, 6, 6): k=4 tmax=13 XL=1.32e+69 G=151 -> every solution has L <= 601 (top 157950, bottom 6, exact enumerations 3481, 13s)
+  bag (3, 3, 4, 6): k=4 tmax=17 XL=1.32e+69 G=151 -> every solution has L <= 601 (top 157950, bottom 6, exact enumerations 3701, 13s)
+  bag (2, 2, 3, 3, 6): k=5 tmax=26 XL=2.99e+87 G=187 -> every solution has L <= 931 (top 277326, bottom 2982, exact enumerations 8438, 28s)
+  bag (2, 3, 3, 3, 4): k=5 tmax=17 XL=2.99e+87 G=187 -> every solution has L <= 931 (top 242730, bottom 2610, exact enumerations 6135, 24s)
+  bag (2, 2, 2, 3, 3, 3): k=6 tmax=17 XL=8.31e+105 G=224 -> every solution has L <= 1339 (top 199362, bottom 797452, exact enumerations 5825, 170s)
+node 216: all 7-smooth y with digit product 216: [14336, 33614, 61236, 1229312]   (324s)
+node 729: 4 digit multisets
+  bag (9, 9, 9): k=3 tmax=0 XL=7.56e+50 G=114 -> every solution has L <= 340 (top 12882, bottom 0, exact enumerations 6, 1s)
+  bag (3, 3, 9, 9): k=4 tmax=0 XL=1.32e+69 G=151 -> every solution has L <= 601 (top 90300, bottom 4, exact enumerations 344, 6s)
+Terminated
+node 1134: 5 digit multisets

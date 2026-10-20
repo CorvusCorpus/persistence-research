@@ -1,0 +1,1 @@
+{"bag": [2, 2], "Lmax": 59, "top": {"0": 31, "1": 30}, "bot": {"2": 30}, "stats": {"top": 30, "bottom": 2, "enum": 2, "proofs": 6, "cost": 181.0}, "cofactors": [1, 2, 4, 8, 16], "pbounds": {"2": 4, "3": 0}}

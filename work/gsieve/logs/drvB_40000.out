@@ -1,0 +1,4 @@
+job main [11824,40001) complete
+job direct [0,40001) complete
+job odd [0,40001) complete
+worker B finished all jobs

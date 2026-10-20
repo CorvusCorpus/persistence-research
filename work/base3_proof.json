@@ -1,0 +1,1 @@
+{"1": {"target": 1, "depth": 0, "preimages": [4], "Lbound": 43}, "4": {"target": 1, "depth": 1, "preimages": [8], "Lbound": 139}, "8": {"target": 1, "depth": 2, "preimages": [], "Lbound": 189}, "2": {"target": 2, "depth": 0, "preimages": [16], "Lbound": 93}, "16": {"target": 2, "depth": 1, "preimages": [], "Lbound": 236}}

@@ -1,0 +1,5 @@
+job main [7898,36001) complete
+budget exhausted; rerun to resume
+job direct [0,36001) complete
+job odd [10544,36001) complete
+worker B finished all jobs

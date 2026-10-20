@@ -1,0 +1,149 @@
+node 2: 1 digit multisets
+  bag (2,): k=1 tmax=4 XL=8.47e+14 G=42 -> every solution has L <= 42  (top cases 0, bottom cases 0, exact enumerations 0)
+node 2: all 7-smooth y with digit product 2: [12, 21, 112]   (0s)
+node 12: 3 digit multisets
+  bag (2, 6): k=2 tmax=6 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 2)
+  bag (3, 4): k=2 tmax=1 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 5)
+  bag (2, 2, 3): k=3 tmax=7 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 454)
+node 12: all 7-smooth y with digit product 12: [126, 162, 216, 1134, 13122]   (2s)
+node 21: 1 digit multisets
+  bag (3, 7): k=2 tmax=0 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 1)
+node 21: all 7-smooth y with digit product 21: []   (0s)
+node 112: 4 digit multisets
+  bag (2, 7, 8): k=3 tmax=9 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 535)
+  bag (4, 4, 7): k=3 tmax=7 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 378)
+  bag (2, 2, 4, 7): k=4 tmax=15 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 157950, bottom cases 6, exact enumerations 4100)
+  bag (2, 2, 2, 2, 7): k=5 tmax=13 XL=2.99e+87 G=187 -> every solution has L <= 931  (top cases 104160, bottom cases 1120, exact enumerations 1737)
+node 112: all 7-smooth y with digit product 112: [1728, 2187]   (35s)
+node 126: 3 digit multisets
+  bag (2, 7, 9): k=3 tmax=8 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 542)
+  bag (3, 6, 7): k=3 tmax=7 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 539)
+  bag (2, 3, 3, 7): k=4 tmax=12 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 157950, bottom cases 6, exact enumerations 3911)
+node 126: all 7-smooth y with digit product 126: [729, 972, 1792]   (23s)
+node 162: 5 digit multisets
+  bag (2, 9, 9): k=3 tmax=5 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 218)
+  bag (3, 6, 9): k=3 tmax=10 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 693)
+  bag (2, 3, 3, 9): k=4 tmax=9 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 157950, bottom cases 6, exact enumerations 3569)
+  bag (3, 3, 3, 6): k=4 tmax=18 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 67800, bottom cases 4, exact enumerations 1896)
+  bag (2, 3, 3, 3, 3): k=5 tmax=9 XL=2.99e+87 G=187 -> every solution has L <= 931  (top cases 104160, bottom cases 1120, exact enumerations 2072)
+node 162: all 7-smooth y with digit product 162: [93312]   (37s)
+node 6: 2 digit multisets
+  bag (6,): k=1 tmax=4 XL=8.47e+14 G=42 -> every solution has L <= 42  (top cases 0, bottom cases 0, exact enumerations 0)
+  bag (2, 3): k=2 tmax=5 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 5)
+node 6: all 7-smooth y with digit product 6: [16, 32, 111132]   (0s)
+node 16: 4 digit multisets
+  bag (2, 8): k=2 tmax=7 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 2)
+  bag (4, 4): k=2 tmax=4 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 77, bottom cases 0, exact enumerations 1)
+  bag (2, 2, 4): k=3 tmax=11 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 448)
+  bag (2, 2, 2, 2): k=4 tmax=11 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 22650, bottom cases 2, exact enumerations 615)
+node 16: all 7-smooth y with digit product 16: [28, 128, 144, 224, 441]   (4s)
+node 28: 2 digit multisets
+  bag (4, 7): k=2 tmax=1 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 3)
+  bag (2, 2, 7): k=3 tmax=8 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 382)
+node 28: all 7-smooth y with digit product 28: [147]   (3s)
+node 32: 5 digit multisets
+  bag (4, 8): k=2 tmax=5 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 1)
+  bag (2, 2, 8): k=3 tmax=10 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 331)
+  bag (2, 4, 4): k=3 tmax=10 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 447)
+  bag (2, 2, 2, 4): k=4 tmax=13 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 67800, bottom cases 4, exact enumerations 1729)
+  bag (2, 2, 2, 2, 2): k=5 tmax=17 XL=2.99e+87 G=187 -> every solution has L <= 931  (top cases 34782, bottom cases 374, exact enumerations 1307)
+node 32: all 7-smooth y with digit product 32: [48, 84]   (17s)
+node 48: 7 digit multisets
+  bag (6, 8): k=2 tmax=10 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 4)
+  bag (2, 3, 8): k=3 tmax=11 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 682)
+  bag (2, 4, 6): k=3 tmax=11 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 909)
+  bag (2, 2, 2, 6): k=4 tmax=12 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 67800, bottom cases 4, exact enumerations 1564)
+  bag (3, 4, 4): k=3 tmax=6 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 449)
+  bag (2, 2, 3, 4): k=4 tmax=12 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 157950, bottom cases 6, exact enumerations 3936)
+  bag (2, 2, 2, 2, 3): k=5 tmax=12 XL=2.99e+87 G=187 -> every solution has L <= 931  (top cases 104160, bottom cases 1120, exact enumerations 1952)
+node 48: all 7-smooth y with digit product 48: [168, 1344]   (43s)
+node 84: 3 digit multisets
+  bag (2, 6, 7): k=3 tmax=7 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 548)
+  bag (3, 4, 7): k=3 tmax=1 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 758)
+  bag (2, 2, 3, 7): k=4 tmax=11 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 157950, bottom cases 6, exact enumerations 3944)
+node 84: all 7-smooth y with digit product 84: [672]   (23s)
+node 147: 1 digit multisets
+  bag (3, 7, 7): k=3 tmax=0 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 131)
+node 147: all 7-smooth y with digit product 147: []   (2s)
+node 168: 5 digit multisets
+  bag (3, 7, 8): k=3 tmax=1 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 528)
+  bag (4, 6, 7): k=3 tmax=9 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 773)
+  bag (2, 2, 6, 7): k=4 tmax=16 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 157950, bottom cases 6, exact enumerations 4073)
+  bag (2, 3, 4, 7): k=4 tmax=13 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 270600, bottom cases 8, exact enumerations 6488)
+  bag (2, 2, 2, 3, 7): k=5 tmax=15 XL=2.99e+87 G=187 -> every solution has L <= 931  (top cases 242730, bottom cases 2610, exact enumerations 4598)
+node 168: all 7-smooth y with digit product 168: [378, 1764, 6174, 6272, 27216]   (74s)
+node 378: 4 digit multisets
+  bag (6, 7, 9): k=3 tmax=4 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 313)
+  bag (2, 3, 7, 9): k=4 tmax=13 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 270600, bottom cases 8, exact enumerations 6601)
+  bag (3, 3, 6, 7): k=4 tmax=16 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 157950, bottom cases 6, exact enumerations 3812)
+  bag (2, 3, 3, 3, 7): k=5 tmax=15 XL=2.99e+87 G=187 -> every solution has L <= 931  (top cases 242730, bottom cases 2610, exact enumerations 4806)
+node 378: all 7-smooth y with digit product 378: []   (69s)
+node 441: 2 digit multisets
+  bag (7, 7, 9): k=3 tmax=0 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 15)
+  bag (3, 3, 7, 7): k=4 tmax=0 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 90300, bottom cases 4, exact enumerations 349)
+node 441: all 7-smooth y with digit product 441: []   (8s)
+node 686: 1 digit multisets
+  bag (2, 7, 7, 7): k=4 tmax=12 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 67800, bottom cases 4, exact enumerations 1609)
+node 686: all 7-smooth y with digit product 686: []   (6s)
+node 882: 3 digit multisets
+  bag (2, 7, 7, 9): k=4 tmax=9 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 157950, bottom cases 6, exact enumerations 3351)
+  bag (3, 6, 7, 7): k=4 tmax=11 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 157950, bottom cases 6, exact enumerations 3211)
+  bag (2, 3, 3, 7, 7): k=5 tmax=14 XL=2.99e+87 G=187 -> every solution has L <= 931  (top cases 277326, bottom cases 2982, exact enumerations 5311)
+node 882: all 7-smooth y with digit product 882: []   (57s)
+node 8: 3 digit multisets
+  bag (8,): k=1 tmax=3 XL=8.47e+14 G=42 -> every solution has L <= 42  (top cases 0, bottom cases 0, exact enumerations 0)
+  bag (2, 4): k=2 tmax=16 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 3)
+  bag (2, 2, 2): k=3 tmax=8 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 12882, bottom cases 0, exact enumerations 147)
+node 8: all 7-smooth y with digit product 8: [18, 24, 42, 81, 14112]   (1s)
+node 18: 3 digit multisets
+  bag (2, 9): k=2 tmax=6 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 2)
+  bag (3, 6): k=2 tmax=7 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 3)
+  bag (2, 3, 3): k=3 tmax=10 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 455)
+node 18: all 7-smooth y with digit product 18: [36, 63, 192, 1323]   (2s)
+node 24: 5 digit multisets
+  bag (3, 8): k=2 tmax=1 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 7)
+  bag (4, 6): k=2 tmax=6 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 1)
+  bag (2, 2, 6): k=3 tmax=9 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 452)
+  bag (2, 3, 4): k=3 tmax=11 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 921)
+  bag (2, 2, 2, 3): k=4 tmax=10 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 67800, bottom cases 4, exact enumerations 1778)
+node 24: all 7-smooth y with digit product 24: [64, 243, 324, 432, 4116]   (13s)
+node 36: 6 digit multisets
+  bag (4, 9): k=2 tmax=1 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 2)
+  bag (2, 2, 9): k=3 tmax=12 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 339)
+  bag (6, 6): k=2 tmax=10 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 77, bottom cases 0, exact enumerations 4)
+  bag (2, 3, 6): k=3 tmax=10 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 912)
+  bag (3, 3, 4): k=3 tmax=1 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 444)
+  bag (2, 2, 3, 3): k=4 tmax=9 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 90300, bottom cases 4, exact enumerations 2014)
+node 36: all 7-smooth y with digit product 36: [49, 343]   (18s)
+node 42: 2 digit multisets
+  bag (6, 7): k=2 tmax=4 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 3)
+  bag (2, 3, 7): k=3 tmax=10 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 76953, bottom cases 0, exact enumerations 782)
+node 42: all 7-smooth y with digit product 42: [1176, 1372, 131712]   (5s)
+node 49: 1 digit multisets
+  bag (7, 7): k=2 tmax=0 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 77, bottom cases 0, exact enumerations 0)
+node 49: all 7-smooth y with digit product 49: []   (0s)
+node 63: 2 digit multisets
+  bag (7, 9): k=2 tmax=0 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 154, bottom cases 0, exact enumerations 0)
+  bag (3, 3, 7): k=3 tmax=0 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 248)
+node 63: all 7-smooth y with digit product 63: []   (2s)
+node 81: 3 digit multisets
+  bag (9, 9): k=2 tmax=0 XL=6.13e+32 G=78 -> every solution has L <= 155  (top cases 77, bottom cases 0, exact enumerations 0)
+  bag (3, 3, 9): k=3 tmax=0 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 250)
+  bag (3, 3, 3, 3): k=4 tmax=0 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 22650, bottom cases 2, exact enumerations 161)
+node 81: all 7-smooth y with digit product 81: []   (4s)
+node 243: 3 digit multisets
+  bag (3, 9, 9): k=3 tmax=0 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 38533, bottom cases 0, exact enumerations 135)
+  bag (3, 3, 3, 9): k=4 tmax=0 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 67800, bottom cases 4, exact enumerations 331)
+  bag (3, 3, 3, 3, 3): k=5 tmax=0 XL=2.99e+87 G=187 -> every solution has L <= 931  (top cases 34782, bottom cases 374, exact enumerations 210)
+node 243: all 7-smooth y with digit product 243: []   (10s)
+node 343: 1 digit multisets
+  bag (7, 7, 7): k=3 tmax=0 XL=7.56e+50 G=114 -> every solution has L <= 340  (top cases 12882, bottom cases 0, exact enumerations 4)
+node 343: all 7-smooth y with digit product 343: []   (1s)
+node 1323: 2 digit multisets
+  bag (3, 7, 7, 9): k=4 tmax=0 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 157950, bottom cases 6, exact enumerations 374)
+  bag (3, 3, 3, 7, 7): k=5 tmax=0 XL=2.99e+87 G=187 -> every solution has L <= 931  (top cases 138756, bottom cases 1492, exact enumerations 450)
+node 1323: all 7-smooth y with digit product 1323: []   (23s)
+node 1372: 2 digit multisets
+  bag (4, 7, 7, 7): k=4 tmax=1 XL=1.32e+69 G=151 -> every solution has L <= 601  (top cases 67800, bottom cases 4, exact enumerations 1224)
+  bag (2, 2, 7, 7, 7): k=5 tmax=13 XL=2.99e+87 G=187 -> every solution has L <= 931  (top cases 138756, bottom cases 1492, exact enumerations 2312)
+node 1372: all 7-smooth y with digit product 1372: [177147]   (23s)

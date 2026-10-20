@@ -1,0 +1,7 @@
+node 2646: 4 digit multisets
+  bag (6, 7, 7, 9): k=4 tmax=7 XL=1.32e+69 G=151 -> every solution has L <= 601 (top 157950, bottom 6, exact enumerations 2878, 13s)
+  bag (2, 3, 7, 7, 9): k=5 tmax=16 XL=2.99e+87 G=187 -> every solution has L <= 931 (top 450492, bottom 4844, exact enumerations 9820, 44s)
+  bag (3, 3, 6, 7, 7): k=5 tmax=18 XL=2.99e+87 G=187 -> every solution has L <= 931 (top 277326, bottom 2982, exact enumerations 6052, 27s)
+Terminated
+node 2744: 3 digit multisets
+  bag (7, 7, 7, 8): k=4 tmax=1 XL=1.32e+69 G=151 -> every solution has L <= 601 (top 67800, bottom 4, exact enumerations 1193, 6s)

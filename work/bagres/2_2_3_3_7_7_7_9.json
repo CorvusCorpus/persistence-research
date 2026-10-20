@@ -1,0 +1,1 @@
+{"bag": [2, 2, 3, 3, 7, 7, 7, 9], "Lmax": 409, "bounds": [52, 52, 52, 52, 52, 52, 52, 52], "stats": {"top": 41906897, "bottom": 45628616, "enum": 84441, "proofs": 36, "l1fail": 1276327}, "source": "prove_iter3 run (C inner loops)"}

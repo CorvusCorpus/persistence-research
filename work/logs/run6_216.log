@@ -1,0 +1,3 @@
+node 216: 12 digit multisets
+  bag (3, 8, 9): k=3 tmax=1 XL=7.56e+50 G=114 -> every solution has L <= 340 (top 76953, bottom 0, exact enumerations 462, 5s)
+  bag (4, 6, 9): k=3 tmax=4 XL=7.56e+50 G=114 -> every solution has L <= 340 (top 76953, bottom 0, exact enumerations 442, 5s)

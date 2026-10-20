@@ -1,0 +1,16 @@
+node 131712: 15 digit multisets
+  bag (6, 7, 7, 7, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 7, 7, 7, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 6, 7, 7, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (3, 4, 4, 7, 7, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 6, 7, 7, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 6, 7, 7, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 4, 7, 7, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 6, 7, 7, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 4, 4, 4, 7, 7, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 3, 7, 7, 7, 8): resuming top={0: 87, 1: 87, 2: 87, 3: 87} bot={9: 2, 8: 87, 7: 87, 6: 87} partial=[5, 'bottom', 87, 12806091513983345190767494291418775552, 38]
+  bag (2, 2, 2, 2, 3, 7, 7, 7, 8): k=9 tmax=32 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 48223532, bottom solves 24917670, survivor runs 8708, proofs 45, 154s)
+  bag (2, 2, 2, 2, 4, 6, 7, 7, 7): k=9 tmax=37 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 48223532, bottom solves 32559850, survivor runs 9334, proofs 45, 343s)
+  bag (2, 2, 2, 3, 4, 4, 7, 7, 7): k=9 tmax=40 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 101 (top cases 62846184, bottom solves 44243913, survivor runs 12444, proofs 45, 394s)
+  bag (2, 2, 2, 2, 2, 2, 6, 7, 7, 7): k=10 tmax=39 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 132693914, bottom solves 85073388, survivor runs 34412, proofs 55, 758s)
+  bag (2, 2, 2, 2, 2, 3, 4, 7, 7, 7): k=10 tmax=40 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 347218433, bottom solves 256880580, survivor runs 89440, proofs 55, 2098s)

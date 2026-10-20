@@ -1,0 +1,20 @@
+# compiled helpers
+work/csrc/topc
+work/csrc/topc3
+work/csrc/bottomc
+work/csrc/bottomc2
+work/csrc/bottomc3
+work/csrc/topb
+work/csrc/bottomb
+work/csrc/top
+work/csrc/bottom
+work/zf7
+work/gsieve/gsieve_k1[23]
+work/gsieve/gsieve_k1[23]_nl7
+work/gsieve/gs_*
+# python
+__pycache__/
+*.pyc
+# bundles
+*.zip
+work/gsieve/prod_logs.tar.gz

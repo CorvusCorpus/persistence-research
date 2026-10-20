@@ -1,0 +1,226 @@
+  base 6 bag (): cofactors 1 p-bounds {2: 0, 3: 0} top {} bot {0: 29} -> every solution has L <= 29 (top 0, bottom 1, survivors 0, proofs 1, 0.0s)
+base 6: node 1 (target 1, kmax 0): all smooth y with digit product 1: [] (L <= 29, 0s)
+  base 6 bag (2,): cofactors 4 p-bounds {2: 3, 3: 0} top {0: 31} bot {1: 30} -> every solution has L <= 60 (top 0, bottom 1, survivors 0, proofs 3, 0.0s)
+base 6: node 2 (target 2, kmax 1): all smooth y with digit product 2: [8] (L <= 60, 0s)
+  base 6 bag (3,): cofactors 3 p-bounds {2: 0, 3: 2} top {0: 31} bot {1: 30} -> every solution has L <= 60 (top 0, bottom 1, survivors 0, proofs 3, 0.0s)
+base 6: node 3 (target 3, kmax 1): all smooth y with digit product 3: [9, 45] (L <= 60, 0s)
+  base 6 bag (5,): cofactors 1 p-bounds {2: 0, 3: 0} top {0: 31} bot {1: 30} -> every solution has L <= 60 (top 0, bottom 1, survivors 0, proofs 3, 0.0s)
+base 6: node 5 (target 5, kmax 1): all smooth y with digit product 5: [] (L <= 60, 0s)
+  base 6 bag (4,): cofactors 3 p-bounds {2: 2, 3: 0} top {0: 31} bot {1: 30} -> every solution has L <= 60 (top 0, bottom 1, survivors 0, proofs 3, 0.0s)
+  base 6 bag (2, 2): cofactors 5 p-bounds {2: 4, 3: 0} top {0: 31, 1: 30} bot {2: 30} -> every solution has L <= 59 (top 30, bottom 2, survivors 2, proofs 6, 0.0s)
+base 6: node 4 (target 4, kmax 2): all smooth y with digit product 4: [10, 25, 50, 80] (L <= 60, 0s)
+  base 6 bag (3, 3): cofactors 3 p-bounds {2: 0, 3: 2} top {0: 31, 1: 30} bot {2: 30} -> every solution has L <= 59 (top 30, bottom 2, survivors 1, proofs 6, 0.0s)
+base 6: node 9 (target 3, kmax 2): all smooth y with digit product 9: [] (L <= 59, 0s)
+  base 6 bag (2, 5): cofactors 6 p-bounds {2: 5, 3: 0} top {0: 31, 1: 30} bot {2: 30} -> every solution has L <= 59 (top 60, bottom 2, survivors 3, proofs 6, 0.0s)
+base 6: node 10 (target 4, kmax 2): all smooth y with digit product 10: [32] (L <= 59, 0s)
+  base 6 bag (5, 5): cofactors 1 p-bounds {2: 0, 3: 0} top {0: 31, 1: 30} bot {2: 30} -> every solution has L <= 59 (top 30, bottom 2, survivors 1, proofs 6, 0.0s)
+base 6: node 25 (target 4, kmax 2): all smooth y with digit product 25: [] (L <= 59, 0s)
+  base 6 bag (2, 4): cofactors 8 p-bounds {2: 7, 3: 0} top {0: 31, 1: 30} bot {2: 30} -> every solution has L <= 59 (top 60, bottom 2, survivors 3, proofs 6, 0.0s)
+  base 6 bag (2, 2, 2): cofactors 10 p-bounds {2: 9, 3: 0} top {0: 31, 1: 30} bot {2: 30, 3: 31} -> every solution has L <= 59 (top 30, bottom 83, survivors 2, proofs 10, 0.0s)
+base 6: node 8 (target 2, kmax 3): all smooth y with digit product 8: [16, 512] (L <= 59, 0s)
+  base 6 bag (3, 3, 5): cofactors 7 p-bounds {2: 0, 3: 6} top {0: 31, 1: 31} bot {2: 30, 3: 31} -> every solution has L <= 60 (top 154, bottom 65, survivors 0, proofs 10, 0.0s)
+base 6: node 45 (target 3, kmax 3): all smooth y with digit product 45: [] (L <= 60, 0s)
+  base 6 bag (2, 5, 5): cofactors 3 p-bounds {2: 2, 3: 0} top {0: 31, 1: 31} bot {2: 30, 3: 31} -> every solution has L <= 60 (top 154, bottom 65, survivors 2, proofs 10, 0.0s)
+base 6: node 50 (target 4, kmax 3): all smooth y with digit product 50: [] (L <= 60, 0s)
+  base 6 bag (4, 4): cofactors 7 p-bounds {2: 6, 3: 0} top {0: 31, 1: 30} bot {2: 30} -> every solution has L <= 59 (top 30, bottom 2, survivors 1, proofs 6, 0.0s)
+  base 6 bag (2, 2, 4): cofactors 14 p-bounds {2: 13, 3: 0} top {0: 31, 1: 30} bot {2: 30, 3: 31} -> every solution has L <= 59 (top 60, bottom 162, survivors 3, proofs 10, 0.0s)
+  base 6 bag (2, 2, 2, 2): cofactors 8 p-bounds {2: 7, 3: 0} top {0: 31, 1: 31, 2: 30} bot {3: 30, 4: 31} -> every solution has L <= 59 (top 578, bottom 83, survivors 5, proofs 15, 0.0s)
+base 6: node 16 (target 2, kmax 4): all smooth y with digit product 16: [64, 1600] (L <= 59, 0s)
+  base 6 bag (4, 5, 5): cofactors 2 p-bounds {2: 1, 3: 0} top {0: 31, 1: 31} bot {2: 30, 3: 31} -> every solution has L <= 60 (top 154, bottom 65, survivors 0, proofs 10, 0.0s)
+  base 6 bag (2, 2, 5, 5): cofactors 6 p-bounds {2: 5, 3: 0} top {0: 31, 1: 31, 2: 30} bot {3: 30, 4: 31} -> every solution has L <= 59 (top 2026, bottom 162, survivors 7, proofs 15, 0.0s)
+base 6: node 100 (target 4, kmax 4): all smooth y with digit product 100: [] (L <= 60, 0s)
+  base 6 bag (2, 4, 4): cofactors 16 p-bounds {2: 15, 3: 0} top {0: 31, 1: 30} bot {2: 30, 3: 31} -> every solution has L <= 59 (top 60, bottom 162, survivors 3, proofs 10, 0.0s)
+  base 6 bag (2, 2, 2, 4): cofactors 13 p-bounds {2: 12, 3: 0} top {0: 31, 1: 31} bot {2: 30, 3: 31, 4: 31} -> every solution has L <= 60 (top 156, bottom 1694, survivors 4, proofs 15, 0.0s)
+  base 6 bag (2, 2, 2, 2, 2): cofactors 9 p-bounds {2: 8, 3: 0} top {0: 31, 1: 31, 2: 30} bot {3: 30, 4: 31, 5: 31} -> every solution has L <= 59 (top 578, bottom 1830, survivors 5, proofs 21, 0.0s)
+base 6: node 32 (target 4, kmax 5): all smooth y with digit product 32: [100, 160, 32768] (L <= 60, 0s)
+  base 6 bag (4, 4, 5): cofactors 5 p-bounds {2: 4, 3: 0} top {0: 31, 1: 31} bot {2: 30, 3: 31} -> every solution has L <= 60 (top 154, bottom 65, survivors 0, proofs 10, 0.0s)
+  base 6 bag (2, 2, 4, 5): cofactors 14 p-bounds {2: 13, 3: 0} top {0: 31, 1: 31} bot {2: 30, 3: 31, 4: 31} -> every solution has L <= 60 (top 234, bottom 3701, survivors 5, proofs 15, 0.0s)
+  base 6 bag (2, 2, 2, 2, 5): cofactors 11 p-bounds {2: 10, 3: 0} top {0: 31, 1: 31, 2: 30} bot {3: 30, 4: 31, 5: 31} -> every solution has L <= 59 (top 1591, bottom 5247, survivors 7, proofs 21, 0.1s)
+base 6: node 80 (target 4, kmax 5): all smooth y with digit product 80: [10240] (L <= 60, 0s)
+  base 6 bag (2, 5, 5, 5, 5): cofactors 3 p-bounds {2: 2, 3: 0} top {0: 31, 1: 31, 2: 31} bot {3: 30, 4: 31, 5: 31} -> every solution has L <= 60 (top 5002, bottom 1692, survivors 4, proofs 21, 0.1s)
+base 6: node 1250 (target 4, kmax 5): all smooth y with digit product 1250: [] (L <= 60, 0s)
+  base 6 bag (5, 5, 5, 5, 5): cofactors 1 p-bounds {2: 0, 3: 0} top {0: 31, 1: 31, 2: 31} bot {3: 30, 4: 31, 5: 31} -> every solution has L <= 60 (top 1743, bottom 616, survivors 0, proofs 21, 0.0s)
+base 6: node 3125 (target 4, kmax 5): all smooth y with digit product 3125: [] (L <= 60, 0s)
+  base 6 bag (4, 4, 4): cofactors 6 p-bounds {2: 5, 3: 0} top {0: 31, 1: 31} bot {2: 30, 3: 31} -> every solution has L <= 60 (top 77, bottom 34, survivors 0, proofs 10, 0.0s)
+  base 6 bag (2, 2, 4, 4): cofactors 12 p-bounds {2: 11, 3: 0} top {0: 31, 1: 31} bot {2: 30, 3: 31, 4: 31} -> every solution has L <= 60 (top 156, bottom 2159, survivors 4, proofs 15, 0.0s)
+  base 6 bag (2, 2, 2, 2, 4): cofactors 19 p-bounds {2: 18, 3: 0} top {0: 31, 1: 31, 2: 31} bot {3: 31, 4: 31, 5: 31} -> every solution has L <= 61 (top 1593, bottom 5393, survivors 5, proofs 21, 0.1s)
+  base 6 bag (2, 2, 2, 2, 2, 2): cofactors 10 p-bounds {2: 9, 3: 0} top {0: 31, 1: 31, 2: 31} bot {3: 30, 4: 31, 5: 31, 6: 31} -> every solution has L <= 60 (top 1743, bottom 8640, survivors 4, proofs 28, 0.1s)
+base 6: node 64 (target 2, kmax 6): all smooth y with digit product 64: [10000, 64000, 80000, 390625] (L <= 61, 0s)
+  base 6 bag (2, 4, 4, 5): cofactors 13 p-bounds {2: 12, 3: 0} top {0: 31, 1: 31} bot {2: 30, 3: 31, 4: 31} -> every solution has L <= 60 (top 234, bottom 3701, survivors 5, proofs 15, 0.0s)
+  base 6 bag (2, 2, 2, 4, 5): cofactors 16 p-bounds {2: 15, 3: 0} top {0: 31, 1: 31, 2: 30} bot {3: 30, 4: 31, 5: 31} -> every solution has L <= 59 (top 3477, bottom 12189, survivors 9, proofs 21, 0.1s)
+  base 6 bag (2, 2, 2, 2, 2, 5): cofactors 12 p-bounds {2: 11, 3: 0} top {0: 31, 1: 31, 2: 31} bot {3: 30, 4: 31, 5: 31, 6: 31} -> every solution has L <= 60 (top 5145, bottom 30213, survivors 6, proofs 28, 0.1s)
+base 6: node 160 (target 4, kmax 6): all smooth y with digit product 160: [640, 1250, 3125, 3200] (L <= 60, 0s)
+  base 6 bag (2, 4, 4, 4, 5): cofactors 15 p-bounds {2: 14, 3: 0} top {0: 31, 1: 31, 2: 30} bot {3: 30, 4: 31, 5: 31} -> every solution has L <= 59 (top 3477, bottom 12189, survivors 8, proofs 21, 0.1s)
+  base 6 bag (2, 2, 2, 4, 4, 5): cofactors 22 p-bounds {2: 21, 3: 0} top {0: 31, 1: 31, 2: 31} bot {3: 31, 4: 31, 5: 31, 6: 31} -> every solution has L <= 61 (top 13188, bottom 117233, survivors 7, proofs 28, 0.3s)
+  base 6 bag (2, 2, 2, 2, 2, 4, 5): cofactors 27 p-bounds {2: 26, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 32, 5: 32, 6: 32, 7: 32} -> every solution has L <= 62 (top 79726, bottom 357545, survivors 8, proofs 36, 1.3s)
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 5): cofactors 17 p-bounds {2: 16, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 31, 5: 31, 6: 31, 7: 31, 8: 31} -> every solution has L <= 61 (top 107908, bottom 479849, survivors 7, proofs 45, 1.7s)
+base 6: node 640 (target 4, kmax 8): all smooth y with digit product 640: [] (L <= 62, 3s)
+  base 6 bag (4, 4, 4, 5, 5): cofactors 8 p-bounds {2: 7, 3: 0} top {0: 31, 1: 31, 2: 31} bot {3: 30, 4: 31, 5: 31} -> every solution has L <= 60 (top 6518, bottom 2157, survivors 0, proofs 21, 0.1s)
+  base 6 bag (2, 2, 4, 4, 5, 5): cofactors 22 p-bounds {2: 21, 3: 0} top {0: 31, 1: 31, 2: 31} bot {3: 31, 4: 31, 5: 31, 6: 31} -> every solution has L <= 61 (top 14751, bottom 143560, survivors 7, proofs 28, 0.3s)
+  base 6 bag (2, 2, 2, 2, 4, 5, 5): cofactors 24 p-bounds {2: 23, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 31, 5: 31, 6: 31, 7: 31} -> every solution has L <= 61 (top 107794, bottom 496216, survivors 8, proofs 36, 1.8s)
+  base 6 bag (2, 2, 2, 2, 2, 2, 5, 5): cofactors 18 p-bounds {2: 17, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 31, 5: 31, 6: 31, 7: 31, 8: 31} -> every solution has L <= 61 (top 179170, bottom 893786, survivors 6, proofs 45, 2.8s)
+base 6: node 1600 (target 2, kmax 8): all smooth y with digit product 1600: [] (L <= 61, 5s)
+  base 6 bag (4, 4, 5, 5, 5, 5): cofactors 4 p-bounds {2: 3, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 30} bot {4: 30, 5: 31, 6: 31} -> every solution has L <= 59 (top 43722, bottom 6840, survivors 0, proofs 28, 0.3s)
+  base 6 bag (2, 2, 4, 5, 5, 5, 5): cofactors 26 p-bounds {2: 25, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 31, 5: 31, 6: 31, 7: 31} -> every solution has L <= 61 (top 107794, bottom 496216, survivors 8, proofs 36, 1.9s)
+  base 6 bag (2, 2, 2, 2, 5, 5, 5, 5): cofactors 17 p-bounds {2: 16, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 31, 5: 31, 6: 31, 7: 31, 8: 31} -> every solution has L <= 61 (top 200526, bottom 1121935, survivors 7, proofs 45, 2.8s)
+base 6: node 10000 (target 2, kmax 8): all smooth y with digit product 10000: [] (L <= 61, 5s)
+  base 6 bag (5, 5, 5, 5, 5, 5, 5, 5): cofactors 1 p-bounds {2: 0, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 30} bot {5: 48, 6: 31, 7: 31, 8: 31} -> every solution has L <= 77 (top 106327, bottom 25134, survivors 0, proofs 44, 0.5s)
+base 6: node 390625 (target 2, kmax 8): all smooth y with digit product 390625: [] (L <= 77, 0s)
+  base 6 bag (2, 4, 4, 4, 4): cofactors 15 p-bounds {2: 14, 3: 0} top {0: 31, 1: 31, 2: 30} bot {3: 30, 4: 31, 5: 31} -> every solution has L <= 59 (top 1593, bottom 5393, survivors 6, proofs 21, 0.1s)
+  base 6 bag (2, 2, 2, 4, 4, 4): cofactors 20 p-bounds {2: 19, 3: 0} top {0: 31, 1: 31, 2: 31} bot {3: 31, 4: 31, 5: 31, 6: 31} -> every solution has L <= 61 (top 6708, bottom 52045, survivors 6, proofs 28, 0.2s)
+  base 6 bag (2, 2, 2, 2, 2, 4, 4): cofactors 29 p-bounds {2: 28, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 34, 5: 34, 6: 34, 7: 34} -> every solution has L <= 64 (top 43912, bottom 201856, survivors 7, proofs 36, 0.8s)
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4): cofactors 24 p-bounds {2: 23, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 31, 5: 31, 6: 31, 7: 31, 8: 31} -> every solution has L <= 61 (top 107908, bottom 479849, survivors 7, proofs 45, 2.1s)
+Traceback (most recent call last):
+  File "/home/claude/persist/prove_cum_b.py", line 265, in <module>
+    Lb = max([prove_bag(t, base, D - 1, log=lambda x: print(x, flush=True))[0] for t in bags_of(s, b)] + [0])
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/persist/prove_cum_b.py", line 239, in prove_bag
+    if not ok: raise RuntimeError(f"base {b} bag {bag}: level {j} ({side}) survives at G={G}")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2): level 3 (top) survives at G=66
+  base 6 bag (2, 4, 4, 4, 4): proved earlier -> L <= 59
+  base 6 bag (2, 2, 2, 4, 4, 4): proved earlier -> L <= 61
+  base 6 bag (2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 64
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4): proved earlier -> L <= 61
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2): cofactors 16 p-bounds {2: 15, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 30} bot {5: 30, 6: 31, 7: 31, 8: 31, 9: 31} -> every solution has L <= 59 (top 107456, bottom 433757, survivors 9, proofs 55, 1.1s)
+base 6: node 512 (target 2, kmax 9): all smooth y with digit product 512: [] (L <= 64, 1s)
+  base 6 bag (2, 4, 4, 4, 5, 5): cofactors 19 p-bounds {2: 18, 3: 0} top {0: 31, 1: 31, 2: 31} bot {3: 31, 4: 31, 5: 31, 6: 31} -> every solution has L <= 61 (top 13188, bottom 117233, survivors 6, proofs 28, 0.2s)
+  base 6 bag (2, 2, 2, 4, 4, 5, 5): cofactors 26 p-bounds {2: 25, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 31, 5: 31, 6: 31, 7: 31} -> every solution has L <= 61 (top 135862, bottom 641152, survivors 8, proofs 36, 1.8s)
+  base 6 bag (2, 2, 2, 2, 2, 4, 5, 5): cofactors 30 p-bounds {2: 29, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 35, 5: 35, 6: 35, 7: 35, 8: 35} -> every solution has L <= 65 (top 464669, bottom 3530898, survivors 10, proofs 45, 9.4s)
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 5, 5): cofactors 25 p-bounds {2: 24, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31} bot {5: 31, 6: 31, 7: 31, 8: 31, 9: 31} -> every solution has L <= 61 (top 821827, bottom 3945655, survivors 19, proofs 55, 13.1s)
+base 6: node 3200 (target 4, kmax 9): all smooth y with digit product 3200: [] (L <= 65, 25s)
+  base 6 bag (2, 4, 4, 4, 5, 5, 5, 5): cofactors 29 p-bounds {2: 28, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 34, 5: 34, 6: 34, 7: 34, 8: 34} -> every solution has L <= 64 (top 486025, bottom 3729909, survivors 13, proofs 45, 8.6s)
+  base 6 bag (2, 2, 2, 4, 4, 5, 5, 5, 5): cofactors 36 p-bounds {2: 35, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31} bot {5: 41, 6: 41, 7: 41, 8: 41, 9: 41} -> every solution has L <= 71 (top 3803646, bottom 26989107, survivors 31, proofs 55, 72.4s)
+  base 6 bag (2, 2, 2, 2, 2, 4, 5, 5, 5, 5): cofactors 34 p-bounds {2: 33, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31} bot {5: 39, 6: 39, 7: 39, 8: 39, 9: 39, 10: 39} -> every solution has L <= 69 (top 14062364, bottom 122083276, survivors 201, proofs 66, 206.2s)
+Traceback (most recent call last):
+  File "/home/claude/persist/prove_cum_b.py", line 292, in <module>
+    Lb = max([prove_bag(t, base, D - 1, log=lambda x: print(x, flush=True))[0] for t in bags_of(s, b)] + [0])
+              ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/persist/prove_cum_b.py", line 266, in prove_bag
+    if not ok: raise RuntimeError(f"base {b} bag {bag}: level {j} ({side}) survives at G={G}")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: base 6 bag (2, 2, 2, 2, 2, 2, 2, 5, 5, 5, 5): level 6 (bottom) survives at G=48
+  base 6 bag (2, 4, 4, 4, 5, 5, 5, 5): proved earlier -> L <= 64
+  base 6 bag (2, 2, 2, 4, 4, 5, 5, 5, 5): proved earlier -> L <= 71
+  base 6 bag (2, 2, 2, 2, 2, 4, 5, 5, 5, 5): proved earlier -> L <= 69
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 5, 5, 5, 5): cofactors 31 p-bounds {2: 30, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31} bot {6: 36, 7: 36, 8: 36, 9: 36, 10: 36, 11: 36} -> every solution has L <= 66 (top 22292400, bottom 125119862, survivors 263, proofs 78, 112.1s)
+base 6: node 80000 (target 2, kmax 11): all smooth y with digit product 80000: [] (L <= 71, 112s)
+  base 6 bag (2, 4, 4, 4, 4, 4, 5): cofactors 27 p-bounds {2: 26, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 32, 5: 32, 6: 32, 7: 32} -> every solution has L <= 62 (top 79726, bottom 357545, survivors 8, proofs 36, 0.7s)
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 5): cofactors 26 p-bounds {2: 25, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 31, 5: 31, 6: 31, 7: 31, 8: 31} -> every solution has L <= 61 (top 486025, bottom 2998535, survivors 14, proofs 45, 5.0s)
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 5): cofactors 35 p-bounds {2: 34, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31} bot {5: 40, 6: 40, 7: 40, 8: 40, 9: 40} -> every solution has L <= 70 (top 2730885, bottom 17918355, survivors 37, proofs 55, 30.9s)
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 5): cofactors 37 p-bounds {2: 36, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31} bot {6: 42, 7: 42, 8: 42, 9: 42, 10: 42} -> every solution has L <= 72 (top 22020025, bottom 49480626, survivors 223, proofs 66, 149.5s)
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 5): cofactors 40 p-bounds {2: 39, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31} bot {6: 48, 7: 45, 8: 45, 9: 45, 10: 45, 11: 45} -> every solution has L <= 78 (top 28764938, bottom 134079748, survivors 156, proofs 77, 295.8s)
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 5): cofactors 27 p-bounds {2: 26, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31} bot {6: 32, 7: 32, 8: 32, 9: 32, 10: 32, 11: 32, 12: 32} -> every solution has L <= 62 (top 28105247, bottom 118776690, survivors 203, proofs 91, 275.1s)
+base 6: node 10240 (target 4, kmax 12): all smooth y with digit product 10240: [] (L <= 78, 757s)
+  base 6 bag (2, 4, 4, 4, 4, 5, 5, 5): cofactors 31 p-bounds {2: 30, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 36, 5: 36, 6: 36, 7: 36, 8: 36} -> every solution has L <= 66 (top 486025, bottom 4342450, survivors 13, proofs 45, 5.7s)
+  base 6 bag (2, 2, 2, 4, 4, 4, 5, 5, 5): cofactors 34 p-bounds {2: 33, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31} bot {5: 39, 6: 39, 7: 39, 8: 39, 9: 39} -> every solution has L <= 69 (top 4062597, bottom 27831622, survivors 59, proofs 55, 42.1s)
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 5, 5, 5): cofactors 43 p-bounds {2: 42, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31} bot {6: 48, 7: 49, 8: 49, 9: 49, 10: 49} -> every solution has L <= 78 (top 45955610, bottom 78620584, survivors 527, proofs 61, 277.8s)
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 5, 5, 5): cofactors 37 p-bounds {2: 36, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31} bot {6: 48, 7: 42, 8: 42, 9: 42, 10: 42, 11: 42} -> every solution has L <= 78 (top 65618584, bottom 352322400, survivors 294, proofs 77, 604.0s)
+  base 6 bag (2, 4, 4, 4, 4, 5, 5, 5): proved earlier -> L <= 66
+  base 6 bag (2, 2, 2, 4, 4, 4, 5, 5, 5): proved earlier -> L <= 69
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 5, 5, 5): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 5, 5, 5): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 5, 5, 5): cofactors 33 p-bounds {2: 32, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31, 6: 31} bot {7: 38, 8: 38, 9: 38, 10: 38, 11: 38, 12: 38} -> every solution has L <= 68 (top 121391976, bottom 435183506, survivors 1047, proofs 91, 930.2s)
+base 6: node 64000 (target 2, kmax 12): all smooth y with digit product 64000: [] (L <= 78, 930s)
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): cofactors 27 p-bounds {2: 26, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31} bot {4: 32, 5: 32, 6: 32, 7: 32, 8: 32} -> every solution has L <= 62 (top 107908, bottom 504279, survivors 8, proofs 45, 1.1s)
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): cofactors 35 p-bounds {2: 34, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31} bot {5: 40, 6: 40, 7: 40, 8: 40, 9: 40} -> every solution has L <= 70 (top 998563, bottom 6031846, survivors 22, proofs 55, 15.4s)
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): cofactors 35 p-bounds {2: 34, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31} bot {6: 40, 7: 40, 8: 40, 9: 40, 10: 40} -> every solution has L <= 70 (top 9491068, bottom 20052877, survivors 94, proofs 66, 68.5s)
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): cofactors 39 p-bounds {2: 38, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31} bot {6: 48, 7: 44, 8: 44, 9: 44, 10: 44, 11: 44} -> every solution has L <= 78 (top 22292400, bottom 114712758, survivors 122, proofs 77, 248.5s)
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): cofactors 43 p-bounds {2: 42, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31, 6: 31} bot {7: 48, 8: 49, 9: 49, 10: 49, 11: 49, 12: 49} -> every solution has L <= 78 (top 121391976, bottom 420955412, survivors 1553, proofs 85, 1032.6s)
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): cofactors 43 p-bounds {2: 42, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31, 6: 31} bot {7: 48, 8: 49, 9: 49, 10: 49, 11: 49, 12: 49, 13: 49} -> every solution has L <= 78 (top 271722300, bottom 1208291594, survivors 1730, proofs 98, 3171.3s)
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): cofactors 36 p-bounds {2: 35, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31, 6: 31, 7: 31} bot {8: 41, 9: 41, 10: 41, 11: 41, 12: 41, 13: 41, 14: 41} -> every solution has L <= 71 (top 441463392, bottom 1266132064, survivors 3344, proofs 120, 172.0s)
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier -> L <= 71
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier -> L <= 71
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier -> L <= 71
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier -> L <= 71
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier -> L <= 71
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier -> L <= 71
+  base 6 bag (2, 4, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 62
+  base 6 bag (2, 2, 2, 4, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 4, 4, 4, 4, 4): proved earlier -> L <= 70
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4): proved earlier -> L <= 78
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4): proved earlier -> L <= 71
+  base 6 bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2): cofactors 29 p-bounds {2: 28, 3: 0} top {0: 31, 1: 31, 2: 31, 3: 31, 4: 31, 5: 31, 6: 31, 7: 31} bot {8: 34, 9: 34, 10: 34, 11: 34, 12: 34, 13: 34, 14: 34, 15: 34} -> every solution has L <= 64 (top 263938421, bottom 1044490292, survivors 2517, proofs 136, 399.7s)
+base 6: node 32768 (target 4, kmax 15): all smooth y with digit product 32768: [] (L <= 78, 400s)
+THEOREM base 6, final digit 1: tree complete (1 nodes), max persistence 1
+THEOREM base 6, final digit 2: tree complete (10 nodes), max persistence 5
+THEOREM base 6, final digit 3: tree complete (3 nodes), max persistence 2
+THEOREM base 6, final digit 4: tree complete (14 nodes), max persistence 5
+THEOREM base 6, final digit 5: tree complete (1 nodes), max persistence 1
+THEOREM base 6, final digit 1: tree complete (1 nodes), max persistence 1
+THEOREM base 6, final digit 2: tree complete (10 nodes), max persistence 5
+THEOREM base 6, final digit 3: tree complete (3 nodes), max persistence 2
+THEOREM base 6, final digit 4: tree complete (14 nodes), max persistence 5
+THEOREM base 6, final digit 5: tree complete (1 nodes), max persistence 1

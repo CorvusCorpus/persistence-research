@@ -1,0 +1,2 @@
+T4 1 2490 20092 153
+DONE mode=odd dm=G N=36000 N0=-1 c=[0,400) K=13 NL=14 points=1115705788 s1=14304400 s2=0 s3=0 s4=1 gmp=1 full=0 members=0 time=8.72
