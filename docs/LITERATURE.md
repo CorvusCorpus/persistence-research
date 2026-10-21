@@ -75,3 +75,21 @@ blocked from the cloud container.
   - the bridge lemma.
 
   Everything else is credited.
+
+## Zeroless powers of two, OEIS A007377 (re-check 21 Oct 2026, session 3)
+- **OEIS A007377**, fetched directly from oeis.org.
+  - Terms: 0..9, 13, 14, 15, 16, 18, 19, 24, 25, 27, 28, 31..37, 39, 49, 51, 67, 72, 76, 77, 81, 86.
+  - Comment: "It is an open problem of long standing to show that 86 is the last term."
+  - The only search bound: "Checked up to k = 10^10" (David Radcliffe, Aug 21 2022). The newest dated comment is
+    N. J. A. Sloane's example (Feb 10 2023).
+- **Older figures.**
+  - T. Khovanova's blog ("86 Conjecture", Feb 2011) cites a check to 4.6·10^7.
+  - A comment there claims 2.5·10^9, citing math.stackexchange: unconfirmed.
+- **Related computations that are not A007377 bounds:**
+  - B. Chaffin's "Zeros in Powers of 2" (2019, updated Jan 2026) and C. Tooth search for the first 2^n with a run of k
+    zeros (A006889).
+  - arXiv:2503.23177 (Dumitru 2025) sieves for powers of 2 with all even digits, using the last 54 digits.
+  - arXiv:2202.13256 and arXiv:2511.03861 treat ternary digits of 2^n (Erdős, Sloane).
+  - arXiv:2510.18414 (Noda 2025) gives no search, only bounds for a digit generating function.
+- **Novelty.** Residue lifting over n mod 4·5^(k−1) is standard (the papers above). Only the search bound, if
+  extended, would be new. Web searches found no verification beyond 10^10.

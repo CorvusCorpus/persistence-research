@@ -751,3 +751,56 @@ Zero-free mode (E) was the chain sieve's validation mode. At production scale:
   at c = 77.
   - A hidden PowerShell process holds a stay-awake power request (`SetThreadExecutionState`) while the run's `wsl.exe`
     is alive (`zerofree/keepawake.txt`). No settings were changed.
+
+## 2026-10-21 · Session 3 (desktop PC) · A007377: zeroless powers of two (harness)
+
+Goal: verify that 2^n contains a 0 for every 86 < n ≤ N far beyond the published 10^10. Method and lemmas:
+`docs/ZEROLESS_POW2.md`. The zero-free run (Z.5) was paused meanwhile; this work used at most 8 threads and no GPU.
+
+### P.1 Literature (`docs/LITERATURE.md`, A007377 section)
+- The newest search bound is OEIS A007377's "Checked up to k = 10^10" (Radcliffe, Aug 2022). Older figures:
+  4.6·10^7 (Khovanova's blog, 2011) and an unconfirmed claim of 2.5·10^9.
+- Residue lifting is standard. Only the bound would be new.
+
+### P.2 Code (`work/pow2/`)
+- **`z2sieve.c`.** Stages:
+  1. the last 13 digits, along r = n mod P, P = 4·5^12, by doubling;
+  2. digits 14–26 by the affine lift along j = n div P;
+  3. the first 7 digits by a 2^24-bin table with margins;
+  4. digits 27–162 by a limb engine on (2^r mod 10^162)·(2^(jP) mod 10^162);
+  5. GMP/MPFR on the last 1000 and first 40 digits.
+- **Integrity gates before every `CDONE`:** tables re-hashed, the Q table re-hashed, running state re-derived by
+  modular exponentiation, stage 2 against stage 1, and sampled stage 4 against stages 1–2.
+- **Builds:** `z2sieve` (K = 13, NL = 18, TB = 24, TD = 7) and the positive-control build `z2sieve_k4` (K = 4, NL = 2,
+  TD = 3, NMIN = 60).
+- **Tools:** `val_z2.py` (exact check of a dump), `val_z2.sh` (the whole validation), `prod_z2.py` (driver with resume
+  and a CAND/MEMBER tripwire), `aggregate_z2.py` (coverage).
+- **Prototype check of lemma 2 first:** Python, 20,000 random n < 10^17 for K = 4 and for K = 13, with 0 mismatches.
+
+### P.3 Validation (`validation_pc/pow2/val_z2.out`, source `z2sieve.c` `cdb63fb3…`): ALL CHECKS PASSED
+- **K: kernel tests**, 10^6 random n < 2^56 per build, against GMP/MPFR.
+  - Every stage had 0 mismatches.
+  - K = 13: 450,951 stage-3 rejections were confirmed by rigorous leading digits.
+  - K = 4: 209,445 stage-3 rejections, likewise.
+- **E: exact regions** (dump against Python integers and python-flint balls; S2 set exact both ways; every decision,
+  coverage and counter).
+  - K = 13: [1000, 2001000), [P − 10^6, P + 10^6), [10^12, 10^12 + 2·10^6), [10^15 − 999993, 10^15 + 1000007),
+    [3.7·10^13, +2·10^6) and [2^61 − 2·10^6, 2^61). All OK, each with about 143,600 stage-2 survivors.
+  - K = 4: [10^12, +10^6) and [2^61 − 10^6, 2^61). About 132,000 stage-4 survivors each, every one rejected by
+    the final windows and confirmed.
+- **C: positive control.** The K = 4 build over [60, 2·10^6) reports MEMBER for exactly 67, 72, 76, 77, 81, 86. Every
+  other n has its 0 confirmed independently.
+- **T: threads.** Dumps at 1 and 8 threads are identical (K = 13 at 10^15; K = 4 over [60, 2·10^6)).
+
+### P.4 Benchmark (K = 13, 8 threads)
+- **Run:** `./z2sieve 1000000000000 1250000000000 threads=8`, 2.5·10^11 exponents in 87.1 s wall (695 CPU-s).
+  That is 2.9·10^9 exponents/s, or 2.78 ns per exponent per thread.
+- **Survivors:**
+  - stage 1: 28.2%;
+  - stage 2: 7.17%;
+  - stage 3: 3.94%;
+  - stage 4: 5,987 (2.4·10^−8, as 0.9^136 predicts);
+  - stage 5: 0.
+- **Projection at 20 threads:** to be measured, estimated 5–6·10^9/s. So 10^13 in about 0.5 h, 10^14 in about 5 h.
+- **Next step: a CUDA port.** Stage 2 is a few additions and three bit lookups in tables that fit in shared memory.
+  It should reach 10^15–10^16 in hours, once the GPU is free.

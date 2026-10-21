@@ -1,0 +1,2 @@
+z2sieve K=13 NL=18 TB=24 TD=7 NMIN=1000 JCH=1024: P=976562500, log10(2) 2^128 = 4d104d427de7fbcc47c4acd605be48bc; table: 7565172 of 16777216 bins reject (0.4509), built in 1.5s
+kerneltest K=13 NL=18 TB=24 TD=7 samples=1000000 seed=11: mismatches stage1 0 stage2 0 limbs 0 engine 0 frac 0 top 0 (stage-3 rejections 450951, stage-4 rejections 999999)
