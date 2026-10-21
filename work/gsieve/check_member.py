@@ -27,7 +27,7 @@ def check(form, a, b, c):
     orbit = [x]
     while orbit[-1] >= 10: orbit.append(digit_product(orbit[-1]))
     pers = len(orbit) - 1
-    print(f"form={form} a={a} b={b} c={c}: x has {len(s)} digits; chain number: {chain}; persistence of x: {pers}")
+    print(f"form={form} a={a} b={b} c={c}: x has {len(s)} digits; zero-free: {'0' not in s}; chain number: {chain}; persistence of x: {pers}")
     for i, y in enumerate(orbit): print(f"  step {i}: {short(y)}")
     if chain and pers >= 11: print("  !!! persistence(x) >= 11: x is the digit product of a number with persistence >= 12 !!!")
     return chain, pers
