@@ -13,10 +13,28 @@ z2sieve: z2sieve.c
 z2sieve_k4: z2sieve.c
 	$(CC) $(CFLAGS) -DKK=4 -DNL=2 -DTB=18 -DTD=3 -DNMIN=60 -o $@ $< $(LIBS)
 
+# CUDA variant: stages 2-4 on an NVIDIA GPU (z2sieve_cuda.cu), the same decisions as the CPU build. Not part of
+# `make all` (needs nvcc). CUDA_ARCH=sm_86 is the RTX 3060 Ti.
+NVCC      ?= nvcc
+CUDA_ARCH ?= sm_86
+NVFLAGS   ?= -O3 -arch=$(CUDA_ARCH)
+CUDA_HOME ?= $(patsubst %/bin/nvcc,%,$(shell command -v $(NVCC) 2>/dev/null))
+CUDALIBS   = -L$(CUDA_HOME)/lib64 -lcudart_static -ldl -lrt -lstdc++
+K4 = -DKK=4 -DNL=2 -DTB=18 -DTD=3
+z2sieve_cuda.o: z2sieve_cuda.cu z2sieve_cuda.h
+	$(NVCC) $(NVFLAGS) -c -o $@ z2sieve_cuda.cu
+z2sieve_k4_cuda.o: z2sieve_cuda.cu z2sieve_cuda.h
+	$(NVCC) $(NVFLAGS) $(K4) -c -o $@ z2sieve_cuda.cu
+z2sieve_cuda: z2sieve.c z2sieve_cuda.h z2sieve_cuda.o
+	$(CC) $(CFLAGS) -DZ2_CUDA -o $@ z2sieve.c z2sieve_cuda.o $(LIBS) $(CUDALIBS)
+z2sieve_k4_cuda: z2sieve.c z2sieve_cuda.h z2sieve_k4_cuda.o
+	$(CC) $(CFLAGS) -DZ2_CUDA $(K4) -DNMIN=60 -o $@ z2sieve.c z2sieve_k4_cuda.o $(LIBS) $(CUDALIBS)
+cuda: z2sieve_cuda z2sieve_k4_cuda
+
 test: all
 	./val_z2.sh
 
 clean:
-	rm -f z2sieve z2sieve_k4
+	rm -f z2sieve z2sieve_k4 z2sieve_cuda z2sieve_k4_cuda z2sieve_cuda.o z2sieve_k4_cuda.o
 
-.PHONY: all test clean
+.PHONY: all cuda test clean

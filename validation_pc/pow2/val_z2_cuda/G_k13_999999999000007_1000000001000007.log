@@ -1,0 +1,1 @@
+val_z2 ./z2sieve_cuda n=[999999999000007,1000000001000007) K=13 NL=18 TB=24 TD=7: s1=564015 s2=143586 R3=64569 R4=79017 S4=0 R5=0 members=[] cand=0; stage 3 passed 4339 with a 0 in the first 7 digits: OK

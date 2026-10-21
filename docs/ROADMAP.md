@@ -79,7 +79,9 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
   (4 MB for K = 26) and an affine lift mod 2^K replace point-by-point stepping. About 7% of candidates survive
   stage 2 in this mode, so the CPU later stages set the pace.
 - **A007377** (2^n with no digit 0, "checked up to k = 10^10", Radcliffe 2022). IN PROGRESS (session 3): `work/pow2/z2sieve`
-  is built and validated (`docs/ZEROLESS_POW2.md`, NOTEBOOK P); CPU 2.9·10^9 exponents/s at 8 threads; CUDA port next.
+  (CPU) and `z2sieve_cuda` (GPU, 6.8·10^10 exponents/s: 10^15 in about 4 h) are built and validated
+  (`docs/ZEROLESS_POW2.md`, NOTEBOOK P). NEXT: production on the GPU once the zero-free run is done (runs over 12 h
+  need the user's approval), then a second pass and the OEIS comment.
   Original note: the same machinery as a single row
   could reach about 10^14–10^15. The ternary analogues (Erdős's digit-2 problem, zero-free 2^n in base 3) are
   already verified to 2·3^45 ≈ 5.9·10^21 (arXiv 2202.13256); our sieve cannot compete there.

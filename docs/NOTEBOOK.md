@@ -804,3 +804,49 @@ Goal: verify that 2^n contains a 0 for every 86 < n ≤ N far beyond the publish
 - **Projection at 20 threads:** to be measured, estimated 5–6·10^9/s. So 10^13 in about 0.5 h, 10^14 in about 5 h.
 - **Next step: a CUDA port.** Stage 2 is a few additions and three bit lookups in tables that fit in shared memory.
   It should reach 10^15–10^16 in hours, once the GPU is free.
+
+### P.5 CUDA variant (`z2sieve_cuda.cu`, `make cuda`; design in `docs/ZEROLESS_POW2.md`)
+- **Design.**
+  - One thread per stage-1 survivor, from a host bitmap with ranks and run-start tables every 1024 residues.
+  - Lockstep j-walks in blocks of 128 threads, with a shared queue of stage-2 survivors drained every 8 steps.
+  - Stage 5 stays on the host. Device tables are compared with their host copies before each `CDONE`.
+- **Tuning.**
+  - Measured on [10^12, 1.25·10^12), 2.5·10^11 exponents, with JCH = 1024 until the last step.
+  - Timing probes: a `-DZ2PROBE` build stops after a given stage. Nsight's counters need a Windows setting that was not
+    changed.
+
+  | step | change | wall |
+  |---|---|---|
+  | 1 | first version | 11.45 s |
+  | 2 | per-thread counters instead of shared atomics | 11.45 s (atomics were not the cost) |
+  | 3 | probes: setup 0.80 s, +stage 2 2.33 s, +stage 3 2.84 s, +stage 4 11.46 s | the limb engine dominates |
+  | 4 | exact multiplier for the 10^9 quotient (m = ⌈2^76/5^9⌉ on acc >> 9, proven, 1.4·10^6 values checked); 32-bit digit windows; self-check sampled 1/64 as on the CPU | 11.45 s (latency-bound) |
+  | 5 | limbs of 2^r in L1-cached global memory (higher occupancy), queue drained every 16 steps | 9.69 s |
+  | 6 | limbs back in shared memory but limb-major (no strided rows), every 8 steps | 8.16 s |
+  | 7 | two passes: stage 3 with compaction; Q rows of the window in shared memory; 16-bit queue entries | 6.02 s |
+  | 8 | exact pre-filter of limbs 0–3 with no early exit (whole warps), then the full engine; JCH = 4096 | 3.75 s (10^12 in 15.0 s) |
+
+- **Production speed.** One chunk [4·10^12, 8·10^12) takes 59.1 s, or 6.8·10^10 exponents/s, 23 times the CPU at 8
+  threads. The GPU ran at 1920 MHz, 121 W, 68 °C.
+  - Survivors: s2 = 2.87·10^11, s3 = 1.57·10^11, s4 = 93,993, s5 = 0.
+- **Projection.** 10^14 in about 25 min, 10^15 in about 4.1 h, 10^16 in about 41 h.
+- **Safety fix before commit.**
+  - At first the probes were switched on by the environment variable `Z2_PROBE` alone.
+  - A stray variable would have skipped stages, yet still logged coverage. Probes now exist only in `-DZ2PROBE`
+    builds.
+  - The production build ignores the variable (checked).
+
+### P.6 Validation of the final binaries (`validation_pc/pow2/val_z2_cuda.out`): ALL CHECKS PASSED (24 of 24)
+- **Builds.** Sources `z2sieve.c` `1847c835…`, `z2sieve_cuda.cu` `4cc8b5e1…`, `z2sieve_cuda.h` `07c605c2…` (JCH = 4096).
+  - Binaries: `z2sieve` `0fa4226a…`, `z2sieve_k4` `3a57e241…`, `z2sieve_cuda` `7c5cd3b3…`, `z2sieve_k4_cuda` `f0b1fce9…`.
+  - GPU: RTX 3060 Ti, driver 610.88.
+- **Repeated sections K, E, C, T** (as P.3): identical numbers.
+- **G: the GPU builds.**
+  - All six exact K = 13 regions are OK, with the same counts as the CPU build.
+  - The positive control over [60, 2·10^6) gives MEMBER exactly 67, 72, 76, 77, 81, 86.
+  - The dumps at 1 and 8 threads are identical.
+- **X: CPU against GPU.**
+  - Sorted dumps are identical, both for K = 13 at 10^15 and for K = 4 over [60, 2·10^6).
+  - On the production-scale slice [4·10^12, 4.25·10^12) the CDONE counters are identical:
+    s1 = 70,512,472,576, s2 = 17,923,428,218, s3 = 9,841,385,431, s4 = 5,935.
+- **Record.** `validation_pc/pow2/val_z2.out` remains the record of the first CPU-only version (commit `b65c790`).

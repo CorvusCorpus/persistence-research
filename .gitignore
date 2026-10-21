@@ -17,6 +17,7 @@ work/gsieve/gs_*
 work/pow2/z2sieve
 work/pow2/z2sieve_k4
 work/pow2/z2sieve_*cuda
+work/pow2/*.o
 work/pow2/val_logs/
 work/pow2/runs/
 # python

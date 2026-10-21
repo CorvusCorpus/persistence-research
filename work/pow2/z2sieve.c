@@ -26,6 +26,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#ifdef Z2_CUDA
+#include "z2sieve_cuda.h"           // stages 2-4 on the GPU (z2sieve_cuda.cu); stage 1 is a host bitmap, stage 5 the host
+#define VARIANT "cuda"
+#else
+#define VARIANT "cpu"
+#endif
 
 typedef uint64_t u64; typedef uint32_t u32; typedef unsigned __int128 u128;
 
@@ -45,7 +51,7 @@ typedef uint64_t u64; typedef uint32_t u32; typedef unsigned __int128 u128;
 #define NMIN 1000                  // smallest n accepted: 2^n must be longer than the 9 NL-digit window
 #endif
 #ifndef JCH
-#define JCH 1024                   // j values per chunk
+#define JCH 4096                   // j values per chunk (a chunk is JCH P = 4 10^12 consecutive n)
 #endif
 #define RB (1ULL << 20)            // residues r per block
 #define E9 1000000000ULL
@@ -89,11 +95,11 @@ static u64 *ZT[6];                 // ZT[w]: bit v set iff v written with w digi
 static u64 *TOP;                   // stage 3: bit k set iff bin k rejects
 static u32 (*Q)[NL];               // Q[i] = 2^((CH_JA + i) P) mod 10^(9 NL) for the current chunk
 static int NTH = 1, DUMP = 0, CHKALL = 0;
-static u64 CH_JA, CH_JB, CH_N0, CH_N1, NBLK, NEXTB;
+static u64 CH_JA, CH_JB, CH_N0, CH_N1, NBLK, NEXTB __attribute__((unused));
 typedef struct { u64 cnt[8]; char *out; size_t on, oc; int bad; } bres_t;    // one block's counters and output
 static bres_t *BRES;
 static __thread bres_t *CUR;
-static __thread u32 *JBUF;
+static __thread u32 *JBUF __attribute__((unused));
 static __thread mpz_t gx, gm, gt; static __thread mpfr_t fa, fb, fc, fd;
 // counters: 1 = passed stage 1, 2 = stage 2, 3 = stage 3, 4 = stage 4, 5 = no 0 in the stage-5 windows (or n small
 // enough to compute 2^n in full), 6 = CAND (no 0 found, 2^n too large to compute), 7 = MEMBER (2^n has no 0)
@@ -279,6 +285,7 @@ static void final_check(u64 n) {
 }
 
 // ---------------- the sieve ----------------
+#ifndef Z2_CUDA                                 // the CPU variant's stages 2-4
 static void do_r(u64 r, u64 w, u64 s, const u32 *R, u64 j0, u64 j1) {
     bres_t *B = CUR;
     u64 z0 = mulmod(s, C2K, M2), zlo = z0 % M5, zhi = z0 / M5;
@@ -336,6 +343,7 @@ static void *worker(void *arg) {
     free(JBUF); mpz_clears(gx, gm, gt, NULL); mpfr_clears(fa, fb, fc, fd, (mpfr_ptr)0); mpfr_free_cache();
     return NULL;
 }
+#endif
 static void build_q(void) {                     // Q for the chunk [CH_JA, CH_JB), by modular exponentiation
     mpz_t m, x, two, e; mpz_inits(m, x, two, e, NULL);
     mpz_set_ui(m, 10); mpz_pow_ui(m, m, 9 * NL); mpz_set_ui(two, 2);
@@ -343,6 +351,111 @@ static void build_q(void) {                     // Q for the chunk [CH_JA, CH_JB
     mpz_clears(m, x, two, e, NULL);
 }
 static double now(void) { struct timespec t; clock_gettime(CLOCK_MONOTONIC, &t); return t.tv_sec + 1e-9 * t.tv_nsec; }
+static u64 TH0;                                 // hash of the tables, taken after they were built
+
+// ---------------- CUDA variant: host tables, one chunk on the GPU, stage 5 on host threads ----------------
+#ifdef Z2_CUDA
+static u64 *B1, NW1, S1TOT, NRS, *RSW, *RSS, PW13[1024], PSV[1024]; static u32 *RK1, *RSR, PWL[1024 * NL];
+typedef struct { u64 a, b; } span_t;
+static void run_spans(void *(*fn)(void *), u64 n) {     // fn over [0, n) split into NTH spans
+    pthread_t tid[64]; span_t sp[64]; int nt = NTH < 64 ? NTH : 64;
+    for (int t = 0; t < nt; t++) { sp[t].a = n * t / nt; sp[t].b = n * (t + 1) / nt; if (pthread_create(&tid[t], NULL, fn, &sp[t])) die("pthread_create failed"); }
+    for (int t = 0; t < nt; t++) pthread_join(tid[t], NULL);
+}
+static void *b1_part(void *arg) {               // stage 1 for the words [a, b) of the bitmap
+    span_t *s = arg;
+    kd W = kd_split(powmod(2, s->a * 64 + PP, TENK));
+    for (u64 w = s->a; w < s->b; w++) {
+        u64 bits = 0;
+        for (int k = 0; k < 64; k++, kd_add(&W, W)) if (w * 64 + k < PP && kd_ok(W)) bits |= 1ULL << k;
+        B1[w] = bits;
+    }
+    return NULL;
+}
+static void *rs_part(void *arg) {               // the state at r = 1024 k for k in [a, b)
+    span_t *s = arg;
+    mpz_inits(gx, gm, gt, NULL);
+    for (u64 k = s->a; k < s->b; k++) { RSW[k] = powmod(2, 1024 * k + PP, TENK); RSS[k] = powmod(2, 1024 * k, M2); pow2_limbs(1024 * k, RSR + k * NL); }
+    mpz_clears(gx, gm, gt, NULL);
+    return NULL;
+}
+static void gpu_setup(void) {
+    double t0 = now();
+    NW1 = (PP + 63) / 64; B1 = calloc(NW1 + 1, 8); RK1 = malloc((NW1 + 1) * 4);
+    run_spans(b1_part, NW1);
+    u64 run = 0;
+    for (u64 w = 0; w < NW1; w++) { RK1[w] = (u32)run; run += __builtin_popcountll(B1[w]); }
+    RK1[NW1] = (u32)run; S1TOT = run;
+    if (run >> 32) die("too many stage-1 survivors for 32-bit ranks");
+    NRS = (PP + 1023) / 1024; RSW = malloc(NRS * 8); RSS = malloc(NRS * 8); RSR = malloc(NRS * NL * 4);
+    run_spans(rs_part, NRS);
+    mpz_inits(gx, gm, gt, NULL); mpfr_inits2(256, fa, fb, fc, fd, (mpfr_ptr)0);    // stage 5 in the main thread
+    for (int g = 0; g < 1024; g++) { PW13[g] = powmod(2, g, TENK); PSV[g] = powmod(2, g, M2); pow2_limbs(g, PWL + g * NL); }
+    static u64 zt[1740]; u64 o = 0;                   // static: kept as the host copy of the device table
+    for (int w = 0; w <= 5; w++) for (u64 i = 0; i < P10T[w] / 64 + 1; i++) zt[o++] = ZT[w][i];
+    if (o != 1740) die("digit table size");
+    z2c_t c = { C2K, UU, LLO, LHI };
+    fprintf(stderr, "host tables: stage-1 bitmap %llu survivors of %llu (%.5f), run starts %llu, built in %.1fs\n",
+            (unsigned long long)S1TOT, (unsigned long long)PP, (double)S1TOT / PP, (unsigned long long)NRS, now() - t0);
+    z2g_init(&c, zt, TOP, (1ULL << TB) / 64 + 1, B1, RK1, NW1, RSW, RSS, RSR, NRS, PW13, PSV, PWL);
+}
+static u64 rank1(u64 r) {                       // stage-1 survivors below r
+    u64 w = r >> 6;
+    return RK1[w] + ((r & 63) ? (u64)__builtin_popcountll(B1[w] & ((1ULL << (r & 63)) - 1)) : 0);
+}
+static int cmpu64(const void *a, const void *b) { u64 x = *(const u64 *)a, y = *(const u64 *)b; return x < y ? -1 : x > y; }
+typedef struct { const u64 *v; u64 n; bres_t b; } s5_t;
+static void *s5_worker(void *arg) {
+    s5_t *s = arg; CUR = &s->b;
+    mpz_inits(gx, gm, gt, NULL); mpfr_inits2(256, fa, fb, fc, fd, (mpfr_ptr)0);
+    for (u64 i = 0; i < s->n; i++) final_check(s->v[i]);
+    mpz_clears(gx, gm, gt, NULL); mpfr_clears(fa, fb, fc, fd, (mpfr_ptr)0); mpfr_free_cache();
+    return NULL;
+}
+static void gpu_chunk(u64 *cc, u64 qh) {
+    u64 iv[4]; int niv;                         // survivor indices whose r has some n of [CH_N0, CH_N1)
+    if (CH_N1 - CH_N0 >= PP) { iv[0] = 0; iv[1] = S1TOT; niv = 1; }
+    else {
+        u64 ja = CH_N0 / PP, jb = (CH_N1 - 1) / PP;
+        if (ja == jb) { iv[0] = rank1(CH_N0 - ja * PP); iv[1] = rank1(CH_N1 - ja * PP); niv = 1; }
+        else { iv[0] = rank1(CH_N0 - ja * PP); iv[1] = S1TOT; iv[2] = 0; iv[3] = rank1(CH_N1 - jb * PP); niv = 2; }
+    }
+    z2r_t res;
+    z2g_chunk(CH_JA, CH_JB, CH_N0, CH_N1, &Q[0][0], iv, niv, DUMP, &res);
+    if (res.flags) { fprintf(stderr, "gpu flags %u\n", res.flags); fail("the GPU's stages disagree with the host tables, or a buffer overflowed"); }
+    for (int k = 0; k < 4; k++) cc[k + 1] = res.ctr[k];
+    if (res.ns4 != cc[4]) fail("the GPU's stage-4 list disagrees with its counter");
+    bres_t B = { 0 };
+    if (DUMP) {                                 // all lines in increasing n (stage 5 in this thread)
+        CUR = &B; qsort(res.dmp, res.ndmp, 8, cmpu64);
+        u64 n4 = 0;
+        for (u64 i = 0; i < res.ndmp; i++) {
+            u64 n = res.dmp[i] >> 2; int cls = (int)(res.dmp[i] & 3);
+            emit("S2 %llu\n", (unsigned long long)n);
+            if (cls == 1) emit("R3 %llu\n", (unsigned long long)n);
+            else if (cls == 2) emit("R4 %llu\n", (unsigned long long)n);
+            else { emit("S4 %llu\n", (unsigned long long)n); final_check(n); n4++; }
+        }
+        if (res.ndmp != cc[2] || n4 != cc[4]) fail("the GPU dump disagrees with its counters");
+    } else {                                    // stage 5 on NTH host threads, output in increasing n
+        qsort(res.s4, res.ns4, 8, cmpu64);
+        s5_t sp[64]; pthread_t tid[64]; int nt = NTH < 64 ? NTH : 64;
+        for (int t = 0; t < nt; t++) { memset(&sp[t], 0, sizeof sp[t]); sp[t].v = res.s4 + res.ns4 * t / nt; sp[t].n = res.ns4 * (t + 1) / nt - res.ns4 * t / nt; if (pthread_create(&tid[t], NULL, s5_worker, &sp[t])) die("pthread_create failed"); }
+        for (int t = 0; t < nt; t++) {
+            pthread_join(tid[t], NULL);
+            for (int k = 5; k < 8; k++) B.cnt[k] += sp[t].b.cnt[k];
+            if (sp[t].b.on) { CUR = &B; emit("%.*s", (int)sp[t].b.on, sp[t].b.out); }
+            free(sp[t].b.out);
+        }
+    }
+    for (int k = 5; k < 8; k++) cc[k] = B.cnt[k];
+    if (tables_hash() != TH0) fail("the tables changed");
+    if (fnv(1469598103934665603ULL, Q, JCH * sizeof *Q) != qh) fail("the Q table changed");
+    if (z2g_verify()) fail("a device table no longer equals its host copy");
+    if (B.on) fwrite(B.out, 1, B.on, stdout);
+    free(B.out);
+}
+#endif
 
 // ---------------- kernel test ----------------
 static int kerneltest(u64 samples, u64 seed) {
@@ -400,15 +513,18 @@ int main(int argc, char **argv) {
     double t0 = now();
     build_top();
     u64 nrej = 0; for (u64 w = 0; w < (1ULL << TB) / 64 + 1; w++) nrej += __builtin_popcountll(TOP[w]);
-    fprintf(stderr, "z2sieve K=%d NL=%d TB=%d TD=%d NMIN=%d JCH=%d: P=%llu, log10(2) 2^128 = %016llx%016llx; table: %llu of %llu bins reject (%.4f), built in %.1fs\n",
-            KK, NL, TB, TD, NMIN, JCH, (unsigned long long)PP, (unsigned long long)LHI, (unsigned long long)LLO,
+    fprintf(stderr, "z2sieve K=%d NL=%d TB=%d TD=%d NMIN=%d JCH=%d variant=%s: P=%llu, log10(2) 2^128 = %016llx%016llx; table: %llu of %llu bins reject (%.4f), built in %.1fs\n",
+            KK, NL, TB, TD, NMIN, JCH, VARIANT, (unsigned long long)PP, (unsigned long long)LHI, (unsigned long long)LLO,
             (unsigned long long)nrej, 1ULL << TB, (double)nrej / (double)(1ULL << TB), now() - t0);
     if (!strcmp(argv[1], "kerneltest")) return kerneltest(strtoull(argv[2], NULL, 10), strtoull(argv[3 < argc ? 3 : 2], NULL, 10));
     u64 nlo = strtoull(argv[1], NULL, 10), nhi = strtoull(argv[2], NULL, 10);
     if (nlo < NMIN || nhi <= nlo || nhi > (1ULL << 62)) die("need NMIN <= N_LO < N_HI <= 2^62");
-    u64 th0 = tables_hash();
+    TH0 = tables_hash();
     Q = malloc(JCH * sizeof *Q);
     NBLK = (PP + RB - 1) / RB; BRES = calloc(NBLK, sizeof *BRES);
+#ifdef Z2_CUDA
+    gpu_setup();
+#endif
     u64 tot[8] = { 0 }; double w0 = now(); clock_t c0 = clock(); u64 nch = 0;
     for (u64 c = nlo / PP / JCH; c * JCH * PP < nhi; c++) {
         CH_JA = c * JCH; CH_JB = CH_JA + JCH;
@@ -416,18 +532,22 @@ int main(int argc, char **argv) {
         if (CH_N0 >= CH_N1) continue;
         build_q();
         u64 qh = fnv(1469598103934665603ULL, Q, JCH * sizeof *Q);
+        u64 cc[8] = { 0 };
+#ifdef Z2_CUDA
+        gpu_chunk(cc, qh);
+#else
         memset(BRES, 0, NBLK * sizeof *BRES); NEXTB = 0;
         pthread_t *tid = malloc(NTH * sizeof *tid);
         for (int t = 0; t < NTH; t++) if (pthread_create(&tid[t], NULL, worker, NULL)) die("pthread_create failed");
         for (int t = 0; t < NTH; t++) pthread_join(tid[t], NULL);
         free(tid);
         // integrity: tables and Q unchanged, every block's running state re-derived
-        if (tables_hash() != th0) fail("the tables changed");
+        if (tables_hash() != TH0) fail("the tables changed");
         if (fnv(1469598103934665603ULL, Q, JCH * sizeof *Q) != qh) fail("the Q table changed");
-        u64 cc[8] = { 0 };
         for (u64 b = 0; b < NBLK; b++) { if (BRES[b].bad) fail("a block's running state disagrees with modular exponentiation"); for (int k = 0; k < 8; k++) cc[k] += BRES[b].cnt[k]; }
         for (u64 b = 0; b < NBLK; b++) if (BRES[b].on) { fwrite(BRES[b].out, 1, BRES[b].on, stdout); }
         for (u64 b = 0; b < NBLK; b++) free(BRES[b].out);
+#endif
         printf("CDONE j=[%llu,%llu) n=[%llu,%llu) s1=%llu s2=%llu s3=%llu s4=%llu s5=%llu cand=%llu members=%llu\n",
                (unsigned long long)CH_JA, (unsigned long long)CH_JB, (unsigned long long)CH_N0, (unsigned long long)CH_N1,
                (unsigned long long)cc[1], (unsigned long long)cc[2], (unsigned long long)cc[3], (unsigned long long)cc[4],
@@ -437,8 +557,8 @@ int main(int argc, char **argv) {
         nch++;
     }
     double wall = now() - w0, cpu = (double)(clock() - c0) / CLOCKS_PER_SEC;
-    printf("DONE n=[%llu,%llu) K=%d NL=%d TB=%d TD=%d chunks=%llu s1=%llu s2=%llu s3=%llu s4=%llu s5=%llu cand=%llu members=%llu time=%.2f threads=%d wall=%.2f\n",
-           (unsigned long long)nlo, (unsigned long long)nhi, KK, NL, TB, TD, (unsigned long long)nch,
+    printf("DONE n=[%llu,%llu) K=%d NL=%d TB=%d TD=%d variant=%s chunks=%llu s1=%llu s2=%llu s3=%llu s4=%llu s5=%llu cand=%llu members=%llu time=%.2f threads=%d wall=%.2f\n",
+           (unsigned long long)nlo, (unsigned long long)nhi, KK, NL, TB, TD, VARIANT, (unsigned long long)nch,
            (unsigned long long)tot[1], (unsigned long long)tot[2], (unsigned long long)tot[3], (unsigned long long)tot[4],
            (unsigned long long)tot[5], (unsigned long long)tot[6], (unsigned long long)tot[7], cpu, NTH, wall);
     return 0;

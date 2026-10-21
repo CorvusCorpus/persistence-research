@@ -55,7 +55,7 @@ Write n = r + jP with P = 4·5^(K−1) and 0 ≤ r < P. P is the order of 2 modu
   the wrap-around never reject.
 - **Work.** Work is linear in the search limit N (the persistence problems are cubic).
   - Stage 2 runs about 0.28·N steps of a few integer operations.
-  - Stage 1 runs P steps per chunk of 1024·P ≈ 10^12 exponents.
+  - Stage 1 runs P steps per chunk of 4096·P = 4·10^12 exponents (JCH = 4096).
 - **Exact output.** Every n of [N_LO, N_HI) is rejected by an exact test, or by the stage-3 table with its margins, or
   it is reported:
   - `MEMBER`: 2^n computed in full and found to have no 0;
@@ -86,7 +86,7 @@ its last one.
   - Regions:
     - the start of the range;
     - the first j boundary;
-    - the chunk boundaries 10^12 = 1024·P and 10^15 = 1024000·P;
+    - the j boundary 10^12 = 1024·P and the chunk boundary 10^15 = 250·4096·P;
     - 3.7·10^13;
     - just below 2^61.
 - **C: positive control.**
@@ -95,6 +95,32 @@ its last one.
 - **T: threads.** Dumps at 1 and 8 threads are identical.
 - **Results:** `validation_pc/pow2/`. See `docs/NOTEBOOK.md`, section P.
 
+## CUDA variant (`z2sieve_cuda.cu`, `make cuda`)
+- **Host.**
+  - Stage 1 becomes a bitmap over r (122 MB, built in parallel by the CPU code), with 32-bit word ranks.
+  - Run-start tables hold w, 2^r mod 5^26 and 2^r mod 10^162 at every r = 1024·k (84 MB), plus 2^g for g < 1024.
+  - Stage 5 runs on the host threads.
+- **One GPU thread per surviving residue.**
+  - The thread derives its state with one multiplication from the run-start tables.
+  - It then walks j through the chunk in lockstep with its block of 128 threads.
+- **Stage-2 survivors.**
+  - They go to a shared queue (16-bit entries) that the block drains every 8 steps of j, in three passes:
+    1. stage 3, whose survivors are compacted;
+    2. an exact stage-4 pre-filter on limbs 0–3 (digits 27–36), with no early exit, so whole warps run it;
+    3. the full limb engine on its survivors.
+  - The digit tables, the queues, the limbs of 2^r (limb-major) and the window's Q rows live in shared memory (31 KB).
+  - 10^9 quotients use an exact multiplier: m = ⌈2^76/5^9⌉ on acc >> 9, error below 1/5^9.
+- **Integrity: the same gates as the CPU build, plus:**
+  - every device table is compared with its host copy before each `CDONE` (as in gsieve's CUDA variant);
+  - the bitmap is checked against w(r), and stage 2 against stage 1, at every residue;
+  - sampled limb self-checks;
+  - device flags make the program stop.
+- **Speed.**
+  - One chunk of 4·10^12 exponents takes 59 s, so 6.8·10^10 exponents/s: 23 times the CPU build at 8 threads.
+  - Projected: 10^14 in about 25 min, 10^15 in about 4 h, 10^16 in about 41 h.
+  - The tuning steps are in `docs/NOTEBOOK.md`, section P.5.
+
 ## Production
-To be done. The CPU build first, then a CUDA port: each step of stage 2 is a few integer additions and three bit lookups
-in tables that fit in shared memory.
+To be done, on the GPU once the zero-free run (NOTEBOOK Z) has released it, with `prod_z2.py` (`EXE=./z2sieve_cuda`) and
+`aggregate_z2.py`. Runs over 12 h need the user's approval. An independent second pass of the range (the CPU build on a
+slice, or a second GPU pass with counter comparison) follows the rule for non-ECC hardware.

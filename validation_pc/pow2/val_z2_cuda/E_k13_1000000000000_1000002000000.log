@@ -1,0 +1,1 @@
+val_z2 ./z2sieve n=[1000000000000,1000002000000) K=13 NL=18 TB=24 TD=7: s1=564529 s2=143805 R3=64597 R4=79208 S4=0 R5=0 members=[] cand=0; stage 3 passed 4322 with a 0 in the first 7 digits: OK

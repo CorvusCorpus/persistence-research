@@ -1,0 +1,1 @@
+val_z2 ./z2sieve_k4 n=[1000000000000,1000001000000) K=4 NL=2 TB=18 TD=3: s1=728000 s2=477540 R3=98852 R4=246511 S4=132177 R5=132177 members=[] cand=0; stage 3 passed 154 with a 0 in the first 3 digits: OK

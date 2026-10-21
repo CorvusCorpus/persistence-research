@@ -44,6 +44,8 @@ work/                original working directory (flat layout; run scripts from h
   logs/              run logs, sieve outputs
   gsieve/            chain sieve: gsieve.c (ifma/avx512/avx2/scalar variants, pthreads), constants,
                      drivers, validation, logs/
+  pow2/              zeroless powers of two (OEIS A007377): z2sieve.c (CPU), z2sieve_cuda.cu (GPU),
+                     validation (val_z2.sh), driver (prod_z2.py), docs/ZEROLESS_POW2.md
 ```
 
 ## Quick start (Linux; gcc, GMP, MPFR, Python 3 with python-flint and mpmath)
@@ -53,6 +55,7 @@ make test             # chain-sieve validation suite + base-10 smoke test + reco
 make records-check    # SHA-256 manifest of the record files + production-log coverage
 make logs-tarball     # dist/persistence-logs-<commit>.tar.xz for a GitHub release
 make -C work/gsieve cuda   # optional: CUDA variant of the chain sieve (stages 1-2 on an NVIDIA GPU, CUDA 13)
+make -C work/pow2 all cuda # zeroless powers of two (A007377): CPU and GPU builds; validate with work/pow2/val_z2.sh
 ```
 On Windows, `scripts/setup_wsl_cuda.sh` sets up a WSL2 distribution with all of the above, CUDA included.
 Individual pieces, from `work/gsieve/`: `make test` (validation suite),

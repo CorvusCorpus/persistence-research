@@ -1,0 +1,1 @@
+val_z2 ./z2sieve_k4_cuda n=[60,2000000) K=4 NL=2 TB=18 TD=3: s1=1455960 s2=955111 R3=200156 R4=491365 S4=263590 R5=263584 members=[67, 72, 76, 77, 81, 86] cand=0; stage 3 passed 321 with a 0 in the first 3 digits: OK
