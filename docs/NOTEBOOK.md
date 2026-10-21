@@ -987,3 +987,55 @@ Question from the user: can the N³ cost of the chain sieve be beaten?
   - threads;
   - E mode;
   - a production-scale cross-check against gsieve's dumps.
+
+### T.4 `tsieve6`: the full main path, identical to gsieve (session 4, 21 Oct 2026)
+- **What it is.** The coset tree with bitmap hit lists (K = 13, so the block covers digits 14–26) feeds gsieve's own
+  stages 3–5, included from `gsieve.c`: the TOP table, `limb_check` and `full_check`. M = 3^b 7^c mod 10^126 comes from
+  tables (T3, T7).
+  - Counters: points and s1 as gsieve counts them. Region points come from gsieve's row loop. For s1, the polytope
+    points below 10^XMIN whose last 13 digits pass are subtracted.
+  - pthreads over 4^7 subtree roots.
+  - Modes G and E. In E, a node has 5 admissible lifts when their digits are odd.
+  - Downstream batched per thread: stage 3, then `limb_check`'s first test from the low 4 limbs (the same decision,
+    with prefetch), then the full M product and `limb_check` for the rest.
+  - `roots=A:B` processes a subset of the 16,384 roots, for benchmarks.
+- **Bugs found while building it.**
+  - An implicit `exp10l` declaration: `<signal.h>` was included before gsieve.c's `_GNU_SOURCE` (the CLAUDE.md
+    pitfall). Fixed by defining `_GNU_SOURCE` first.
+  - A sign error in a reciprocal made row bounds slow. They stayed exact.
+- **Validation** (`val_tsieve6.sh`: gsieve and tsieve6 on the same region; every DONE counter and the sorted
+  S2/R3/R4/S4/MEMBER dump lines):
+  - G mode: N = 300, 500, 800; shells (900, n0 = 600) and (1200, n0 = 1100); 2–4 threads. IDENTICAL.
+  - E mode: N = 300, 600 and (900, n0 = 700). IDENTICAL. N = 300 and 600 have members=1: the known 137-digit
+    2^77·3^64·7^98, found by the tree on the main path.
+  - **Positive control** (`val_e2e_tree.py`, NL = 7, N = 160). tsieve6 on the main path (173 members) plus gsieve's
+    direct (59) and odd (82) paths gives **314/314** of the known zero-free numbers: none missing, none extra.
+  - The E-mode tree has 275,439,346 leaves, which equals gsieve's E-mode bitmap count (`good=`). That is an
+    independent check of the tree.
+  - Re-validated after every later change (the last three G/E regions and 314/314).
+- **Speed** (this machine, 4 threads).
+  - gsieve, N = 16,000: 357 s wall (1,263 CPU-s), or 1,405 s with one thread.
+  - tsieve6 is slower at that size. With K = 13 there are always 6.7·10⁷ cosets of about N³/P13 points each (520 at
+    N = 8,000), and per-coset work dominates.
+  - At N = 10⁵, on 1/256 of the cosets (`roots=0:64`, M = 7), extrapolated:
+
+    | version | CPU-s per 1/256 | full run |
+    |---|---|---|
+    | first | 1,772 | 126 core-h |
+    | batched downstream with prefetch | 1,514 | 108 core-h |
+    | without stages 3–5 (timing build) | 939 | — |
+    | gsieve at 0.326 ns/point | ≈ 1,270 | ≈ 90 core-h |
+
+    With M = 8 (no table, the tree per coset) it took 1,920.
+  - Counts per 1/256: s1 2.68·10¹¹, hits 5.6·10¹⁰ (4.8× fewer than s1), rows 5.4·10⁹, s2 1.48·10¹⁰.
+  - Costs: about 7 ns per hit, about 90 ns per row (about 10 hits each), and about 39 ns per s2 survivor
+    downstream. gsieve's stages 3–5 cost about 41 ns per s2 survivor.
+- **Conclusion for the CPU.** The tree sieve is about 1.2× slower than gsieve at N = 10⁵ on this CPU. Its cost grows as
+  N^2.58 against N³, so the crossover is near N ≈ 3·10⁵. The constants that matter are per hit and per row, which
+  scalar code does not reduce enough.
+- **Next step: the GPU.** Per coset, the work is regular integer arithmetic: T(h0) as a tree, U in shared memory
+  (2·5^7 bits = 19.5 KB), rows, hits, and the downstream with small tables.
+  - Estimate at N = 10⁵: about 10¹⁵ simple instructions, a few minutes on the RTX 3060 Ti. The CUDA gsieve takes
+    about 64 min at 2.6·10¹¹/s (G mode with GSIEVE_GPU34).
+  - It can only be validated on the desktop. Plan: a CUDA build with the same counters and dumps, and val_tsieve6.sh
+    against gsieve as the acceptance test.
