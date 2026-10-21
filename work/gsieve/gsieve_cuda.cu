@@ -53,8 +53,11 @@ static_assert(ITEMS * NWARP == 32, "the per-tile scan uses one warp");
 
 typedef unsigned long long ull;
 struct tabs_t { const ull *BM; const unsigned *RK; const ull *AB; const unsigned short *H0; const unsigned *POS;
-                const unsigned *OKM; int top; };
+                const unsigned *OKM; int top;
+                const ull *TOPW; const unsigned *T2; int nl; };   // stages 3-4 (gpu_init_later)
 static tabs_t T;                       // device tables (read only after gpu_init)
+#define TBB 18                         // leading-digit table: 2^TBB bins (TB in gsieve.c)
+#define E9D 1000000000ull
 
 __device__ __forceinline__ unsigned div4(unsigned v) { return (unsigned)(((ull)v * M4) >> 45); }    // v < 2^31
 __device__ __forceinline__ unsigned okw(const unsigned *okm, unsigned d) { return (okm[d >> 5] >> (d & 31)) & 1u; }
@@ -83,15 +86,55 @@ __device__ __forceinline__ unsigned stage2(ull ab, unsigned h0, unsigned j, cons
 #endif
 }
 
+// ---- stages 3-4 on the GPU: exact ports of later_stages() and limb_check() in gsieve.c ----
+// one digit d is allowed (the same rule as the digit-26 check: G mode not 0 or 5, E mode not 0, P mode any)
+__device__ __forceinline__ unsigned dig_ok(unsigned d, int top) { return top == 2 || (d != 0 && (top != 0 || d != 5)); }
+// the 9 digits of a base-1e9 limb v (zero padded): FL4[v % 10^4] | FL5[v / 10^4] of the CPU code
+__device__ __forceinline__ unsigned limb9_ok(ull v, const unsigned *okm, int top) {
+    unsigned x = (unsigned)v;
+    return okw(okm, x % 10000u) && okw(okm, (x / 10000u) % 10000u) && dig_ok(x / 100000000u, top);
+}
+// digits [2K, 9 nl) of (2^a M) mod 10^(9 nl), A = T2[a], B = M: 1 if all allowed (limb_check)
+__device__ unsigned limb_ok(const unsigned *__restrict__ A, const unsigned *B, int nl, const unsigned *okm, int top) {
+    ull a0 = A[0], a1 = A[1], a2 = A[2], a3 = A[3], b0 = B[0], b1 = B[1], b2 = B[2], b3 = B[3];
+    ull acc = a0 * b0, cy = acc / E9D;                       // each sum has at most 14 products < 10^18: < 2^64
+    acc = a0 * b1 + a1 * b0 + cy; cy = acc / E9D;
+    acc = a0 * b2 + a1 * b1 + a2 * b0 + cy; cy = acc / E9D; ull l2 = acc - cy * E9D;
+    acc = a0 * b3 + a1 * b2 + a2 * b1 + a3 * b0 + cy; cy = acc / E9D; ull l3 = acc - cy * E9D;
+#if KK == 13
+    if (!dig_ok((unsigned)(l2 / 100000000ull), top)) return 0;           // FL1[l2 / 10^8]: digit 26
+#else
+    if (!okw(okm, 1000u + (unsigned)(l2 / 1000000ull))) return 0;        // FL3[l2 / 10^6]: digits 24..26, as "1ddd"
+#endif
+    if (!limb9_ok(l3, okm, top)) return 0;
+    for (int kk = 4; kk < nl; kk++) {
+        acc = cy;
+        for (int u = 0; u <= kk; u++) acc += (ull)A[u] * B[kk - u];
+        cy = acc / E9D;
+        if (!limb9_ok(acc - cy * E9D, okm, top)) return 0;
+    }
+    return 1;
+}
+
 __global__ void __launch_bounds__(BLK) s12_kernel(tabs_t t, const gseg_t *__restrict__ seg, unsigned *__restrict__ s1o,
         unsigned *__restrict__ offo, unsigned *__restrict__ cnto, unsigned *__restrict__ pos, ull poscap,
-        ull *__restrict__ ctr, govf_t *__restrict__ ovf, ull ovfcap) {
+        ull *__restrict__ ctr, govf_t *__restrict__ ovf, ull ovfcap,
+        int later, int dumpall, const gsegx_t *__restrict__ segx, const unsigned *__restrict__ mrows,
+        unsigned *__restrict__ s2o, unsigned *__restrict__ s3o, unsigned *__restrict__ s4o) {
     __shared__ unsigned okm[OKW], sbuf[SCAP], wc[32];
     __shared__ unsigned sh_r0, sh_r1, sh_tot;
     __shared__ ull sh_off;
+    __shared__ unsigned msh[16], sh_c3, sh_c4, sh_nout;
+    extern __shared__ unsigned char scode[];                  // SCAP bytes when later (dynamic shared memory)
     const unsigned tid = threadIdx.x, lane = tid & 31, warp = tid >> 5, k = blockIdx.x;
     for (unsigned v = tid; v < OKW; v += BLK) okm[v] = t.OKM[v];
     const gseg_t sg = seg[k];
+    gsegx_t sx = { 0, 0, 0, 0 };
+    unsigned tot2 = 0, tot3 = 0, tot4 = 0, nout = 0;          // thread 0: the segment's stage-2/3/4 counts
+    if (later) {
+        sx = segx[k];
+        for (int v = tid; v < t.nl; v += BLK) msh[v] = mrows[(ull)sx.mrow * t.nl + v];
+    }
     if (tid == 0) {                                           // stage 1: rank range of the set bits in [s, e)
         unsigned w0 = sg.s >> 6, w1 = (sg.e - 1) >> 6;
         unsigned r0 = t.RK[w0] + __popcll(t.BM[w0] & ((1ull << (sg.s & 63)) - 1));
@@ -102,8 +145,33 @@ __global__ void __launch_bounds__(BLK) s12_kernel(tabs_t t, const gseg_t *__rest
     __syncthreads();
     const unsigned r0 = sh_r0, r1 = sh_r1, j = sg.j, below = (1u << lane) - 1;
     unsigned nbuf = 0, seq = 0;                               // block-uniform
-    // write sbuf[0, n) to the output: the segment's final chunk, or an early chunk recorded in ovf
+    // stages 3-4 (later): classify the stage-2 survivors sbuf[0, n) as later_stages() does -- leading-digit table
+    // (R3), limb engine (R4), else S4 -- and set nout, the number of entries to write: all of them with their class
+    // in the top two bits (dumpall), or only the S4 ones, in order. Without later, nout = n.
+#define CLASSIFY(n) do {                                                                                           \
+        if (!later) { nout = (n); break; }                                                                       \
+        if (tid == 0) { sh_c3 = 0; sh_c4 = 0; }                                                                  \
+        __syncthreads();                                                                                         \
+        unsigned c3_ = 0, c4_ = 0;                                                                               \
+        for (unsigned v = tid; v < (n); v += BLK) {                                                              \
+            ull a_ = (ull)((long long)sbuf[v] + sx.delta), bin_ = (a_ * L2 + sx.tb) >> (64 - TBB);                \
+            unsigned code_ = ((__ldg(&t.TOPW[bin_ >> 6]) >> (bin_ & 63)) & 1ull) ? 0u                             \
+                           : limb_ok(t.T2 + a_ * (ull)t.nl, msh, t.nl, okm, t.top) ? 2u : 1u;                     \
+            scode[v] = (unsigned char)code_; c3_ += code_ != 0; c4_ += code_ == 2;                                \
+        }                                                                                                        \
+        atomicAdd(&sh_c3, c3_); atomicAdd(&sh_c4, c4_);                                                          \
+        __syncthreads();                                                                                         \
+        if (dumpall) { for (unsigned v = tid; v < (n); v += BLK) sbuf[v] |= (unsigned)scode[v] << 30; nout = (n); } \
+        else {                                                                                                   \
+            if (tid == 0) { unsigned j_ = 0; for (unsigned v = 0; v < (n); v++) if (scode[v] == 2) sbuf[j_++] = sbuf[v] | (2u << 30); sh_nout = j_; } \
+            __syncthreads(); nout = sh_nout;                                                                     \
+        }                                                                                                        \
+        if (tid == 0) { tot2 += (n); tot3 += sh_c3; tot4 += sh_c4; }                                             \
+        __syncthreads();                                                                                         \
+    } while (0)
+    // write sbuf[0, n) to the output: the segment's final chunk, or an early chunk recorded in ovf (none if empty)
 #define FLUSH(n, fin) do {                                                                                         \
+        if ((n) == 0 && !(fin)) break;                                                                           \
         if (tid == 0) sh_off = (n) ? atomicAdd(&ctr[0], (ull)(n)) : 0;                                           \
         __syncthreads();                                                                                         \
         const ull off_ = sh_off;                                                                                 \
@@ -115,7 +183,7 @@ __global__ void __launch_bounds__(BLK) s12_kernel(tabs_t t, const gseg_t *__rest
         __syncthreads();                                                                                         \
     } while (0)
     for (unsigned base = r0; base < r1; base += TILE) {
-        if (nbuf + TILE > SCAP) { FLUSH(nbuf, 0); nbuf = 0; seq++; }
+        if (nbuf + TILE > SCAP) { CLASSIFY(nbuf); FLUSH(nout, 0); nbuf = 0; seq++; }
         ull ab[ITEMS]; unsigned h0[ITEMS], bal[ITEMS];
 #pragma unroll
         for (int q = 0; q < ITEMS; q++) {
@@ -143,8 +211,11 @@ __global__ void __launch_bounds__(BLK) s12_kernel(tabs_t t, const gseg_t *__rest
         nbuf += sh_tot;
         __syncthreads();                                      // wc, sh_tot are reused by the next tile
     }
-    FLUSH(nbuf, 1);
+    CLASSIFY(nbuf);
+    FLUSH(nout, 1);
+    if (later && tid == 0) { s2o[k] = tot2; s3o[k] = tot3; s4o[k] = tot4; }
 #undef FLUSH
+#undef CLASSIFY
 }
 
 // ---------------------------------------------------------------- host side
@@ -152,7 +223,7 @@ __global__ void __launch_bounds__(BLK) s12_kernel(tabs_t t, const gseg_t *__rest
 // at any time (gpu_verify_tables): GeForce memory has no ECC, and the tables are never written after the upload,
 // so a memory fault that changes them persists until such a check finds it.
 struct tbl_t { const void *h; const void *d; size_t bytes; const char *name; };
-static tbl_t TBL[8]; static int NTBL;
+static tbl_t TBL[12]; static int NTBL;
 static char *VSTAGE; static cudaStream_t VSTREAM;            // pinned staging buffer and stream of the checks
 #define VCH ((size_t)64 << 20)
 static int cmp_device(const tbl_t &t) {                    // 0 if the device copy equals the host copy
@@ -202,6 +273,22 @@ extern "C" void gpu_init(const uint64_t *BM, const uint32_t *RK, uint64_t nw, co
     fprintf(stderr, "gpu: %s (cc %d.%d, %d SMs), K=%d tables %.3f GB in device memory, verified; %.2f GB free\n",
             p.name, p.major, p.minor, p.multiProcessorCount, KK, tot / 1e9, fr / 1e9);
 }
+extern "C" void gpu_init_later(const uint64_t *TOP, uint64_t ntopw, const uint32_t *T2, uint64_t nrows, int nl) {
+    if (nl < 4 || nl > 16) { fprintf(stderr, "gpu_init_later: NL = %d not supported\n", nl); exit(1); }
+    size_t tot = 0;
+    T.TOPW = dupload((const ull *)TOP, ntopw, "TOP", &tot);
+    T.T2 = dupload((const unsigned *)T2, nrows * nl, "T2", &tot);
+    T.nl = nl;
+    fprintf(stderr, "gpu: stages 3-4 on the GPU: TOP and T2 (%llu rows of %d limbs), %.3f GB, verified\n", (ull)nrows, nl, tot / 1e9);
+}
+static void ctx_alloc_later(gctx_t *g) {          // stages 3-4 buffers, allocated at the first launch that needs them
+    uint64_t n = g->segcap;
+    CK(cudaHostAlloc((void **)&g->h_segx, n * sizeof(gsegx_t), cudaHostAllocDefault)); CK(cudaMalloc((void **)&g->d_segx, n * sizeof(gsegx_t)));
+    CK(cudaHostAlloc((void **)&g->h_m, n * 16 * 4, cudaHostAllocDefault)); CK(cudaMalloc((void **)&g->d_m, n * 16 * 4));
+    CK(cudaHostAlloc((void **)&g->h_s2, n * 4, cudaHostAllocDefault)); CK(cudaMalloc((void **)&g->d_s2, n * 4));
+    CK(cudaHostAlloc((void **)&g->h_s3, n * 4, cudaHostAllocDefault)); CK(cudaMalloc((void **)&g->d_s3, n * 4));
+    CK(cudaHostAlloc((void **)&g->h_s4, n * 4, cudaHostAllocDefault)); CK(cudaMalloc((void **)&g->d_s4, n * 4));
+}
 
 static void ctx_alloc_seg(gctx_t *g, uint64_t n) {
     CK(cudaHostAlloc((void **)&g->h_seg, n * sizeof(gseg_t), cudaHostAllocDefault));
@@ -221,6 +308,7 @@ static void ctx_alloc_ovf(gctx_t *g, uint64_t n) {
     CK(cudaHostAlloc((void **)&g->h_ovf, n * sizeof(govf_t), cudaHostAllocDefault)); CK(cudaMalloc((void **)&g->d_ovf, n * sizeof(govf_t)));
     g->ovfcap = n;
 }
+extern "C" void gpu_ctx_later(gctx_t *g) { if (!g->h_segx) ctx_alloc_later(g); }
 extern "C" gctx_t *gpu_ctx_new(uint64_t segcap, uint64_t poscap) {
     gctx_t *g = (gctx_t *)calloc(1, sizeof *g);
     cudaStream_t s; CK(cudaStreamCreateWithFlags(&s, cudaStreamNonBlocking)); g->stream = s;
@@ -228,14 +316,21 @@ extern "C" gctx_t *gpu_ctx_new(uint64_t segcap, uint64_t poscap) {
     CK(cudaHostAlloc((void **)&g->h_ctr, 2 * sizeof(ull), cudaHostAllocDefault)); CK(cudaMalloc((void **)&g->d_ctr, 2 * sizeof(ull)));
     return g;
 }
-extern "C" void gpu_run(gctx_t *g, uint64_t nseg) {
+extern "C" void gpu_run(gctx_t *g, uint64_t nseg, uint64_t nm, int later, int dumpall) {
     if (nseg == 0) { g->h_ctr[0] = g->h_ctr[1] = 0; return; }
     if (nseg > g->segcap || nseg >= (1ull << 31)) { fprintf(stderr, "gpu_run: %llu segments exceed the buffers\n", (ull)nseg); exit(1); }
+    if (later && (!T.T2 || nm > g->segcap)) { fprintf(stderr, "gpu_run: stages 3-4 not initialised or %llu M rows exceed the buffers\n", (ull)nm); exit(1); }
     cudaStream_t s = (cudaStream_t)g->stream;
     CK(cudaMemcpyAsync(g->d_seg, g->h_seg, nseg * sizeof(gseg_t), cudaMemcpyHostToDevice, s));
+    if (later) {
+        if (!g->h_segx) ctx_alloc_later(g);
+        CK(cudaMemcpyAsync(g->d_segx, g->h_segx, nseg * sizeof(gsegx_t), cudaMemcpyHostToDevice, s));
+        CK(cudaMemcpyAsync(g->d_m, g->h_m, nm * T.nl * 4, cudaMemcpyHostToDevice, s));
+    }
     for (;;) {
         CK(cudaMemsetAsync(g->d_ctr, 0, 2 * sizeof(ull), s));
-        s12_kernel<<<(unsigned)nseg, BLK, 0, s>>>(T, g->d_seg, g->d_s1, g->d_off, g->d_cnt, g->d_pos, g->poscap, g->d_ctr, g->d_ovf, g->ovfcap);
+        s12_kernel<<<(unsigned)nseg, BLK, later ? SCAP : 0, s>>>(T, g->d_seg, g->d_s1, g->d_off, g->d_cnt, g->d_pos, g->poscap,
+            g->d_ctr, g->d_ovf, g->ovfcap, later, dumpall, g->d_segx, g->d_m, g->d_s2, g->d_s3, g->d_s4);
         CK(cudaGetLastError());
         CK(cudaMemcpyAsync(g->h_ctr, g->d_ctr, 2 * sizeof(ull), cudaMemcpyDeviceToHost, s));
         CK(cudaStreamSynchronize(s));
@@ -254,6 +349,11 @@ extern "C" void gpu_run(gctx_t *g, uint64_t nseg) {
     CK(cudaMemcpyAsync(g->h_s1, g->d_s1, nseg * 4, cudaMemcpyDeviceToHost, s));
     CK(cudaMemcpyAsync(g->h_off, g->d_off, nseg * 4, cudaMemcpyDeviceToHost, s));
     CK(cudaMemcpyAsync(g->h_cnt, g->d_cnt, nseg * 4, cudaMemcpyDeviceToHost, s));
+    if (later) {
+        CK(cudaMemcpyAsync(g->h_s2, g->d_s2, nseg * 4, cudaMemcpyDeviceToHost, s));
+        CK(cudaMemcpyAsync(g->h_s3, g->d_s3, nseg * 4, cudaMemcpyDeviceToHost, s));
+        CK(cudaMemcpyAsync(g->h_s4, g->d_s4, nseg * 4, cudaMemcpyDeviceToHost, s));
+    }
     if (g->h_ctr[0]) CK(cudaMemcpyAsync(g->h_pos, g->d_pos, g->h_ctr[0] * 4, cudaMemcpyDeviceToHost, s));
     if (g->h_ctr[1]) CK(cudaMemcpyAsync(g->h_ovf, g->d_ovf, g->h_ctr[1] * sizeof(govf_t), cudaMemcpyDeviceToHost, s));
     CK(cudaStreamSynchronize(s));
@@ -264,6 +364,10 @@ extern "C" void gpu_ctx_free(gctx_t *g) {
     CK(cudaFreeHost(g->h_pos)); CK(cudaFreeHost(g->h_ovf)); CK(cudaFreeHost(g->h_ctr));
     CK(cudaFree(g->d_seg)); CK(cudaFree(g->d_s1)); CK(cudaFree(g->d_off)); CK(cudaFree(g->d_cnt));
     CK(cudaFree(g->d_pos)); CK(cudaFree(g->d_ovf)); CK(cudaFree(g->d_ctr));
+    if (g->h_segx) {
+        CK(cudaFreeHost(g->h_segx)); CK(cudaFreeHost(g->h_m)); CK(cudaFreeHost(g->h_s2)); CK(cudaFreeHost(g->h_s3)); CK(cudaFreeHost(g->h_s4));
+        CK(cudaFree(g->d_segx)); CK(cudaFree(g->d_m)); CK(cudaFree(g->d_s2)); CK(cudaFree(g->d_s3)); CK(cudaFree(g->d_s4));
+    }
     CK(cudaStreamDestroy((cudaStream_t)g->stream));
     free(g);
 }

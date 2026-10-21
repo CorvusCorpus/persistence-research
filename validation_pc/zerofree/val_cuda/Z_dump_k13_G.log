@@ -1,0 +1,4 @@
+DONE mode=main dm=G N=150 N0=-1 c=[0,151) K=13 NL=14 variant=cuda34 points=332946 s1=22867 s2=1271 s3=539 s4=0 gmp=0 full=0 members=0 time=0.15 threads=1 wall=0.22
+region points (python) = 332946
+S2: C=1271 python=1271 OK
+R3=732 R4=539 S4=0: top-table and limb-engine decisions verified

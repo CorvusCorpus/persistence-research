@@ -1,0 +1,5 @@
+./gsieve_k13_cuda:1: variant=cuda lines=0 sha256=e3b0c44298fc1c14 counters=('345911607', '4383760', '0', '0', '0', '0', '0', '0') (2s)
+./gsieve_k13_cuda:8: variant=cuda lines=0 sha256=e3b0c44298fc1c14 counters=('345911607', '4383760', '0', '0', '0', '0', '0', '0') (0s)
+./gsieve_k13_avx2:8: variant=avx2 lines=0 sha256=e3b0c44298fc1c14 counters=('345911607', '4383760', '0', '0', '0', '0', '0', '0') (0s)
+./gsieve_k13_scalar:8: variant=scalar lines=0 sha256=e3b0c44298fc1c14 counters=('345911607', '4383760', '0', '0', '0', '0', '0', '0') (0s)
+identical dumps and counters across 4 binaries for: odd G 3000 0 3001

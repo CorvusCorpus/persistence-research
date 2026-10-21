@@ -1,0 +1,69 @@
+make: Nothing to be done for 'cuda'.
+make: Nothing to be done for 'all'.
+cc -O3 -march=native -Wall -Wno-unused-function -DS2_AVX2 -DKK=13 -o gsieve_k13_avx2 gsieve.c -lgmp -lm -lpthread
+gsieve.c:187:45: warning: ‘LO’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                             ^~
+cc -O3 -march=native -Wall -Wno-unused-function -DS2_AVX2 -DKK=12 -o gsieve_k12_avx2 gsieve.c -lgmp -lm -lpthread
+gsieve.c: In function ‘scan’:
+gsieve.c:491:51: warning: unused variable ‘z’ [-Wunused-variable]
+  491 |     const __m256i v4 = _mm256_set1_epi64x(10000), z = _mm256_setzero_si256();
+      |                                                   ^
+gsieve.c: At top level:
+gsieve.c:187:45: warning: ‘LO’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                             ^~
+cc -O3 -march=native -Wall -Wno-unused-function -DS2_AVX2 -DKK=13 -DNL=7 -o gsieve_k13_nl7_avx2 gsieve.c -lgmp -lm -lpthread
+gsieve.c:187:45: warning: ‘LO’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                             ^~
+cc -O3 -march=native -Wall -Wno-unused-function -DS2_AVX2 -DKK=12 -DNL=7 -o gsieve_k12_nl7_avx2 gsieve.c -lgmp -lm -lpthread
+gsieve.c: In function ‘scan’:
+gsieve.c:491:51: warning: unused variable ‘z’ [-Wunused-variable]
+  491 |     const __m256i v4 = _mm256_set1_epi64x(10000), z = _mm256_setzero_si256();
+      |                                                   ^
+gsieve.c: At top level:
+gsieve.c:187:45: warning: ‘LO’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                             ^~
+cc -O3 -march=native -Wall -Wno-unused-function -DSCALAR -DKK=13 -o gsieve_k13_scalar gsieve.c -lgmp -lm -lpthread
+gsieve.c:187:98: warning: ‘POS’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:187:82: warning: ‘H0’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:187:61: warning: ‘AB’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O3 -march=native -Wall -Wno-unused-function -DSCALAR -DKK=12 -o gsieve_k12_scalar gsieve.c -lgmp -lm -lpthread
+gsieve.c:187:98: warning: ‘POS’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:187:82: warning: ‘H0’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:187:61: warning: ‘AB’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O3 -march=native -Wall -Wno-unused-function -DSCALAR -DKK=13 -DNL=7 -o gsieve_k13_nl7_scalar gsieve.c -lgmp -lm -lpthread
+gsieve.c:187:98: warning: ‘POS’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:187:82: warning: ‘H0’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:187:61: warning: ‘AB’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+cc -O3 -march=native -Wall -Wno-unused-function -DSCALAR -DKK=12 -DNL=7 -o gsieve_k12_nl7_scalar gsieve.c -lgmp -lm -lpthread
+gsieve.c:187:98: warning: ‘POS’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                                  ^~~
+gsieve.c:187:82: warning: ‘H0’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                                                  ^~
+gsieve.c:187:61: warning: ‘AB’ defined but not used [-Wunused-variable]
+  187 | static u64 *BM; static u32 *RK; static u64 *LO; static u64 *AB; static uint16_t *H0; static u32 *POS; static u64 NGOOD;
+      |                                                             ^~
+make: 'val_kernel' is up to date.

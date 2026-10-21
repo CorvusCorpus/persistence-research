@@ -1,0 +1,6 @@
+DONE points=8864714 s1=555296 s2=555296 s3=369091 s4=15629 gmp=15629 full=15629 members=82
+points 8864714: equal
+S2 (b >= 26, last 26 digits zero-free): 555296 = exact; D4 (b <= 25, last 54 digits): 8188 = exact
+R3 186205 (every one has a 0 among its first 5 digits), R4 361650, S4 7441: verified
+members: 82 = exact
+odd2 decisions verified

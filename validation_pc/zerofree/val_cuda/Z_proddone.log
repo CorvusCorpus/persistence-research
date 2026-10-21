@@ -1,0 +1,2 @@
+main N=36000 N0=-1 c=[7540,7898): points=858547070292 s1=58998835763 s2=3243476704 s3=1296156297 s4=0 gmp=0 full=0 members=0 | variant=cuda34 threads=20 wall=4s | prod time=235.10s -> MATCH
+all counters match the production DONE lines

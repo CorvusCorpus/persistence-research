@@ -668,10 +668,103 @@ static void direct_c(u64 c) {
             }
         }
 }
+#ifdef S2_CUDA
+// ---------------- odd2: the odd path in zero-free mode (E) by a 2-adic suffix collapse (GSIEVE_ODD2=1) ----------------
+// For x = 3^a 5^b 7^c with b >= 26: x = 0 (mod 5^26), and x = (-1)^(a+c) 5^(b + a f3 + c f7) (mod 2^26) with
+// 3 = -5^f3, 7 = -5^f7. So x mod 10^26 = 5^26 z, z = (-1)^(a+c) 5^e mod 2^26, e = (b + a f3 + c f7 - 26) mod 2^24
+// (5 has order 2^24 modulo 2^26). The bitmap BO (2 x 2^24 bits, index sign 2^24 + e) records which (sign, e) give 26
+// digits without a 0. Along a row (a, c fixed, b increasing) e increases by one: the row is a contiguous bit range.
+// A survivor then goes through the leading-digit table (t = a L3 + b L5 + c L7), the limb engine for digits
+// 26..9NL-1 of 5^b (3^a 7^c) (table T5[b] = 5^b mod 10^(9NL), row factor M = 3^a 7^c) and GMP, with the counters
+// and dump lines of the main path (S2 = 26 digits pass, R3, R4, S4). Rows b <= 25 are stepped point by point as before.
+static int ODD2;
+#define ODDK 26                             // digits of the 2-adic bitmap
+#define OPER (1ULL << (ODDK - 2))
+static u64 *BO, F3O, F7O, ODD2HASH;
+static u32 (*T5)[NL];
+static int zf26(u128 x) {                           // the 26 digits of x < 10^26 (zero padded) have no 0
+    for (int i = 0; i < 26; i++) { if (x % 10 == 0) return 0; x /= 10; }
+    return 1;
+}
+typedef struct { u64 e0, e1; } bochunk_t;
+static void *bo_pass(void *arg) {                   // bits of e in [e0, e1) for both signs
+    bochunk_t *ch = arg;
+    const u64 m26 = (1ULL << ODDK) - 1, P526 = 1490116119384765625ULL;      // 5^26
+    u64 z = 1, p = 5;
+    for (u64 e = ch->e0; e; e >>= 1) { if (e & 1) z = z * p & m26; p = p * p & m26; }      // 5^e0 mod 2^26
+    for (u64 e = ch->e0; e < ch->e1; e++) {
+        if (zf26((u128)P526 * z)) BO[e >> 6] |= 1ULL << (e & 63);
+        u64 zn = (1ULL << ODDK) - z;                                         // -z mod 2^26 (z is odd)
+        if (zf26((u128)P526 * zn)) BO[(OPER + e) >> 6] |= 1ULL << ((OPER + e) & 63);
+        z = z * 5 & m26;
+    }
+    return NULL;
+}
+static void build_odd2(int nth) {
+    BO = hmalloc(2 * OPER / 8 + 8);
+    bochunk_t *ch = calloc(nth, sizeof *ch);
+    pthread_t *tid = malloc(nth * sizeof *tid);
+    for (int t = 0; t < nth; t++) {            // chunks of whole 64-bit words, so no two threads share a word
+        ch[t].e0 = OPER / 64 * (u64)t / nth * 64; ch[t].e1 = OPER / 64 * (u64)(t + 1) / nth * 64;
+        if (pthread_create(&tid[t], NULL, bo_pass, &ch[t])) { fprintf(stderr, "pthread_create failed\n"); exit(1); }
+    }
+    for (int t = 0; t < nth; t++) pthread_join(tid[t], NULL);
+    free(ch); free(tid);
+    F3O = OF3 & (OPER - 1); F7O = OF7 & (OPER - 1);       // 5^OF3 = -3, 5^OF7 = -7 (mod 2^40), hence mod 2^26
+    T5 = hmalloc(((u64)NN + 1) * sizeof *T5);
+    memset(T5[0], 0, sizeof T5[0]); T5[0][0] = 1;
+    for (u64 b = 1; b <= (u64)NN; b++) { memcpy(T5[b], T5[b - 1], sizeof T5[0]); mulsmall(T5[b], 5); }
+    u64 n = 0; for (u64 w = 0; w < 2 * OPER / 64; w++) n += __builtin_popcountll(BO[w]);
+    ODD2HASH = fnv(fnv(fnv(1469598103934665603ULL, BO, 2 * OPER / 8), T5, ((u64)NN + 1) * sizeof *T5), TOP, ((1ULL << TB) / 64 + 1) * 8);
+    fprintf(stderr, "odd2: 2-adic bitmap of the last %d digits: %llu of %llu (sign, e) zero-free (density %.5f)\n",
+            ODDK, (unsigned long long)n, (unsigned long long)(2 * OPER), (double)n / (2 * OPER));
+}
+static void odd2_rows(u64 c) {                      // the part b >= 26 of odd_c(c) in mode E
+    u32 M[NL]; pow7_limbs(M, c);                    // M = 3^a 7^c, stepped along a
+    for (i64 a = 0; 2 * NN - a - 2 * (i64)c >= 2 * ODDK; a++, mulsmall(M, 3)) {
+        i64 bH = (2 * NN - a - 2 * (i64)c) / 2, bL = ODDK;             // a + 2b + 2c <= 2N
+        for (; bL <= bH; bL++) {                    // x >= 10^XMIN, decided per (b, c) exactly as odd_c does
+            double need = (XMIN - (u64)bL * LG5 - c * LG7) / LG3;
+            if (a >= (need > 0 ? (i64)ceil(need - 1e-6) : 0)) break;
+        }
+        if (N0 >= 0) { i64 t = 2 * N0 + 1 - a - 2 * (i64)c; if (t > 0 && (t + 1) / 2 > bL) bL = (t + 1) / 2; }   // a + 2b + 2c > 2 N0
+        if (bL > bH) continue;
+        u64 len = (u64)(bH - bL + 1), half = (((u64)a + c) & 1) * OPER;
+        u64 e = ((u64)bL + (u64)a * F3O + c * F7O - ODDK) & (OPER - 1);
+        cnt[0] += len;
+        for (u64 done = 0; done < len; ) {          // the bit range [e, e + len), wrapping at 2^24 within its half
+            u64 n = len - done < OPER - e ? len - done : OPER - e, s = half + e, en = s + n;
+            for (u64 w = s >> 6; w <= (en - 1) >> 6; w++) {
+                u64 bits = BO[w];
+                if (w == s >> 6) bits &= ~0ULL << (s & 63);
+                if (w == (en - 1) >> 6 && (en & 63)) bits &= (1ULL << (en & 63)) - 1;
+                while (bits) {
+                    u64 pos = (w << 6) | (u64)__builtin_ctzll(bits), b = (u64)bL + done + (pos - s);
+                    bits &= bits - 1;
+                    cnt[1]++; cnt[2]++;
+                    if (DUMP) emit("S2 %lld %llu %llu\n", (long long)a, (unsigned long long)b, (unsigned long long)c);
+                    u64 bin = ((u64)a * L3 + b * L5 + c * L7) >> (64 - TB);
+                    if ((TOP[bin >> 6] >> (bin & 63)) & 1) { if (DUMP) emit("R3 %lld %llu %llu\n", (long long)a, (unsigned long long)b, (unsigned long long)c); continue; }
+                    cnt[3]++;
+                    if (!limb_check(T5[b], M, T5[b])) { if (DUMP) emit("R4 %lld %llu %llu\n", (long long)a, (unsigned long long)b, (unsigned long long)c); continue; }
+                    cnt[4]++;
+                    if (DUMP) emit("S4 %lld %llu %llu\n", (long long)a, (unsigned long long)b, (unsigned long long)c);
+                    full_check(1, (u64)a, b, c, C_ODD5);
+                }
+            }
+            done += n; e = 0;
+        }
+    }
+}
+#endif
 static void odd_c(u64 c) {
     const u64 MSK = (1ULL << 38) - 1;
     {
+#ifdef S2_CUDA
+        u64 bdirect = (DM == 0) ? 39 : (ODD2 && DM == 1) ? ODDK - 1 : (u64)NN;      // odd2: b >= 26 by the bitmap
+#else
         u64 bdirect = (DM == 0) ? 39 : (u64)NN;      // E / P modes: enumerate every b directly
+#endif
         for (u64 b = 1; b <= bdirect; b++) {
             i64 amax = 2 * NN - 2 * (i64)b - 2 * (i64)c;
             if (amax < 0) break;
@@ -690,6 +783,9 @@ static void odd_c(u64 c) {
                 x0 = 3 * x0; x0 -= (x0 >= 2 * E18 ? 2 : x0 >= E18 ? 1 : 0) * E18;
             }
         }
+#ifdef S2_CUDA
+        if (ODD2 && DM == 1) odd2_rows(c);
+#endif
         if (DM != 0) return;
         // b >= 40: x mod 2^40 = (-1)^(a+c) 5^(b + a f3 + c f7); all-odd forces (a+c) odd and
         // b + a f3 + c f7 == OTHREAD (mod 2^38)  (the unique odd-digit 2-adic thread)
@@ -802,20 +898,49 @@ static int ovf_cmp(const void *x, const void *y) {
     const govf_t *p = x, *q = y;
     return p->seg != q->seg ? (p->seg < q->seg ? -1 : 1) : (p->seq < q->seq ? -1 : p->seq > q->seq);
 }
-// append n GPU survivors of segment k to PBUF, checking that they are strictly increasing positions in [s, e) and
+// Stages 3-4 on the GPU (GSIEVE_GPU34=1): the GPU also runs later_stages()' leading-digit table and limb engine and
+// returns per segment the counts s2, s3, s4 and the entries: every stage-2 survivor with its class (dump mode) or
+// only the stage-4 survivors. The host then makes later_stages()' dump lines in its order and its GMP calls.
+static int GPU34;
+// append n GPU entries of segment k to PBUF, checking that their positions are strictly increasing in [s, e) and
 // no more than the segment's s1 (a violation means a GPU fault: stop rather than continue)
 static void take(const gctx_t *g, u64 k, u64 off, u64 n, u64 s1, u64 *np, u64 *lo) {
     for (u64 q = 0; q < n; q++) {
-        u64 p = g->h_pos[off + q];
+        u64 v = g->h_pos[off + q], p = GPU34 ? GPU34_POS(v) : v;
         if (*np >= s1 || p < *lo || p >= g->h_seg[k].e) { fprintf(stderr, "GPU survivor list of segment %llu is inconsistent\n", (unsigned long long)k); exit(1); }
-        PBUF[(*np)++] = p; *lo = p + 1;
+        PBUF[(*np)++] = v; *lo = p + 1;
+    }
+}
+// GPU34: the counters and outputs of later_stages() for one segment's entries PBUF[0, np)
+static void later_gpu(gctx_t *g, u64 k, u64 np, i64 delta, u64 b, u64 c) {
+    u64 s2 = g->h_s2[k], s3 = g->h_s3[k], s4 = g->h_s4[k], n3 = 0, n4 = 0;
+    for (u64 q = 0; q < np; q++) { unsigned code = GPU34_CODE(PBUF[q]); n3 += code != 0; n4 += code == 2; if (code > 2) n4 = ~0ULL; }
+    if (s4 > s3 || s3 > s2 || s2 > g->h_s1[k] || np != (DUMP ? s2 : s4) || (DUMP && n3 != s3) || n4 != s4) {
+        fprintf(stderr, "GPU stage-3/4 results of segment %llu are inconsistent\n", (unsigned long long)k); exit(1);
+    }
+    cnt[2] += s2; cnt[3] += s3; cnt[4] += s4;
+    if (DUMP) for (u64 q = 0; q < np; q++) {               // as later_stages(): S2 lines with the R3 rejections
+        u64 a = (u64)((i64)GPU34_POS(PBUF[q]) + delta);
+        emit("S2 %llu %llu %llu\n", (unsigned long long)a, (unsigned long long)b, (unsigned long long)c);
+        if (GPU34_CODE(PBUF[q]) == 0) emit("R3 %llu %llu %llu\n", (unsigned long long)a, (unsigned long long)b, (unsigned long long)c);
+    }
+    for (u64 q = 0; q < np; q++) {                        // then the stage-3 survivors: R4, or S4 and the GMP check
+        unsigned code = GPU34_CODE(PBUF[q]);
+        if (code == 0) continue;
+        u64 a = (u64)((i64)GPU34_POS(PBUF[q]) + delta);
+        if (code == 1) { if (DUMP) emit("R4 %llu %llu %llu\n", (unsigned long long)a, (unsigned long long)b, (unsigned long long)c); continue; }
+        if (DUMP) emit("S4 %llu %llu %llu\n", (unsigned long long)a, (unsigned long long)b, (unsigned long long)c);
+        full_check(0, a, b, c, C_EVEN);
     }
 }
 static void main_piece(gctx_t *g, i64 *sdel, u64 *srow, u64 c, u64 b0, u64 b1) {
     if (6 * NN - 6 * (i64)c - 2 * AMIN < 0) return;
-    // pass 1: the segments of rows b0 <= b < b1, computed as in main_c()
-    u64 lam = (u64)(((u128)c * MU7 + (u128)b0 * MU3) % P2), ns = 0;
+    // pass 1: the segments of rows b0 <= b < b1, computed as in main_c(); with GPU34 also each row's tb and M
+    u64 lam = (u64)(((u128)c * MU7 + (u128)b0 * MU3) % P2), ns = 0, nm = 0, tb1 = c * L7 + b0 * L3;
+    u32 M1[NL];
+    if (GPU34) pow37_limbs(M1, b0, c);
     for (i64 b = (i64)b0; b < (i64)b1; b++) {
+        u64 ns0 = ns;
         i64 ahi = (6 * NN - 3 * b - 6 * (i64)c) / 2;
         double need = (XMIN - b * LG3 - c * LG7) / LG2;
         i64 alo = need > AMIN ? (i64)ceil(need - 1e-6) : AMIN;
@@ -831,23 +956,31 @@ static void main_piece(gctx_t *g, i64 *sdel, u64 *srow, u64 c, u64 b0, u64 b1) {
                 u64 j2 = j + 1; if (j2 == QQ) j2 = 0;
                 g->h_seg[ns] = (gseg_t){ 0, (u32)(r + len - P1), (u32)j2 }; sdel[ns] = alo + (i64)(P1 - r); srow[ns++] = (u64)b;
             }
+            if (GPU34) {                                  // the row data later_stages() uses: tb and M
+                memcpy(g->h_m + nm * NL, M1, sizeof M1);
+                for (u64 q = ns0; q < ns; q++) g->h_segx[q] = (gsegx_t){ sdel[q], tb1, (uint32_t)nm, 0 };
+                nm++;
+            }
         }
         lam += MU3; if (lam >= P2) lam -= P2;
+        if (GPU34) { tb1 += L3; mulsmall(M1, 3); }
     }
     if (!ns) return;
-    gpu_run(g, ns);
+    gpu_run(g, ns, nm, GPU34, DUMP);
     // pass 2: the segments in row order, with tb and M stepped along the rows as in main_c()
     u64 novf = g->h_ctr[1], oi = 0, nsurv = 0, brow = b0, tb = c * L7 + b0 * L3;
-    u32 M[NL]; pow37_limbs(M, b0, c);
+    u32 M[NL];
+    if (!GPU34) pow37_limbs(M, b0, c);
     if (novf > 1) qsort(g->h_ovf, novf, sizeof *g->h_ovf, ovf_cmp);
     for (u64 k = 0; k < ns; k++) {
-        for (; brow < srow[k]; brow++) { tb += L3; mulsmall(M, 3); }
+        if (!GPU34) for (; brow < srow[k]; brow++) { tb += L3; mulsmall(M, 3); }
         u64 s1 = g->h_s1[k], np = 0, lo = g->h_seg[k].s;
         for (; oi < novf && g->h_ovf[oi].seg == k; oi++) take(g, k, g->h_ovf[oi].off, g->h_ovf[oi].cnt, s1, &np, &lo);
         take(g, k, g->h_off[k], g->h_cnt[k], s1, &np, &lo);
         nsurv += np;
         if (s1 == 0) continue;                    // scan() returns before counting when r1 <= r0
         cnt[1] += s1;
+        if (GPU34) { later_gpu(g, k, np, sdel[k], srow[k], c); continue; }
 #ifdef BENCH2
         cnt[2] += np; continue;                   // benchmark of stages 1-2 alone (as BENCH2 in the CPU variants)
 #endif
@@ -926,6 +1059,7 @@ static void *worker_cuda(void *arg) {
     i64 *sdel = malloc(segcap * sizeof *sdel); u64 *srow = malloc(segcap * sizeof *srow);
     if (!PBUF || !PA || !PBIN || !sdel || !srow) { fprintf(stderr, "alloc failed\n"); exit(1); }
     gctx_t *g = gpu_ctx_new(segcap, PIECE / 128 + 65536);
+    if (GPU34) gpu_ctx_later(g);
     OBC = 1 << 16; OB = malloc(OBC);
     for (;;) {
         u64 p = __atomic_fetch_add(&NEXTP, 1, __ATOMIC_RELAXED);
@@ -1017,7 +1151,7 @@ static int kerneltest(u64 nj, u64 seed, int nth) {
             u64 e = (pos + len < P1 && ns + 1 < segcap) ? pos + len : P1;
             g->h_seg[ns++] = (gseg_t){ (u32)pos, (u32)e, (u32)j }; pos = e;
         }
-        gpu_run(g, ns);
+        gpu_run(g, ns, 0, 0, 0);
         if (g->h_ctr[1] > 1) qsort(g->h_ovf, g->h_ctr[1], sizeof *g->h_ovf, ovf_cmp);
         for (u64 k = 0; k < ns; k++) {
             u64 i0 = kt_lb(g->h_seg[k].s), i1 = kt_lb(g->h_seg[k].e), n = kt_gather(g, k, &oi, v, vcap), m = 0, ok = g->h_s1[k] == i1 - i0;
@@ -1038,7 +1172,7 @@ static int kerneltest(u64 nj, u64 seed, int nth) {
         u64 e = (sm64(&sd) & 1) ? KT_PE[sm64(&sd) % KT_NG] : sm64(&sd) % P1, j = sm64(&sd) % QQ;
         g->h_seg[k] = (gseg_t){ (u32)e, (u32)(e + 1), (u32)j };
     }
-    gpu_run(g, n2);
+    gpu_run(g, n2, 0, 0, 0);
     if (g->h_ctr[1] > 1) qsort(g->h_ovf, g->h_ctr[1], sizeof *g->h_ovf, ovf_cmp);
     mpz_t x, m10; mpz_init(x); mpz_init(m10); mpz_ui_pow_ui(m10, 10, 2 * KK);
     char buf[64];
@@ -1061,6 +1195,16 @@ static int kerneltest(u64 nj, u64 seed, int nth) {
     return bad1 + bad2 ? 1 : 0;
 }
 #endif
+
+static const char *variant_name(void) {          // the variant printed in the logs: "cuda34" with GSIEVE_GPU34=1
+#ifdef S2_CUDA
+#if TB != 18
+#error "the CUDA stages 3-4 (gsieve_cuda.cu, TBB) assume TB = 18"
+#endif
+    if (GPU34) return "cuda34";
+#endif
+    return VARIANT;
+}
 
 int main(int argc, char **argv) {
 #ifdef S2_CUDA
@@ -1100,16 +1244,25 @@ int main(int argc, char **argv) {
 #endif
 #ifdef S2_CUDA
         gpu_init(BM, RK, (P1 + 63) / 64, AB, H0, POS, NGOOD, OK4B, DM);    // digit-26 check: DM 0 = G, 1 = E, 2 = P
+        if (getenv("GSIEVE_GPU34") && atoi(getenv("GSIEVE_GPU34"))) {      // stages 3-4 on the GPU as well
+            GPU34 = 1;
+            gpu_init_later(TOP, (1ULL << TB) / 64 + 1, &T2[0][0], 3 * (u64)NN + 3, NL);
+        }
         HOSTHASH = host_tables_hash();                                      // (the host copies stay, for the checks)
         if (getenv("GSIEVE_VERIFY")) VINTERVAL = atoi(getenv("GSIEVE_VERIFY"));
         if (VINTERVAL < 1) VINTERVAL = 1;
 #endif
         clock_gettime(CLOCK_MONOTONIC, &w1);
-        fprintf(stderr, "tables: K=%d variant=%s good=%llu (density %.5f) build %.1fs (wall, %d threads)\n", KK, VARIANT, (unsigned long long)NGOOD,
+        fprintf(stderr, "tables: K=%d variant=%s good=%llu (density %.5f) build %.1fs (wall, %d threads)\n", KK, variant_name(), (unsigned long long)NGOOD,
                 (double)NGOOD / P1, (double)(w1.tv_sec - w0.tv_sec) + 1e-9 * (double)(w1.tv_nsec - w0.tv_nsec), NTH);
         CFN = main_c;
     } else if (!strcmp(mode, "direct")) CFN = direct_c;
-    else if (!strcmp(mode, "odd")) CFN = odd_c;
+    else if (!strcmp(mode, "odd")) {
+        CFN = odd_c;
+#ifdef S2_CUDA
+        if (DM == 1 && getenv("GSIEVE_ODD2") && atoi(getenv("GSIEVE_ODD2"))) { ODD2 = 1; build_top(); build_odd2(NTH); }
+#endif
+    }
     else { fprintf(stderr, "bad mode\n"); return 1; }
     t0 = clock();
     clock_gettime(CLOCK_MONOTONIC, &w0);
@@ -1133,6 +1286,11 @@ int main(int argc, char **argv) {
         verify_tables();
         fprintf(stderr, "table checks passed: %llu (device tables against host copies, host tables against their hash)\n", (unsigned long long)NCHECK);
     }
+    if (ODD2) {                                            // the odd2 tables must be unchanged at the end
+        u64 h = fnv(fnv(fnv(1469598103934665603ULL, BO, 2 * OPER / 8), T5, ((u64)NN + 1) * sizeof *T5), TOP, ((1ULL << TB) / 64 + 1) * 8);
+        if (h != ODD2HASH) { fprintf(stderr, "TABLE CHECK FAILED: the odd2 tables changed during the run (memory fault?); discard this log\n"); return 3; }
+        fprintf(stderr, "odd2: tables unchanged at the end of the run\n");
+    }
 #endif
     if (NEXTREP != c1 && c1 > c0) { fprintf(stderr, "reporter incomplete\n"); return 1; }
     if (PROG && c1 > c0) { printf("CDONE %llu points=%llu s4=%llu members=%llu\n", (unsigned long long)(c1 - 1), (unsigned long long)TOT[0], (unsigned long long)TOT[4], (unsigned long long)TOT[7]); fflush(stdout); }
@@ -1141,7 +1299,7 @@ int main(int argc, char **argv) {
     double wall = (double)(w1.tv_sec - w0.tv_sec) + 1e-9 * (double)(w1.tv_nsec - w0.tv_nsec);
     // time = CPU seconds of all threads (core-seconds, as in single-threaded runs); wall = elapsed seconds
     printf("DONE mode=%s dm=%s N=%lld N0=%lld c=[%llu,%llu) K=%d NL=%d variant=%s points=%llu s1=%llu s2=%llu s3=%llu s4=%llu gmp=%llu full=%llu members=%llu time=%.2f threads=%d wall=%.2f\n",
-           mode, argv[2], (long long)NN, (long long)N0, (unsigned long long)c0, (unsigned long long)c1, KK, NL, VARIANT,
+           mode, argv[2], (long long)NN, (long long)N0, (unsigned long long)c0, (unsigned long long)c1, KK, NL, variant_name(),
            (unsigned long long)TOT[0], (unsigned long long)TOT[1], (unsigned long long)TOT[2], (unsigned long long)TOT[3],
            (unsigned long long)TOT[4], (unsigned long long)TOT[5], (unsigned long long)TOT[6], (unsigned long long)TOT[7], el, NTH, wall);
     return 0;

@@ -1,0 +1,5 @@
+DONE mode=main dm=E N=160 N0=-1 c=[0,161) K=12 NL=7 variant=cuda34 points=3276220 s1=1027588 s2=289355 s3=192553 s4=3234 gmp=3234 full=3234 members=180 time=0.19 threads=1 wall=0.23
+DONE mode=direct dm=E N=160 N0=-1 c=[0,161) K=12 NL=7 variant=cuda points=468914 s1=0 s2=0 s3=0 s4=1759 gmp=1759 full=1759 members=52 time=0.02 threads=1 wall=0.03
+DONE mode=odd dm=E N=160 N0=-1 c=[0,161) K=12 NL=7 variant=cuda points=1197824 s1=61136 s2=61136 s3=40579 s4=2699 gmp=2699 full=2699 members=82 time=0.09 threads=1 wall=0.10
+expected 314  found 314  missing 0  extra 0
+E-mode end-to-end: exact match

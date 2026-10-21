@@ -1,7 +1,8 @@
 # Production driver for the chain sieve: runs a worker's job list with per-c checkpoints and resume.
 # usage: prod.py N A|B|ALL BUDGET_SECONDS [N0]
 #   A, B: the two-process split of the original runs; ALL: every path in one process (use with THREADS).
-#   env THREADS (default: number of CPUs) = gsieve threads; EXE (default ./gsieve_k13) = binary;
+#   env THREADS (default: number of CPUs) = gsieve threads; EXE (default ./gsieve_k13) = binary; DM (default G) = digit
+#   mode (E: zero-free, for the zero-free extension);
 #   JOBS=mode:c0:c1,... overrides the job list (keep the original c-ranges when resuming).
 import subprocess, sys, os, time, re
 N = int(sys.argv[1]); worker = sys.argv[2]; budget = float(sys.argv[3])   # seconds this driver may run
@@ -19,6 +20,7 @@ JOBS = {"A": [("main", 0, CM)], "B": [("main", CM, N + 1), ("direct", 0, N + 1),
 if os.environ.get("JOBS"):                      # explicit job list: mode:c0:c1,mode:c0:c1
     JOBS = [(j.split(":")[0], int(j.split(":")[1]), int(j.split(":")[2])) for j in os.environ["JOBS"].split(",")]
 EXE = os.environ.get("EXE", "./gsieve_k13")
+DM = os.environ.get("DM", "G")
 t_start = time.time()
 def logname(mode, c0, c1): return f"prod_N{N}_n0{N0}_{mode}_{c0}_{c1}.log"
 def resume_point(path, c0):
@@ -37,7 +39,7 @@ for (mode, c0, c1) in JOBS:
         if left < 120: print("budget exhausted; rerun to resume", flush=True); sys.exit(0)
         with open(path, "a") as f:
             f.write(f"# invocation start c={start} at {time.ctime()} exe={EXE} threads={THREADS}\n"); f.flush()
-            args = [EXE, mode, "G", str(N), str(start), str(c1), "prog", f"threads={THREADS}"] + ([f"n0={N0}"] if N0 >= 0 else [])
+            args = [EXE, mode, DM, str(N), str(start), str(c1), "prog", f"threads={THREADS}"] + ([f"n0={N0}"] if N0 >= 0 else [])
             subprocess.run(["timeout", str(int(left - 60)), *args], stdout=f, stderr=subprocess.STDOUT)
     print(f"job {mode} [{c0},{c1}) complete", flush=True)
 print(f"worker {worker} finished all jobs", flush=True)

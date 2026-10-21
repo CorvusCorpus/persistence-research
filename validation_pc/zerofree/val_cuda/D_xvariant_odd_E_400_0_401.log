@@ -1,0 +1,5 @@
+./gsieve_k13_cuda:1: variant=cuda lines=84369 sha256=9a2cd2ca6b4e0599 counters=('20104838', '0', '0', '0', '84369', '84369', '84369', '0') (5s)
+./gsieve_k13_cuda:8: variant=cuda lines=84369 sha256=9a2cd2ca6b4e0599 counters=('20104838', '0', '0', '0', '84369', '84369', '84369', '0') (1s)
+./gsieve_k13_avx2:8: variant=avx2 lines=84369 sha256=9a2cd2ca6b4e0599 counters=('20104838', '0', '0', '0', '84369', '84369', '84369', '0') (1s)
+./gsieve_k13_scalar:8: variant=scalar lines=84369 sha256=9a2cd2ca6b4e0599 counters=('20104838', '0', '0', '0', '84369', '84369', '84369', '0') (1s)
+identical dumps and counters across 4 binaries for: odd E 400 0 401

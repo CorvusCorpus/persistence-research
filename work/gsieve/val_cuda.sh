@@ -7,6 +7,8 @@
 #   C: production slices against exact arithmetic (val_prodrow.py), N = 36000 and the shell 36000 < m <= 40000
 #   D: cross-variant dumps (val_xvariant.py): the CUDA binary at 1 and 8 threads against the CPU variants
 #   P: a logged production invocation (val_proddone.py, main N = 36000, c in [7540, 7898), 8.6e11 points)
+#   Z: the zero-free paths: stages 3-4 on the GPU (GSIEVE_GPU34=1: val_dump, dumps byte-identical to avx2, val_e2e,
+#      val_prodrow, val_proddone) and odd2 (GSIEVE_ODD2=1: val_odd2.py against exact arithmetic)
 # usage: val_cuda.sh LOGDIR      (from work/gsieve; exit status 0 only if every check passes)
 set -u
 L=$(mkdir -p "$1" && cd "$1" && pwd) || exit 1
@@ -52,5 +54,31 @@ done
 step "P val_proddone main:7540:7898" "$L/P_proddone.log" python3 val_proddone.py ./gsieve_k13_cuda $(nproc) \
      --only main:7540:7898 logs/prod_N36000_n0-1_main_0_7898.log
 echo "  $(grep -o 'variant=.*' "$L/P_proddone.log")"
+# Z: the zero-free extension's paths: stages 3-4 on the GPU (GSIEVE_GPU34=1) and odd2 (GSIEVE_ODD2=1)
+same() {          # same "ARGS": avx2 and cuda34 dumps (all non-DONE lines) must be byte-identical
+    local t; t=$(mktemp -d)
+    ./gsieve_k13 $1 dump prog threads=8 > "$t/a" 2>/dev/null; GSIEVE_GPU34=1 ./gsieve_k13_cuda $1 dump prog threads=8 > "$t/b" 2>/dev/null
+    local n; n=$(grep -vc '^DONE' "$t/a")
+    if [ "$n" -gt 0 ] && cmp -s <(grep -v '^DONE' "$t/a") <(grep -v '^DONE' "$t/b"); then echo "identical: $n lines"; rm -rf "$t"; return 0; fi
+    echo "DIFFERENT"; rm -rf "$t"; return 1
+}
+for spec in "13 G" "13 E" "12 E" "12 G"; do
+    set -- $spec
+    step "Z val_dump K=$1 $2 N=150 (GPU34)" "$L/Z_dump_k$1_$2.log" env GSIEVE_GPU34=1 python3 val_dump.py $1 $2 150 ./gsieve_k$1_cuda
+done
+for r in "main G 1000 0 1001" "main E 1000 0 1001" "main G 40000 35990 36000 n0=36000"; do
+    step "Z same dump avx2 = cuda34 [$r]" "$L/Z_same_$(echo $r | tr ' =' '__').log" same "$r"
+    echo "  $(cat "$L/Z_same_$(echo $r | tr ' =' '__').log")"
+done
+for k in 13 12; do
+    step "Z val_e2e K=$k NL=7 (GPU34 + ODD2)" "$L/Z_e2e_k$k.log" env GSIEVE_GPU34=1 GSIEVE_ODD2=1 python3 val_e2e.py ./gsieve_k${k}_nl7_cuda 160 7
+    echo "  $(grep -E '^expected' "$L/Z_e2e_k$k.log")"
+done
+step "Z val_prodrow N=36000 c=33000 (GPU34)" "$L/Z_prodrow_36000_33000.log" env GSIEVE_GPU34=1 GSIEVE_THREADS=8 python3 val_prodrow.py 36000 33000 ./gsieve_k13_cuda
+step "Z val_proddone main:7540:7898 (GPU34)" "$L/Z_proddone.log" env GSIEVE_GPU34=1 python3 val_proddone.py ./gsieve_k13_cuda $(nproc) \
+     --only main:7540:7898 logs/prod_N36000_n0-1_main_0_7898.log
+for spec in "400 ./gsieve_k13_cuda" "500 ./gsieve_k13_cuda" "400 ./gsieve_k13_cuda 250" "300 ./gsieve_k13_nl7_cuda -1 7"; do
+    step "Z val_odd2 $spec" "$L/Z_odd2_$(echo $spec | tr ' ./' '___').log" python3 val_odd2.py $spec
+done
 echo "== end $(date -u): $([ $st -eq 0 ] && echo 'ALL CHECKS PASSED' || echo 'SOME CHECKS FAILED')"
 exit $st

@@ -1,0 +1,64 @@
+== start Wed Oct 21 01:11:08 UTC 2026 commit ed7eea2 gsieve.c addf4d33428a216c gsieve_cuda.cu d3057838f4a4e001
+gpu: NVIDIA GeForce RTX 3060 Ti, 610.88, 8192 MiB; CPU variants: avx2 scalar
+K kerneltest K=13 G NJ=1024 exit=0 177s
+  mismatches 0 mismatches 0 
+K kerneltest K=13 E NJ=16 exit=0 21s
+  mismatches 0 mismatches 0 
+K kerneltest K=12 G NJ=256 exit=0 10s
+  mismatches 0 mismatches 0 
+K kerneltest K=12 E NJ=16 exit=0 6s
+  mismatches 0 mismatches 0 
+A suite V=cuda T=1 exit=0 58s
+A suite V=cuda T=8 exit=0 35s
+C val_prodrow N=36000 c=34200 n0=-1 exit=0 4s
+  c=34200: region points 9632000, S2 C=36502 python=36502 OK
+C val_prodrow N=36000 c=33000 n0=-1 exit=0 8s
+  c=33000: region points 26853200, S2 C=101290 python=101290 OK
+C val_prodrow N=36000 c=30000 n0=-1 exit=0 28s
+  c=30000: region points 107706200, S2 C=406909 python=406909 OK
+C val_prodrow N=36000 c=25000 n0=-1 exit=0 92s
+  c=25000: region points 362461200, S2 C=1368616 python=1368616 OK
+C val_prodrow N=40000 c=39500 n0=36000 exit=0 1s
+  c=39500: region points 725700, S2 C=2731 python=2731 OK
+C val_prodrow N=40000 c=38200 n0=36000 exit=0 4s
+  c=38200: region points 9632000, S2 C=36628 python=36628 OK
+C val_prodrow N=40000 c=35990 n0=36000 exit=0 14s
+  c=35990: region points 48044000, S2 C=181475 python=181475 OK
+C val_prodrow N=40000 c=30000 n0=36000 exit=0 47s
+  c=30000: region points 191804000, S2 C=722769 python=722769 OK
+D xvariant [main G 1000 0 1001] exit=0 22s
+D xvariant [main E 400 0 401] exit=0 34s
+D xvariant [main G 36000 20000 20001] exit=0 19s
+D xvariant [main G 40000 35990 36000 n0=36000] exit=0 14s
+D xvariant [main G 36000 7540 7541] exit=0 46s
+D xvariant [main G 40000 11824 11826 n0=36000] exit=0 24s
+D xvariant [direct G 3000 0 3001] exit=0 5s
+D xvariant [direct E 400 0 401] exit=0 0s
+D xvariant [odd G 3000 0 3001] exit=0 3s
+D xvariant [odd E 400 0 401] exit=0 7s
+P val_proddone main:7540:7898 exit=0 5s
+  variant=cuda threads=20 wall=5s | prod time=235.10s -> MATCH
+Z val_dump K=13 G N=150 (GPU34) exit=0 4s
+Z val_dump K=13 E N=150 (GPU34) exit=0 11s
+Z val_dump K=12 E N=150 (GPU34) exit=0 3s
+Z val_dump K=12 G N=150 (GPU34) exit=0 1s
+Z same dump avx2 = cuda34 [main G 1000 0 1001] exit=0 3s
+  identical: 7363950 lines
+Z same dump avx2 = cuda34 [main E 1000 0 1001] exit=0 30s
+  identical: 139741177 lines
+Z same dump avx2 = cuda34 [main G 40000 35990 36000 n0=36000] exit=0 3s
+  identical: 3619069 lines
+Z val_e2e K=13 NL=7 (GPU34 + ODD2) exit=0 15s
+  expected 314  found 314  missing 0  extra 0
+Z val_e2e K=12 NL=7 (GPU34 + ODD2) exit=0 4s
+  expected 314  found 314  missing 0  extra 0
+Z val_prodrow N=36000 c=33000 (GPU34) exit=0 9s
+Z val_proddone main:7540:7898 (GPU34) exit=0 4s
+Z val_odd2 400 ./gsieve_k13_cuda exit=0 12s
+./val_cuda.sh: line 17: 28967 Killed                  "$@" > "$log" 2>&1
+Z val_odd2 1000 ./gsieve_k13_cuda exit=137 71s
+Z val_odd2 400 ./gsieve_k13_cuda 250 exit=0 10s
+Z val_odd2 300 ./gsieve_k13_nl7_cuda -1 7 exit=0 5s
+== end Wed Oct 21 01:25:42 UTC 2026: SOME CHECKS FAILED
+exit=1
+Z val_odd2 500 ./gsieve_k13_cuda exit=0 25s (re-run after the N=1000 step was killed by the OOM killer)

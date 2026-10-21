@@ -1,0 +1,6 @@
+DONE points=20104838 s1=1353558 s2=1353558 s3=901613 s4=13694 gmp=13694 full=13694 members=0
+points 20104838: equal
+S2 (b >= 26, last 26 digits zero-free): 1353558 = exact; D4 (b <= 25, last 54 digits): 13672 = exact
+R3 451945 (every one has a 0 among its first 5 digits), R4 901591, S4 22: verified
+members: 0 = exact
+odd2 decisions verified

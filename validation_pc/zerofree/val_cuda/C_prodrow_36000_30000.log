@@ -1,0 +1,3 @@
+DONE mode=main dm=G N=36000 N0=-1 c=[30000,30001) K=13 NL=14 variant=cuda points=107706200 s1=7396486 s2=406909 s3=162968 s4=0 gmp=0 full=0 members=0 time=0.28 threads=8 wall=0.35
+c=30000: region points 107706200, S2 C=406909 python=406909 OK
+R3 sample verified (300 of 243941), R4=162968 S4=0 verified
