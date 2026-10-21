@@ -1,0 +1,54 @@
+sha256sum: /home/user/persistence-research/work/gsieve/gsieve_k13_cuda: No such file or directory
+== run_shells cpu [40000:50000 50000:60000 60000:70000] start 2026-10-21T14:01:46Z commit ac0db01 gpu  cpu 052dc15d5ee7c80b threads 4
+== second pass (CPU) 40000 < m <= 50000 start 2026-10-21T14:01:46Z
+direct N=50000 N0=40000 c=[0,50001): points=23398270000 s1=0 s2=0 s3=0 s4=171177 gmp=171177 full=0 members=0 | variant=ifma threads=4 wall=157s | prod time=686.54s -> MATCH
+main N=50000 N0=40000 c=[0,50001): points=60979301760000 s1=4190465737806 s2=230373239297 s3=92062786045 s4=14 gmp=14 full=0 members=0 | variant=ifma threads=4 wall=4895s | prod time=5517.24s -> MATCH
+odd N=50000 N0=40000 c=[0,50001): points=35085180000 s1=1248050760 s2=0 s3=0 s4=36 gmp=36 full=0 members=0 | variant=ifma threads=4 wall=89s | prod time=346.61s -> MATCH
+all counters match the production DONE lines
+main: c covered 50001/50001, missing []
+direct: c covered 50001/50001, missing []
+odd: c covered 50001/50001, missing []
+  direct_members = 0
+  direct_points = 23398270000
+  direct_s4 = 171177
+  main_members = 0
+  main_points = 60979301760000
+  main_s4 = 14
+  odd_members = 0
+  odd_points = 35085180000
+  odd_s4 = 36
+points total: 61037785210000
+members: none
+main: boundaries 50001 vs 50001, compared at 50001; totals {'points': 60979301760000, 's4': 14, 'members': 0} vs {'points': 60979301760000, 's4': 14, 'members': 0}; all equal
+direct: boundaries 50001 vs 50001, compared at 50001; totals {'points': 23398270000, 's4': 171177, 'members': 0} vs {'points': 23398270000, 's4': 171177, 'members': 0}; all equal
+odd: boundaries 50001 vs 50001, compared at 50001; totals {'points': 35085180000, 's4': 36, 'members': 0} vs {'points': 35085180000, 's4': 36, 'members': 0}; all equal
+per-c counts identical
+/root/scratch/shells/check_N50000_n040000.tar.xz: 514108 bytes, 3 files; SHA-256 ee63d8ec10fd8cf7
+== second pass (CPU) 40000 < m <= 50000 end 2026-10-21T15:27:34Z
+== second pass (CPU) 50000 < m <= 60000 start 2026-10-21T15:27:34Z
+direct N=60000 N0=50000 c=[0,60001): points=28598270000 s1=0 s2=0 s3=0 s4=209068 gmp=209068 full=0 members=0 | variant=ifma threads=4 wall=193s | prod time=831.68s -> MATCH
+main N=60000 N0=50000 c=[0,60001): points=90974701760000 s1=6251733870317 s2=343694020810 s3=137348477820 s4=42 gmp=42 full=0 members=0 | variant=ifma threads=4 wall=8257s | prod time=8373.23s -> MATCH
+odd N=60000 N0=50000 c=[0,60001): points=42885180000 s1=1797660760 s2=0 s3=0 s4=55 gmp=55 full=0 members=0 | variant=ifma threads=4 wall=137s | prod time=417.44s -> MATCH
+all counters match the production DONE lines
+main: c covered 60001/60001, missing []
+direct: c covered 60001/60001, missing []
+odd: c covered 60001/60001, missing []
+  direct_members = 0
+  direct_points = 28598270000
+  direct_s4 = 209068
+  main_members = 0
+  main_points = 90974701760000
+  main_s4 = 42
+  odd_members = 0
+  odd_points = 42885180000
+  odd_s4 = 55
+points total: 91046185210000
+members: none
+main: boundaries 60001 vs 60001, compared at 60001; totals {'points': 90974701760000, 's4': 42, 'members': 0} vs {'points': 90974701760000, 's4': 42, 'members': 0}; all equal
+direct: boundaries 60001 vs 60001, compared at 60001; totals {'points': 28598270000, 's4': 209068, 'members': 0} vs {'points': 28598270000, 's4': 209068, 'members': 0}; all equal
+odd: boundaries 60001 vs 60001, compared at 60001; totals {'points': 42885180000, 's4': 55, 'members': 0} vs {'points': 42885180000, 's4': 55, 'members': 0}; all equal
+per-c counts identical
+/root/scratch/shells/check_N60000_n050000.tar.xz: 600100 bytes, 3 files; SHA-256 68c08e15eb65d6ae
+== second pass (CPU) 50000 < m <= 60000 end 2026-10-21T17:50:49Z
+== second pass (CPU) 60000 < m <= 70000 start 2026-10-21T17:50:49Z
+direct N=70000 N0=60000 c=[0,70001): points=33798270000 s1=0 s2=0 s3=0 s4=247224 gmp=247224 full=0 members=0 | variant=ifma threads=4 wall=289s | prod time=940.24s -> MATCH

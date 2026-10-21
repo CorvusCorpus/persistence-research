@@ -904,6 +904,24 @@ instead of the desktop. The desktop was unavailable for GPU work, and its memory
   - Coverage is complete (50,001/50,001 c values on all three paths, no members).
   - Per-c points, s4 and members are identical at all 50,001 boundaries on every path.
   - Wall times at 4 threads: main 4,895 s, direct 157 s, odd 89 s. The projection was 1.4 h for main.
+- **Shell 50,000 < m ≤ 60,000: PASSED** (15:27:34–17:50:49 UTC; archive `validation_pc/task4_check/check_N60000_n050000.tar.xz`,
+  SHA-256 `68c08e15…`).
+  - All eight DONE counters match production for each invocation:
+    - main: 90,974,701,760,000 points, s1 = 6,251,733,870,317, s2 = 343,694,020,810, s3 = 137,348,477,820, s4 = 42;
+    - direct: 28,598,270,000 points, s4 = 209,068;
+    - odd: 42,885,180,000 points, s1 = 1,797,660,760, s4 = 55.
+  - full = 0 and members = 0 on every path.
+  - Coverage is complete (60,001/60,001 c values) with no members, and per-c counts are identical at all 60,001
+    boundaries.
+  - Main took 8,257 s wall; benchmarks of the sub-cubic prototype shared the CPU part of the time.
+- **Shell 60,000 < m ≤ 70,000: stopped by decision of the user at 18:01 UTC** (focus moved to the sieve).
+  - Its direct invocation had completed: 33,798,270,000 points, s4 = 247,224, all counters MATCH. The log is kept in
+    `validation_pc/task4_check/partial_N70000_n060000/`, and `val_proddone.py --logdir` reuses it on resume.
+  - Main had run for 6 minutes. Its partial log was discarded, because `val_proddone.py` re-runs incomplete
+    invocations from the start.
+  - The driver output up to the stop is in `validation_pc/task4_check/driver_A.out`.
+- **Status of P2.5:** 2 of the 6 shells are second-passed (40,000 → 60,000). 60,000 → 100,000 remains: about 17 h
+  on this machine, or about 6 h on the desktop CPU.
 
 ## 2026-10-21 · Session 4 (cloud container) · Sub-cubic chain sieve: prototype (`work/tsieve/`)
 
