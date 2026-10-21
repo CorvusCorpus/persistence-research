@@ -850,3 +850,45 @@ Goal: verify that 2^n contains a 0 for every 86 < n ≤ N far beyond the publish
   - On the production-scale slice [4·10^12, 4.25·10^12) the CDONE counters are identical:
     s1 = 70,512,472,576, s2 = 17,923,428,218, s3 = 9,841,385,431, s4 = 5,935.
 - **Record.** `validation_pc/pow2/val_z2.out` remains the record of the first CPU-only version (commit `b65c790`).
+
+## 2026-10-21 · Session 4 (cloud container) · Second pass of the six shells (ROADMAP P2.5)
+
+Goal: the independent CPU second pass of the shells 40,000 < m ≤ 100,000 (NOTEBOOK 4.4), run on cloud server hardware
+instead of the desktop. The desktop was unavailable for GPU work, and its memory has no ECC.
+
+### S.1 Machine and build
+- **Machine.** Cloud VM (Firecracker): Intel Xeon @ 2.10 GHz, 4 vCPUs, AVX-512 with IFMA, 15 GB RAM. Ubuntu 24.04,
+  gcc 13.3.0, GMP 6.3.0 and MPFR 4.2.1 (`apt-get install libgmp-dev libmpfr-dev`), python-flint 0.9.0 (pip).
+  - Server hardware of this kind normally has ECC memory, but that cannot be observed from inside the VM (no EDAC, no
+    DMI). The same holds for the original m ≤ 40,000 run.
+- **Build.** `make` at commit `416796e`: `gsieve.c` `addf4d33…`, `gsieve_k13` `052dc15d…` (variant ifma, `-O3
+  -march=native`, NL = 14).
+
+### S.2 Validation on this machine (`validation_pc/task4_check/cloud_*.log`)
+- `make -C work/gsieve test`: all passed in 2 min 13 s.
+  - Kernel arithmetic: OK.
+  - Four `val_dump` regions: every decision verified.
+  - E-mode end to end: 314/314 for K = 13 and K = 12.
+  - Direct, odd and thread decisions: verified.
+  - `val_prodrow` at c = 35,500: OK.
+- `make -C work/gsieve test-prod`: MATCH on all counters.
+  - main c = [7540, 7898) at N = 36,000: 8.59·10^11 points in 70 s.
+  - That is 1.23·10^10 points/s, or 3.1·10^9 per thread.
+- **Projection for the second pass:** about 22 h in all.
+  - Main paths, in order: 1.4, 2.1, 2.9, 3.8, 4.9 and 6.1 h.
+  - Direct and odd paths: about 15 min per shell.
+
+### S.3 Second pass, shells 40,000 → 70,000 (started 2026-10-21 14:01:46 UTC, commit `ac0db01`)
+- **Inputs.** The production logs were unpacked from `work/gsieve/logs/prod_N{50000,60000,70000,80000,90000,100000}_n0*.tar.xz`
+  into `/root/scratch/shells/`. Every file matches its `.sha256` list.
+- **Command.** `validation_pc/task4_check/launch_check.sh "40000:50000 50000:60000 60000:70000" A` (from the repository
+  root), which runs `setsid nohup ./run_shells.sh /root/scratch/shells "…" cpu` from `work/gsieve`.
+  - It is detached so that it outlives the 2 h limit on background tasks in this environment.
+  - For each shell, `val_proddone.py` re-runs each of the three production invocations (main, direct, odd over
+    c = [0, N]) with `gsieve_k13` at 4 threads, and requires all eight DONE counters to match.
+  - Then `aggregate.py` (full coverage, no members) and `compare_cdone.py` (per-c points, s4 and members) run, and the
+    logs are archived to `validation_pc/task4_check/check_N<N>_n0<N0>.tar.xz`.
+  - The MEMBER tripwire is active.
+- **Scope.** The first three shells take about 7 h. The last three (70,000 → 100,000, about 15 h here) are held for
+  the user's approval, because together they exceed the 12 h limit.
+- **Results:** in S.4.
