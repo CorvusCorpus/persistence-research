@@ -1,0 +1,36 @@
+./val_tsieve6.sh tp13.txt G 4 300 -1 4
+G N=300 N0=-1 M=4: points=22428176 s1=1543243 s2=84616 s3=34055 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+./val_tsieve6.sh tp13.txt G 3 900 600 4
+G N=900 N0=600 M=3: points=502702800 s1=34540773 s2=1898159 s3=759417 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+./val_tsieve6.sh tp13.txt E 5 600 -1 4
+E N=600 N0=-1 M=5: points=205270976 s1=57896227 s2=14716464 s3=9789683 s4=261 gmp=261 full=261 members=1 -> IDENTICAL
+python3 val_e2e_tree.py ./tsieve6_nl7 ../gsieve/gsieve_k13_nl7 tp13.txt 4 160 7 4
+DONE mode=tree dm=E N=160 N0=-1 K=13 M=4 NL=7 points=3238569 s1=914094 s2=231347 s3=153979 s4=3187 gmp=3187 full=3187 members=173 leaves=275439346 rows=997456 hits=654090 tt=1 roots=0:33170/33170 time
+DONE mode=direct dm=E N=160 N0=-1 c=[0,161) K=13 NL=7 variant=avx2 points=506565 s1=0 s2=0 s3=0 s4=1916 gmp=1916 full=1916 members=59 time=0.03 threads=1 wall=0.03
+DONE mode=odd dm=E N=160 N0=-1 c=[0,161) K=13 NL=7 variant=avx2 points=1197824 s1=0 s2=0 s3=0 s4=5081 gmp=5081 full=5081 members=82 time=0.24 threads=1 wall=0.24
+expected 314  found 314  missing 0  extra 0
+E-mode end-to-end (tree sieve on the main path): exact match
+./val_tsieve6.sh tp13.txt G 4 300 -1 4 ../gsieve/gsieve_k13 ./tsieve_gpu_emu
+tsieve_gpu: device emulation, M=4, block 256 threads, batch 512 cosets
+table checks passed: 3 (device tables and constants against host copies, host copies against their hash)
+G N=300 N0=-1 M=4: points=22428176 s1=1543243 s2=84616 s3=34055 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+./val_tsieve6.sh tp13.txt G 4 300 -1 4 ../gsieve/gsieve_k13 ./tsieve_gpu_emu_q8
+tsieve_gpu: device emulation, M=4, block 256 threads, batch 512 cosets
+table checks passed: 3 (device tables and constants against host copies, host copies against their hash)
+G N=300 N0=-1 M=4: points=22428176 s1=1543243 s2=84616 s3=34055 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+./val_tsieve6.sh tp13.txt E 3 300 -1 4 ../gsieve/gsieve_k13 ./tsieve_gpu_emu_q8
+tsieve_gpu: device emulation, M=3, block 256 threads, batch 512 cosets
+table checks passed: 2 (device tables and constants against host copies, host copies against their hash)
+E N=300 N0=-1 M=3: points=22428176 s1=6328962 s2=1606545 s3=1069096 s4=30 gmp=30 full=30 members=1 -> IDENTICAL
+python3 val_e2e_tree.py ./tsieve_gpu_emu_nl7 ../gsieve/gsieve_k13_nl7 tp13.txt 4 160 7 4
+DONE mode=treeemu dm=E N=160 N0=-1 K=13 M=4 NL=7 points=3238569 s1=914094 s2=231347 s3=153979 s4=3187 gmp=3187 full=3187 members=173 leaves=275439346 rows=997456 hits=654090 tt=1 roots=0:33170/33170 t
+DONE mode=direct dm=E N=160 N0=-1 c=[0,161) K=13 NL=7 variant=avx2 points=506565 s1=0 s2=0 s3=0 s4=1916 gmp=1916 full=1916 members=59 time=0.03 threads=1 wall=0.03
+DONE mode=odd dm=E N=160 N0=-1 c=[0,161) K=13 NL=7 variant=avx2 points=1197824 s1=0 s2=0 s3=0 s4=5081 gmp=5081 full=5081 members=82 time=0.24 threads=1 wall=0.24
+expected 314  found 314  missing 0  extra 0
+E-mode end-to-end (tree sieve on the main path): exact match
+TSIEVE TESTS PASSED
+
+real	12m5.389s
+user	46m58.694s
+sys	0m12.518s
+make test exit 0

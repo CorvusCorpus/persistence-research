@@ -56,3 +56,7 @@ work/tsieve/*.o
 work/tsieve/tp13.txt
 work/tsieve/gpu_val/
 work/tsieve/tsieve_gpu_emu_nl7
+work/tsieve/tsieve_gpu_emu_q8
+work/tsieve/tsieve_gpu_q64
+work/csrc/bottomgpu
+work/csrc/bottomgpu_emu

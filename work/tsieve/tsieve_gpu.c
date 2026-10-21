@@ -4,7 +4,7 @@
  * (tsieve6.c, node()), computes each coset's constants and exact i0 range, and sends batches to the GPU, which returns
  * counters, the points that passed stage 4 (for gsieve's full_check on the host) and the rare points near 10^XMIN
  * (decided on the host by gsieve's region rule). With dump the GPU returns every s2 point with its decision.
- * usage: tsieve_gpu PARAMFILE G|E M N [n0=N0] [threads=T] [dump] [roots=A:B]    env TG_NT (threads per block, 256),
+ * usage: tsieve_gpu PARAMFILE G|E M N [n0=N0] [threads=T] [dump] [roots=A:B]    env TG_NT (threads per block, 512 for M = 7, else 256),
  *        TG_BATCH (cosets per launch), TG_OUTCAP (points per launch), TG_EMU_THREADS (emulation build)
  * build: see Makefile (tsieve_gpu: CUDA; tsieve_gpu_emu: the same kernel compiled for the CPU)
  */
@@ -72,9 +72,9 @@ static void *gworker(void *arg) {
 static int VINT, VSTOP2; static u64 NVER;
 static void *verifier(void *arg) {                     /* every VINT seconds: fail-stop check of all tables (non-ECC) */
     (void)arg;
-    for (int t = 0; !__atomic_load_n(&VSTOP2, __ATOMIC_SEQ_CST); t++) {
-        sleep(1);
-        if ((t + 1) % VINT) continue;
+    for (int t = 0; !__atomic_load_n(&VSTOP2, __ATOMIC_SEQ_CST); t++) {   /* 0.1 s ticks: the join at the end waits <= 0.1 s */
+        usleep(100000);
+        if ((t + 1) % (10 * VINT)) continue;
         if (tg_verify()) { fprintf(stderr, "TABLE CHECK FAILED during the run (memory fault?): stopping, discard this run\n"); fflush(stdout); _exit(3); }
         NVER++;
     }
@@ -84,8 +84,11 @@ int main(int argc, char **argv) {
     int rc = ts_setup(argc, argv); if (rc) return rc;
     if (!R2OK) { fprintf(stderr, "the projected region does not fit 64-bit arithmetic\n"); return 1; }
     if (TM > 7) { fprintf(stderr, "the GPU build supports M <= 7 (U in shared memory)\n"); return 1; }
+    if (NN > 1000000) { fprintf(stderr, "the GPU build supports N <= 10^6 (queued points packed as a, b, c < 2^22, 2^21, 2^21)\n"); return 1; }
     tg_params p; memset(&p, 0, sizeof p);
-    p.k = TK; p.m = TM; p.dm = DM; p.nl = NL; p.nt = getenv("TG_NT") ? atoi(getenv("TG_NT")) : 256;
+    /* threads per block: 16 warps per SM is best on the RTX 3060 Ti (NOTEBOOK T.7): M = 7 fits one block per SM in shared
+     * memory, so 512 threads; smaller M fits two blocks of 256 */
+    p.k = TK; p.m = TM; p.dm = DM; p.nl = NL; p.nt = getenv("TG_NT") ? atoi(getenv("TG_NT")) : (TM >= 7 ? 512 : 256);
     p.n3 = n3; p.n2 = n2; p.skip = TSKIP; p.nfull = TNFULL; p.nrem = TNREM;
     p.m1 = TM1; p.mm = TMm; p.br1 = (u64)(((u128)1 << 64) / TM1); p.brm = TBRM;
     p.nleaf = 1; for (int i = 0; i < TM; i++) p.nleaf *= DM == 0 ? 4 : 5;
@@ -93,7 +96,12 @@ int main(int argc, char **argv) {
     for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) p.v[i][j] = TV[i][j];
     for (int q = 0; q < n3; q++) { for (int m = 0; m < 3; m++) p.a3[q][m] = A3[q][m]; p.b3_0[q] = (i64)RQ3[q].b0; p.b3_r[q] = (i64)RQ3[q].br; }
     for (int t = 0; t < n2; t++) { p.a2[t][0] = R2A[t][0]; p.a2[t][1] = R2A[t][1]; p.b2_0[t] = R2B0[t]; p.b2_r[t] = R2BR[t]; }
+    for (int q = 0; q < n3; q++) p.mc3[q] = A3[q][2] ? ~0ULL / (u64)(A3[q][2] > 0 ? A3[q][2] : -A3[q][2]) : 0;
+    for (int t = 0; t < n2; t++) p.mc2[t] = R2A[t][1] ? ~0ULL / (u64)(R2A[t][1] > 0 ? R2A[t][1] : -R2A[t][1]) : 0;
     p.cornerlg = XMIN + 2.0; p.l2 = L2; p.l3 = L3; p.l7 = L7; p.tb = TB;
+    /* b >= cornerb or c >= cornerc gives b lg3 + c lg7 >= cornerlg + 0.4, far beyond any double rounding, so the kernel's
+     * FP64 corner test can only be true below both thresholds */
+    p.cornerb = (u64)ceil((p.cornerlg + 0.4) / LG3); p.cornerc = (u64)ceil((p.cornerlg + 0.4) / LG7);
     memcpy(p.ok4, TOK4, 10000); memcpy(p.okr, TOKR, 10000);
     for (int d = 0; d < 10; d++) p.ok1[d] = (unsigned char)okdigits((u64)d, 1);
     if (tg_init(&p, &T2[0][0], &T3[0][0], &T7[0][0], (3 * (u64)NN + 3) * NL, (2 * (u64)NN + 2) * NL, ((u64)NN + 2) * NL,

@@ -22,7 +22,9 @@ typedef struct {
     long long v[3][3];
     long long a3[8][3], b3_0[8], b3_r[8];           /* region: a3 . (i0, i1, i2) <= b3_0 + b3_r r */
     long long a2[32][2], b2_0[32], b2_r[32];        /* its projection on (i0, i1) */
-    double cornerlg;                                /* points with b lg3 + c lg7 below this go to the host */
+    unsigned long long mc3[8], mc2[32];             /* floor((2^64 - 1) / |c|) for the divisors a3[q][2], a2[t][1] (0 if c = 0) */
+    double cornerlg;                                /* points with b lg3 + c lg7 below this must go to the host ... */
+    unsigned long long cornerb, cornerc;            /* ... so all points with b < cornerb and c < cornerc go there (a superset) */
     unsigned long long l2, l3, l7; int tb;          /* leading-digit table: bin = (a l2 + b l3 + c l7) >> (64 - tb) */
     unsigned char ok4[10000], ok1[10], okr[10000];  /* 4 digits / 1 digit / the top NREM digits admissible */
 } tg_params;

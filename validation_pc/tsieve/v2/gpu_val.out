@@ -1,0 +1,13 @@
+== val_tsieve_gpu 2026-10-21T22:48:57Z commit f0a6868 gpu 31f95f00021f583b threads 20
+== A. exact regions
+== A2. exact regions, test build with a 64-entry queue and 16-value i0 chunks (inline path and chunking)
+== B. positive control (NL = 7, N = 160)
+== C. production scale: GPU tree vs CPU tree, N = 100000, roots 0:16 of 16384
+M=6 CPU: s1=67093430687 s2=3688458557 s3=1473985436 s4=0 gmp=0 full=0 members=0 leaves=65536 rows=1342644156 hits=17588136784 wall=28.30
+M=6 GPU: s1=67093430687 s2=3688458557 s3=1473985436 s4=0 gmp=0 full=0 members=0 leaves=65536 rows=1342644156 hits=17588136784 wall=2.64 -> MATCH
+M=7 CPU: s1=67093430687 s2=3688458557 s3=1473985436 s4=0 gmp=0 full=0 members=0 leaves=65536 rows=1342644156 hits=14070505002 wall=26.91
+M=7 GPU: s1=67093430687 s2=3688458557 s3=1473985436 s4=0 gmp=0 full=0 members=0 leaves=65536 rows=1342644156 hits=14070505002 wall=2.64 -> MATCH
+== D. N = 16000 against gsieve (main G)
+gsieve: points=4090112261376 s1=281070356907 s2=15451871941 s3=6174925138 s4=2 gmp=2 full=0 members=0 wall=115.61
+tree:   points=4090112261376 s1=281070356907 s2=15451871941 s3=6174925138 s4=2 gmp=2 full=0 members=0 wall=98.84 -> MATCH
+== ALL PASSED 2026-10-21T23:15:37Z

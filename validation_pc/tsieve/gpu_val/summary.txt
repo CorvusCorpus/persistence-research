@@ -1,0 +1,22 @@
+== val_tsieve_gpu 2026-10-21T21:49:04Z commit f0a6868 gpu f3abeb5bdb6551a7 threads 20
+== A. exact regions
+G N=300 N0=-1 M=4: points=22428176 s1=1543243 s2=84616 s3=34055 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+G N=500 N0=-1 M=5: points=116783376 s1=8029819 s2=440579 s3=176558 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+G N=900 N0=600 M=3: points=502702800 s1=34540773 s2=1898159 s3=759417 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+G N=1200 N0=1100 M=6: points=391727600 s1=26920046 s2=1479928 s3=591512 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+G N=2000 N0=-1 M=7: points=7905797376 s1=543275141 s2=29856855 s3=11935069 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+E N=300 N0=-1 M=4: points=22428176 s1=6328962 s2=1606545 s3=1069096 s4=30 gmp=30 full=30 members=1 -> IDENTICAL
+E N=600 N0=-1 M=5: points=205270976 s1=57896227 s2=14716464 s3=9789683 s4=261 gmp=261 full=261 members=1 -> IDENTICAL
+E N=900 N0=700 M=6: points=378675200 s1=106804827 s2=27150809 s3=18068105 s4=467 gmp=467 full=42 members=0 -> IDENTICAL
+== B. positive control (NL = 7, N = 160)
+expected 314  found 314  missing 0  extra 0
+E-mode end-to-end (tree sieve on the main path): exact match
+== C. production scale: GPU tree vs CPU tree, N = 100000, roots 0:16 of 16384
+M=6 CPU: s1=67093430687 s2=3688458557 s3=1473985436 s4=0 gmp=0 full=0 members=0 leaves=65536 rows=1342644156 hits=17588136784 wall=wall=30.86
+M=6 GPU: s1=67093430687 s2=3688458557 s3=1473985436 s4=0 gmp=0 full=0 members=0 leaves=65536 rows=1342644156 hits=17588136784 wall=wall=8.04 -> MATCH
+M=7 CPU: s1=67093430687 s2=3688458557 s3=1473985436 s4=0 gmp=0 full=0 members=0 leaves=65536 rows=1342644156 hits=14070505002 wall=wall=29.41
+M=7 GPU: s1=67093430687 s2=3688458557 s3=1473985436 s4=0 gmp=0 full=0 members=0 leaves=65536 rows=1342644156 hits=14070505002 wall=wall=8.04 -> MATCH
+== D. N = 16000 against gsieve (main G)
+gsieve: points=4090112261376 s1=281070356907 s2=15451871941 s3=6174925138 s4=2 gmp=2 full=0 members=0 wall=126.85
+tree:   points=4090112261376 s1=281070356907 s2=15451871941 s3=6174925138 s4=2 gmp=2 full=0 members=0 wall=130.23 -> MATCH
+== ALL PASSED 2026-10-21T22:15:34Z
