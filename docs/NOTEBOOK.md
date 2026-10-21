@@ -669,3 +669,85 @@ Main path G, table build excluded.
 - 1.2: no number below 10^100000 has persistence ≥ 12, so a(12) > 2.67·10^100000. THEOREM given 1.1.
 - 1.8: bridges have more than 69,897 digits, over 99.77% ones.
 - `docs/CHAIN_SIEVE.md`, README, ROADMAP, the paper and the OEIS draft are updated in the same commit.
+
+---
+
+## 2026-10-21 · Session 3 (desktop PC) · Zero-free extension (option 2: OEIS A238985, Chaffin's 10^20000)
+
+Goal: every 7-smooth x < 10^D without a digit 0 is one of the 12,615 known numbers (`work/Z.json`). Chaffin (2016)
+showed that none lies in (10^140, 10^20000). Method and lemma: `docs/ZERO_FREE.md`.
+
+### Z.1 Why new code
+Zero-free mode (E) was the chain sieve's validation mode. At production scale:
+- **Main path:** 3.2·10^9 points/s, entirely CPU-bound. 7.2% of the points pass stage 2, against 0.38% in mode G, and
+  the CPU stages 3–4 cost about 52 ns per survivor. D = 40,000 would take about 9 h.
+- **Odd path:** about 3·10^6 points/s per thread. It is GMP-bound: 0.42% of the points reach a 600-digit GMP check at
+  about 80 µs each. D = 40,000 would take about 12 days.
+
+### Z.2 What was built (commits `bfe9ea0`, `ef5ebde`)
+- **`GSIEVE_GPU34=1`:** stages 3–4 of the main path on the GPU, via a CLASSIFY step at every flush of the kernel.
+  - It is an exact port of `later_stages()` and `limb_check()`; TOP and T2 are uploaded and covered by the fail-stop
+    checks.
+  - Dumps are byte-identical to avx2, and DONE lines say `variant=cuda34`.
+  - Zero-free mode now runs at 2.5·10^10 points/s, and chain mode at 2.6·10^11 (1.5×).
+- **`GSIEVE_ODD2=1`:** the 2-adic suffix collapse for 3^a 5^b 7^c, b ≥ 26 (mode E), on the CPU.
+  - A 4 MB bitmap of the last 26 digits (density 0.0807) is walked along rows in b.
+  - Then come the leading-digit table, a limb engine on T5[b]·(3^a 7^c) and GMP. Rows with b ≤ 25 use the old code.
+  - Speed: 4.8·10^9 points/s at N = 57,240.
+- **New tools:** `val_odd2.py`, `val_cuda.sh` section Z, `prod.py` `DM=`, `run_zerofree.sh`. `check_member.py` now
+  reports zero-freeness.
+- **The CPU binaries are byte-identical to before** (`gsieve_k13` = `46f8308b…`): all new code is under `S2_CUDA` or
+  runtime flags.
+
+### Z.3 Validation on the exact binaries (`gsieve_k13_cuda` `9c8d02af…`; `validation_pc/zerofree/`)
+- **`val_cuda.sh`, all sections:** kernel tests (0 mismatches), the suite at T = 1 and 8, eight production slices, ten
+  cross-variant regions, and the logged invocation (MATCH).
+- **Section Z:**
+  - `val_dump` with GPU34 for K = 13/12 and G/E: all decisions verified against exact arithmetic.
+  - Dumps are byte-identical to avx2 for main G 1000 (7,363,950 lines), main E 1000 (139,741,177 lines) and the shell
+    slice.
+  - `val_e2e` with GPU34 + ODD2 for K = 13 and 12: **314/314**.
+  - `val_prodrow` and `val_proddone` with GPU34: OK and MATCH.
+  - `val_odd2` for N = 400, 400 with n0 = 250, and 300 (NL = 7, with 82 members): exact.
+- **One step failed, and it was a harness failure, not a wrong decision.** `val_odd2` at N = 1000 was killed by the
+  OOM killer, because the Python sets of about 25 M tuples exceed WSL's 7.8 GB. It was replaced by N = 500 (40.5 M
+  points), which passes. Earlier, `odd2` at N = 1000 had shown point counts equal to the old odd path, with no members
+  in either.
+- **Driver tests** (D = 150): both known members were found (main path via GPU34, direct path) and the run ended with
+  ALL PASSED. A planted unexpected member set off the tripwire, which stopped everything (exit 42).
+
+### Z.4 Production run D = 40,000 (started 2026-10-21 01:27:53 UTC)
+- **Launch:** `zerofree/launch_zerofree.sh` (detached), which runs `run_zerofree.sh zerofree 40000`.
+- **Parameters:** N1 = 47,333 (form i: main with GPU34 plus direct, 4 threads) and N3 = 57,229 (form iii: odd2, 16
+  threads), in parallel. Commit `ef5ebde`, binary `9c8d02af…`.
+- **Expected members:** exactly 2^77·3^64·7^98 (137 digits) and 2^25·3^227·7^28 (140 digits).
+- **Results:** in Z.6, once the run ends.
+
+### Z.5 Interrupted by a Windows Update restart; re-check and resume
+- **Cause.** Windows Update restarted the PC at 01:29:12 UTC, about 80 s into the run.
+  - System log event 1074: `MoUsoCoreWorker.exe`, then `TrustedInstaller.exe`, "Operating System: Upgrade (Planned)".
+    The 2026-10 cumulative update KB5127648 (build 26200.9711) and .NET update KB5127690 were installed.
+  - There was no crash and no power loss: no Kernel-Power 41, 6008 or BugCheck events.
+  - The PC then slept from 01:49 to 07:00 UTC (the AC sleep timeout is 15 min).
+- **Written before the kill.**
+  - main: c = 0–215 (1.44·10^12 points), including the member 2^77·3^64·7^98 at c = 98.
+  - odd: c = 0–76 (2.52·10^11 points, no members).
+  - direct: not started.
+- **Are those lines checked?**
+  - main: yes. A c is written only after a table check covering it has passed (epochs, `gsieve.c`).
+  - odd: no. With odd2, CDONE lines are written as each c finishes, and the odd2 tables (bitmap, T5, TOP) are
+    re-hashed only at the end of an invocation. The killed invocation never got there.
+- **Re-check of odd c = 0–76.** The production command with c1 = 77 (`DM=E GSIEVE_ODD2=1 THREADS=16 JOBS=odd:0:77
+  prod.py 57229 ALL 3600`, in `zerofree/recheck_formiii_N57229_c0_77/`), 57 s.
+  - It ended with "odd2: tables unchanged at the end of the run" and a DONE line.
+  - Its 77 CDONE lines are identical to the killed invocation's. Both invocations start at c = 0 and the counts are
+    cumulative, so the lines must agree exactly.
+  - Log: `validation_pc/zerofree/recheck_odd_N57229_c0_77.log`.
+  - Rule for the rest of the run: any odd-path invocation that ends without a DONE line gets the same re-check before
+    its coverage counts.
+- **Unchanged by the update:** NVIDIA driver 610.88; binaries `gsieve_k13_cuda` `9c8d02af…` and `gsieve_k13`
+  `46f8308b…`; WSL kernel 6.18.54.1. No reboot was pending afterwards.
+- **Resumed at 07:10:40 UTC** with `zerofree/launch_zerofree.sh` (detached). prod.py continued main at c = 216 and odd
+  at c = 77.
+  - A hidden PowerShell process holds a stay-awake power request (`SetThreadExecutionState`) while the run's `wsl.exe`
+    is alive (`zerofree/keepawake.txt`). No settings were changed.
