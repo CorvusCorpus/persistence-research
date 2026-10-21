@@ -39,3 +39,8 @@ paper/*.out
 paper/*.fls
 paper/*.fdb_latexmk
 work/gsieve/zerofree/
+work/tsieve/tsieve
+work/tsieve/tsieve_check
+work/tsieve/tsieve4
+work/tsieve/t4_*
+work/tsieve/gmon.out

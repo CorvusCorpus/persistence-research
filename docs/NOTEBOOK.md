@@ -904,3 +904,68 @@ instead of the desktop. The desktop was unavailable for GPU work, and its memory
   - Coverage is complete (50,001/50,001 c values on all three paths, no members).
   - Per-c points, s4 and members are identical at all 50,001 boundaries on every path.
   - Wall times at 4 threads: main 4,895 s, direct 157 s, odd 89 s. The projection was 1.4 h for main.
+
+## 2026-10-21 · Session 4 (cloud container) · Sub-cubic chain sieve: prototype (`work/tsieve/`)
+
+Question from the user: can the N³ cost of the chain sieve be beaten?
+
+### T.1 Idea
+- The points (a, b, c) whose last D digits avoid {0, 5} form exactly 4^D cosets of the lattice
+  L_D = {a + b·μ3 + c·μ7 ≡ 0 (mod P_D)}, which has index P_D = 4·5^(D−1). This follows from L1 and L2.
+- The region has about N³ points. If L_D is well rounded, a coset holds about N³/P_D points.
+  - Enumerating cosets instead of points costs about 4^D at the depth where P_D ≈ N³.
+  - That is N^(3·log 4/log 5) = N^2.58.
+  - LLL check: for K = 13…30, the shortest vector divided by det^(1/3) is 0.34–0.99, so L_K is well rounded.
+- Elementary consequence (not yet in RESULTS.md, needs a literature check): the number of chain numbers with
+  m ≤ N is ≪ N^(2 + log 4/log 5).
+
+### T.2 Code (prototype, not production)
+- **`tparams.py K`.** Constants for depth K:
+  - level-2K logarithms;
+  - an LLL-reduced basis of L_K in the norm (2a, 3b, 6c), with the walk direction chosen so that its step changes
+    J by a unit mod 5;
+  - the lifting constants of the tree.
+- **`tsieve.c`.** The tree of admissible residues to depth K (4^K leaves, the excluded child found from one digit),
+  then every point of each leaf's coset (digits K+1..2K by lemma L3, affine along rows).
+  - `-DCHECK` re-derives every leaf state and every digit rule.
+- **`tsieve4.c`.** Cosets of depth K, with rows along the walk direction. Within a coset:
+  - The lowest M digits of the block h0 + 2^K·Y depend only on Y mod 5^M.
+  - The admissible set T has exactly 4^M elements, by the same parity argument as L2. It is built as a tree from h0.
+  - Along a row, Y = Ys + n·δ. So the hits are the set bits of U = δ^−1·T in the window [δ^−1·Ys, +len), which is
+    read 64 positions per word.
+  - Row bounds are exact: inequalities in lattice coordinates, Fourier–Motzkin projections for the outer loops.
+- **Validation:** `val_tsieve.py` and `val_tsieve2.py` brute-force every point with exact integers.
+  - Regions: N = 60…120, K = 3…6, M = 1…5, including shells with N0.
+  - Both versions give an EXACT MATCH on every region:
+    - the count of points that pass K + M digits;
+    - the exact set of points that pass 2K digits;
+    - 4^K leaves, with no duplicates.
+
+### T.3 Measurements
+- **Setup.** Single thread, CPU time. The CPU was shared with the 4-thread second pass, and the absolute numbers are
+  inflated by about 1.5×. Main path, a ≥ 26.
+
+  | N | points | gsieve (26 digits) | tsieve4, best (K, M) | digits | ratio |
+  |---|---|---|---|---|---|
+  | 2,000 | 7.9·10⁹ | 5.27 s | 10.5 s (9, 4) | 18 | 2.0 |
+  | 4,000 | 6.4·10¹⁰ | 32.5 s | 47.0 s (10, 4) | 20 | 1.45 |
+  | 8,000 | 5.1·10¹¹ | 189.8 s | 233 s (11, 4/5) | 22 | 1.23 |
+
+- **Scaling.** gsieve's time per point falls from 0.67 to 0.37 ns over this range: its rows get longer, and its
+  asymptote is N³ at about 0.3 ns per point. tsieve4 scales as N^2.2–2.3 here, and its asymptote is N^2.58.
+- **Cost breakdown at N = 4,000** (timing builds, noisy):
+  - tree nodes about 7 ns each;
+  - rows about 20 ns each;
+  - each hit about 3.5 ns to iterate, plus 3.5 ns for the digit check.
+- **Projection with the present scalar code** (not measured):
+  - crossover near N ≈ 1.5–3·10⁴;
+  - about 2.5–3× faster than gsieve at 10⁵ and about 6× at 10⁶;
+  - more if the hit loop is vectorized (gsieve's stage 2 is AVX-512) or moved to the GPU, since the cosets are
+    independent.
+- **Not done:**
+  - digits beyond 2K (K = 13 gives 26, as gsieve's stage 2 does);
+  - the slab 26 ≤ a < 2K;
+  - the direct and odd paths;
+  - threads;
+  - E mode;
+  - a production-scale cross-check against gsieve's dumps.
