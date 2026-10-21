@@ -300,9 +300,12 @@ static void leaf(u64 r, u64 alo, u64 ahi) {
 
 static const int INV5[5] = {0, 1, 3, 2, 4};
 typedef struct { int j; u64 r, ylo, yhi; } troot;
-static troot *ROOTS; static u64 NROOTS, NEXTROOT, RFROM, RTO; static int DR;
+static troot *ROOTS; static u64 NROOTS, NEXTROOT, RFROM, RTO; static int DR, COLLECT;
 static void node(int j, u64 r, u64 ylo, u64 yhi) {
-    if (j == DR && ROOTS && NROOTS != (u64)-1 && !TBMP) { ROOTS[NROOTS++] = (troot){j, r, ylo, yhi}; return; }
+    if (COLLECT && j == DR) { ROOTS[NROOTS++] = (troot){j, r, ylo, yhi}; return; }
+#ifdef TS_LEAF_HOOK
+    if (j == TK) { TS_LEAF_HOOK(r, ylo, yhi); return; }      /* the GPU build collects cosets instead */
+#endif
     if (j == TK) { leaf(r, ylo, yhi); return; }
     u64 m = TL5[j] * 5;
     u64 Z = (u64)((u128)(ylo % m) * TLC[j] % m);
@@ -339,7 +342,8 @@ static void *worker6(void *arg) {
     return NULL;
 }
 
-int main(int argc, char **argv) {
+static u64 TS_POINTS, TS_CORNER; static int TS_NTH = 1;
+static int ts_setup(int argc, char **argv) {             /* everything before the workers start; 0 = ok */
     if (argc < 5) { fprintf(stderr, "usage: tsieve6 PARAMFILE G|E M N [n0=N0] [threads=T] [dump]\n"); return 1; }
     FILE *f = fopen(argv[1], "r"); if (!f) { perror(argv[1]); return 1; }
     u64 t[16];
@@ -357,6 +361,7 @@ int main(int argc, char **argv) {
     DM = argv[2][0] == 'E' ? 1 : 0; TM = atoi(argv[3]); NN = atoll(argv[4]);
     int NTH = 1;
     for (int i = 5; i < argc; i++) {
+        if (!strcmp(argv[i], "nogmp")) { NOGMP = 1; continue; }
         if (!strncmp(argv[i], "n0=", 3)) N0 = atoll(argv[i] + 3);
         else if (!strncmp(argv[i], "threads=", 8)) NTH = atoi(argv[i] + 8);
         else if (!strcmp(argv[i], "dump")) DUMP = 1;
@@ -429,22 +434,35 @@ int main(int argc, char **argv) {
     /* subtree roots at depth DR, then the threads */
     DR = TK < 7 ? TK : 7;
     ROOTS = malloc(sizeof(troot) * 4 * TL5[DR - 1]); NROOTS = 0;      /* at most 4 5^(DR-1) roots (E mode) */
+    COLLECT = 1;
     for (int r = 0; r < 4; r++) node(1, (u64)r, TROOT[r][0], TROOT[r][1]);
+    COLLECT = 0;
     if (DM == 0 && NROOTS != 1ULL << (2 * DR)) { fprintf(stderr, "roots %llu, expected 4^%d\n", (unsigned long long)NROOTS, DR); return 4; }
     if (RTO == 0 || RTO > NROOTS) RTO = NROOTS;
     NEXTROOT = RFROM;
+    TS_POINTS = points; TS_CORNER = corner; TS_NTH = NTH;
+    return 0;
+}
+static int ts_report(const char *mode, double cpu, double wall) {
+    if (DM == 0 && RFROM == 0 && RTO == NROOTS && G_leaves != 1ULL << (2 * TK)) { fprintf(stderr, "leaves %llu, expected 4^%d\n", (unsigned long long)G_leaves, TK); return 4; }
+    printf("DONE mode=%s dm=%s N=%lld N0=%lld K=%d M=%d NL=%d points=%llu s1=%llu s2=%llu s3=%llu s4=%llu gmp=%llu full=%llu members=%llu "
+           "leaves=%llu rows=%llu hits=%llu tt=%d roots=%llu:%llu/%llu time=%.2f threads=%d wall=%.2f\n",
+           mode, DM ? "E" : "G", (long long)NN, (long long)N0, TK, TM, NL, (unsigned long long)TS_POINTS, (unsigned long long)(G_s1rows - TS_CORNER),
+           (unsigned long long)G_cnt[2], (unsigned long long)G_cnt[3], (unsigned long long)G_cnt[4], (unsigned long long)G_cnt[5],
+           (unsigned long long)G_cnt[6], (unsigned long long)G_cnt[7], (unsigned long long)G_leaves, (unsigned long long)G_rows,
+           (unsigned long long)G_hits, TTOK, (unsigned long long)RFROM, (unsigned long long)RTO, (unsigned long long)NROOTS, cpu, TS_NTH, wall);
+    return 0;
+}
+#ifndef TSIEVE_NO_MAIN
+int main(int argc, char **argv) {
+    int rc = ts_setup(argc, argv); if (rc) return rc;
+    int NTH = TS_NTH;
     struct timespec w0, w1; clock_gettime(CLOCK_MONOTONIC, &w0); clock_t c0 = clock();
     pthread_t *tid = malloc(NTH * sizeof *tid);
     for (int i = 0; i < NTH; i++) pthread_create(&tid[i], NULL, worker6, NULL);
     for (int i = 0; i < NTH; i++) pthread_join(tid[i], NULL);
     clock_gettime(CLOCK_MONOTONIC, &w1);
     double wall = (double)(w1.tv_sec - w0.tv_sec) + 1e-9 * (double)(w1.tv_nsec - w0.tv_nsec), cpu = (double)(clock() - c0) / CLOCKS_PER_SEC;
-    if (DM == 0 && RFROM == 0 && RTO == NROOTS && G_leaves != 1ULL << (2 * TK)) { fprintf(stderr, "leaves %llu, expected 4^%d\n", (unsigned long long)G_leaves, TK); return 4; }
-    printf("DONE mode=tree dm=%s N=%lld N0=%lld K=%d M=%d NL=%d points=%llu s1=%llu s2=%llu s3=%llu s4=%llu gmp=%llu full=%llu members=%llu "
-           "leaves=%llu rows=%llu hits=%llu tt=%d roots=%llu:%llu/%llu time=%.2f threads=%d wall=%.2f\n",
-           DM ? "E" : "G", (long long)NN, (long long)N0, TK, TM, NL, (unsigned long long)points, (unsigned long long)(G_s1rows - corner),
-           (unsigned long long)G_cnt[2], (unsigned long long)G_cnt[3], (unsigned long long)G_cnt[4], (unsigned long long)G_cnt[5],
-           (unsigned long long)G_cnt[6], (unsigned long long)G_cnt[7], (unsigned long long)G_leaves, (unsigned long long)G_rows,
-           (unsigned long long)G_hits, TTOK, (unsigned long long)RFROM, (unsigned long long)RTO, (unsigned long long)NROOTS, cpu, NTH, wall);
-    return 0;
+    return ts_report("tree", cpu, wall);
 }
+#endif

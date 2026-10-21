@@ -49,3 +49,9 @@ work/tsieve/tsieve6
 work/tsieve/tsieve6_nl7
 work/tsieve/tsieve6_pg
 work/tsieve/t6_*
+work/tsieve/tsieve_gpu
+work/tsieve/tsieve_gpu_nl7
+work/tsieve/tsieve_gpu_emu
+work/tsieve/*.o
+work/tsieve/tp13.txt
+work/tsieve/gpu_val/
