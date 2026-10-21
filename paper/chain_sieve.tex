@@ -314,8 +314,8 @@ at most $161$ digits different from $1$, so more than $99.77\%$ of its digits ar
 \begin{proof}
 By Theorem~\ref{thm:comp}, $m(c_0)>\NB$; let $t$ be the largest index $\le8$ with $m(c_t)>\NB$. If $t<8$ then
 $c_{t+1}=p(c_t)$ is a chain number with $m\le\NB$, hence known and below $2^{162}$, and each digit of $c_t$ other than
-$1$ contributes a factor at least $2$. Finally $m(x)\le\log_{10}x/\log_{10}5<1.431\log_{10}x$ for $7$-smooth $x$, so
-$m(c_t)>\NB$ forces more than $69{,}897$ digits.
+$1$ contributes a factor at least $2$. Finally $m(x)\le\log_{10}x/\log_{10}5$ for $7$-smooth $x$, so
+$m(c_t)>\NB$ gives $\log_{10}c_t>\NB\cdot\log_{10}5>69{,}897$, i.e.\ more than $69{,}897$ digits.
 \end{proof}
 
 A bridge is a near-repunit: writing it as $(10^L-1)/9+\sum_i (d_i-1)10^{a_i}$ with at most $161$ digits $d_i\neq1$

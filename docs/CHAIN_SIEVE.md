@@ -278,7 +278,7 @@ cover the tables, and the second pass would also cover transient faults.
 
 Let n have persistence ≥ 12 and c_i = p^(i+1)(n). Then c_0, …, c_8 are chain numbers and
 m(c_0) > 100,000. Let t be the largest index ≤ 8 with m(c_t) > 100,000. Either t = 8 (nine chain numbers
-beyond the bound), or c_t is a **bridge**: a chain number with more than 69,897 digits (m ≤ 1.431·log10 x)
+beyond the bound), or c_t is a **bridge**: a chain number with more than 69,897 digits (m ≤ log10 x / log10 5, so log10 x > 100,000·log10 5 > 69,897)
 whose digit product is one of the 1,117 known chain numbers (< 2^162), so at most 161 of its digits
 differ from 1 — over 99.77% ones.
 
