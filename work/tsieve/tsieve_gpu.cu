@@ -21,7 +21,9 @@
 #include "tsieve_gpu.h"
 typedef unsigned long long u64; typedef long long i64; typedef unsigned int u32;
 
-#define IMAX 1024
+#ifndef IMAX
+#define IMAX 1024                                      /* i0 values per chunk (small values in tests force chunking) */
+#endif
 #define E9 1000000000ULL
 #define LG3 0.47712125471966243730
 #define LG7 0.84509804001425683071
@@ -111,7 +113,8 @@ __global__ void k_coset(const tg_coset *cos, int ncos, tg_tabs tb, int dump, tg_
     i64 *i1lo = (i64 *)(smem + ((nwords * 4 + 15) & ~15));
     u32 *rcnt = (u32 *)(i1lo + IMAX), *rstart = rcnt + IMAX;
     u64 *bc = (u64 *)(rstart + IMAX + 2);                  /* block counters: s1, rows, hits, s2, s3, s4 */
-    unsigned char *ok4 = (unsigned char *)(bc + 8);
+    u64 *dt = bc + 8;                                      /* dt[k] = k d2 mod 5^K (k < 32), dt[32] = 32 d2 mod 5^K */
+    unsigned char *ok4 = (unsigned char *)(dt + 34);
     PHASE_BEGIN
         for (int x = tid; x < 10000; x += nth) ok4[x] = P.ok4[x];
         for (int w = tid; w < nwords; w += nth) bm[w] = 0;
@@ -119,19 +122,20 @@ __global__ void k_coset(const tg_coset *cos, int ncos, tg_tabs tb, int dump, tg_
     PHASE_END
     for (int ci = bid0; ci < ncos; ci += bstep) {
         const tg_coset C = cos[ci];
-        PHASE_BEGIN                                            /* 1. U */
+        PHASE_BEGIN                                            /* 1. U, and the hit offsets dt */
+            for (int k = tid; k <= 32; k += nth) dt[k] = mod_br((u64)k * C.d2, M1, P.br1);
             for (u64 l = tid; l < P.nleaf; l += nth) {
-                u64 Q = C.h0, y = 0, ll = l; int ok = 1;
+                u32 Q = (u32)C.h0; u64 y = 0, ll = l; int ok = 1;
                 for (int i = 0; i < P.m; i++) {
                     int t;
                     if (P.dm == 0) {
                         int want = (int)(ll & 3), seen = -1; ll >>= 2;
-                        for (t = 0; t < 5; t++) { u64 d = (Q + (u64)t * P.p2k[i]) % 10; if (d != 0 && d != 5 && ++seen == want) break; }
+                        for (t = 0; t < 5; t++) { u32 d = (Q + (u32)t * (u32)P.p2k[i]) % 10; if (d != 0 && d != 5 && ++seen == want) break; }
                     } else {
                         t = (int)(ll % 5); ll /= 5;
-                        if ((Q + (u64)t * P.p2k[i]) % 10 == 0) { ok = 0; break; }
+                        if ((Q + (u32)t * (u32)P.p2k[i]) % 10 == 0) { ok = 0; break; }
                     }
-                    Q = (Q + (u64)t * P.p2k[i]) / 10; y += (u64)t * P.p5[i];
+                    Q = (Q + (u32)t * (u32)P.p2k[i]) / 10; y += (u64)t * P.p5[i];
                 }
                 if (!ok) continue;
                 u64 u = mod_br(y * (u64)C.inv2, Mm, P.brm), u2 = u + Mm;
@@ -180,15 +184,17 @@ __global__ void k_coset(const tg_coset *cos, int ncos, tg_tabs tb, int dump, tg_
                     s = mod_br(s, Mm, P.brm);
                     for (u64 base = 0; base < len; base += Mm) {
                         const u64 wlen = len - base < Mm ? len - base : Mm;
-                        for (u64 off = 0; off < wlen; off += 32) {
+                        u64 Yw = base ? mod_br(Ys + mod_br(base, M1, P.br1) * C.d2, M1, P.br1) : Ys;   /* Y at position base + off */
+                        for (u64 off = 0; off < wlen; off += 32, Yw = Yw + dt[32] >= M1 ? Yw + dt[32] - M1 : Yw + dt[32]) {
                             const u64 pos = s + off, q32 = pos >> 5, sh = pos & 31;
                             u32 w = sh ? (bm[q32] >> sh) | (bm[q32 + 1] << (32 - sh)) : bm[q32];
                             const u64 rem = wlen - off;
                             if (rem < 32) w &= (1u << rem) - 1;
                             while (w) {
-                                const u64 n = base + off + (u64)CTZ32(w); w &= w - 1;
+                                const int bit = CTZ32(w); w &= w - 1;
+                                const u64 n = base + off + (u64)bit;
                                 lhits++;
-                                const u64 Y = mod_br(Ys + n * C.d2, M1, P.br1);
+                                const u64 Y = Yw + dt[bit] >= M1 ? Yw + dt[bit] - M1 : Yw + dt[bit];
                                 u64 v = C.h0 + (Y << P.k);
                                 for (int cc = 0; cc < P.skip; cc++) v /= 10000;
                                 int ok = 1;
@@ -232,7 +238,7 @@ static void keep_host(const tg_params *p, const u32 *T2, const u32 *T3, const u3
 }
 static size_t smem_bytes(const tg_params *p) {
     size_t nwords = (size_t)((2 * p->mm) / 32 + 3);
-    return ((nwords * 4 + 15) & ~(size_t)15) + IMAX * 8 + (2 * IMAX + 2) * 4 + 8 * 8 + 10000;
+    return ((nwords * 4 + 15) & ~(size_t)15) + IMAX * 8 + (2 * IMAX + 2) * 4 + 8 * 8 + 34 * 8 + 10000;
 }
 
 #ifdef TG_EMU

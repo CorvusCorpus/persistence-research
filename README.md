@@ -44,6 +44,9 @@ work/                original working directory (flat layout; run scripts from h
   logs/              run logs, sieve outputs
   gsieve/            chain sieve: gsieve.c (ifma/avx512/avx2/scalar variants, pthreads), constants,
                      drivers, validation, logs/
+  tsieve/            sub-cubic "tree sieve" for the chain sieve's main path (cost ~N^2.58 instead of N^3):
+                     tsieve6.c (CPU, uses gsieve's later stages), tsieve_gpu.cu (CUDA, also builds as a CPU
+                     emulation), validation against gsieve; docs/NOTEBOOK.md section T
   pow2/              zeroless powers of two (OEIS A007377): z2sieve.c (CPU), z2sieve_cuda.cu (GPU),
                      validation (val_z2.sh), driver (prod_z2.py), docs/ZEROLESS_POW2.md
 ```

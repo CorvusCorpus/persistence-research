@@ -54,6 +54,15 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
    `cd work/gsieve && ./run_shells.sh shells "40000:50000 50000:60000 60000:70000 70000:80000 80000:90000 90000:100000" cpu`.
    It re-runs every logged invocation (all eight DONE counters must match) and compares per-c counts. The desktop has
    no ECC memory; recommended before submitting the OEIS comment.
+   - Session 4 (cloud, ECC hardware likely): 40,000 → 60,000 done, every counter and per-c count equal
+     (`validation_pc/task4_check/`); stopped by decision of the user. Remaining: `"60000:70000 … 90000:100000" cpu`.
+6. **Tree sieve (session 4, `work/tsieve/`, NOTEBOOK T).** The points that pass D digits form 4^D cosets of a lattice of
+   index 4·5^(D−1). Walking the coset tree costs about N^(3 log 4 / log 5) = N^2.58, against N³ for the bitmap scan.
+   - `tsieve6` (CPU): identical counters and dumps to gsieve (G and E); 314/314 positive control. About 1.2× slower
+     than gsieve at N = 10⁵ on the cloud CPU; crossover estimated near N ≈ 3·10⁵.
+   - `tsieve_gpu` (CUDA): written; its CPU emulation is identical to gsieve and to `tsieve6` (production-scale slices).
+     NEXT: on the desktop, `make -C work/tsieve cuda tsieve6 && work/tsieve/val_tsieve_gpu.sh` (acceptance and
+     timings). Then tune it, and decide whether it replaces the CUDA gsieve main path for the next shells.
 
 ## P3 — write-up and community verification
 - **Paper draft** (LaTeX):
