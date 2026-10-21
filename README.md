@@ -4,10 +4,11 @@ Baseline snapshot of a research session (19–20 Oct 2026). Start with `docs/SES
 `docs/RESULTS.md`, which lists every claim with its status and evidence, and `docs/ROADMAP.md`.
 
 ## Headline results
-1. **No number below 10^40000 has multiplicative persistence ≥ 12** (any final digit). The previous record
-   was 2.67·10^30000 (T. Peters, OEIS A003001, 2023). This rests on the "chain sieve": every 7-smooth
-   number of digit length ≤ 40,000 contains a 0, or contains a 5 together with an even digit, or is one of
-   1,117 known numbers. 6.4·10^13 candidates were checked. See `docs/CHAIN_SIEVE.md`.
+1. **No number below 10^100000 has multiplicative persistence ≥ 12** (any final digit), so a(12) > 2.67·10^100000.
+   The previous record was 2.67·10^30000 (T. Peters, OEIS A003001, 2023). This rests on the "chain sieve":
+   every 7-smooth number of digit length ≤ 100,000 contains a 0, or contains a 5 together with an even digit,
+   or is one of 1,117 known numbers. 1.0·10^15 candidates were checked, those beyond length 40,000 on a GPU
+   (session 3); an independent second pass of that part is still to do. See `docs/CHAIN_SIEVE.md`.
 2. **Bases 3, 4, 6:** complete theorems for every nonzero final digit. Maximum persistence for orbits
    ending at each digit:
    - base 3: 3 (digit 1), 2 (digit 2);

@@ -12,9 +12,9 @@
 \newtheorem{remark}[theorem]{Remark}
 
 % The proved bound. Raise it only after docs/RESULTS.md records the extension as COMPUTATIONAL.
-\newcommand{\NB}{40{,}000}
-\newcommand{\NBexp}{40000}
-\newcommand{\ncand}{6.4067\cdot 10^{13}}
+\newcommand{\NB}{100{,}000}
+\newcommand{\NBexp}{100000}
+\newcommand{\ncand}{1.0004\cdot 10^{15}}
 
 \title{No multiplicative persistence $12$ below $10^{\NBexp}$:\\ a sieve over chain numbers\\[4pt]
 \large Draft of 20 October 2026 --- computer-assisted, not peer reviewed}
@@ -38,7 +38,8 @@ elementary lemmas: a suffix collapse that turns the last $13$ digits of every ca
 bitmap, an exact $4^k$ count of admissible endings, an affine formula for the next $13$ digits, and the uniqueness of
 an odd-digit $2$-adic ``thread'' for multiples of high powers of $5$. We describe the implementation and its
 validation: exact-arithmetic comparisons, an independent reference implementation, rediscovery of known zero-free
-numbers, and two complete re-executions on different hardware with an independent implementation of the core stages.
+numbers, and two complete re-executions of the original run up to length $40{,}000$ on different hardware with an
+independent (GPU) implementation of the core stages, which then extended the search to length $\NB$.
 A random-digit heuristic, calibrated against the complete data, is reported separately; it is not part of the proof.
 \end{abstract}
 
@@ -256,14 +257,16 @@ The computation was checked as follows.
   agrees with the program on full regions and on production slices, including all odd-thread candidates found there.
 \item \emph{Kernel tests (GPU).} On the whole table, $6.9\cdot10^{10}$ stage-2 decisions of the GPU agree with an
   independent host formula. On $2^{20}$ random points, the decisions agree with $2^E\bmod10^{26}$ computed by GMP.
-\item \emph{Complete re-executions.} The logged production run ($\ncand$ candidates, computed on a cloud machine with
+\item \emph{Complete re-executions.} The logged production run for $m\le40{,}000$ ($6.4067\cdot10^{13}$ candidates, computed on a cloud machine with
   ECC memory) was re-executed twice on a desktop PC with the GPU implementation of stages 1--2. Every counter of every
   invocation and every per-$c$ count agreed with the original logs.
-\item \emph{Statistics.} Over the full runs the survival rates of stages 1 and 2 are $0.06872$ and $0.05497$, against
-  $0.8^{12}=0.068719$ and $0.8^{13}=0.054976$.
-\item \emph{Fault tolerance.} On machines without ECC memory, the GPU tables are re-verified every minute against
-  host copies, and output is written only after a passed check. New shells also get an independent second pass on the
-  CPU, compared counter by counter.
+\item \emph{Statistics.} In every run the survival rates of stages 1 and 2 match $0.8^{12}=0.0687195$ and
+  $0.8^{13}=0.0549756$. Stage 1 agrees to all printed digits; stage 2 is within $3$ binomial standard deviations
+  (Table~\ref{tab:runs}).
+\item \emph{Fault tolerance.} The shells beyond $m=40{,}000$ ran once, on a desktop without ECC memory. The GPU tables
+  were re-verified every minute against the host copies, and output was written only after a passed check, so a log
+  never contains results computed with corrupted tables. An independent second pass of these shells on the CPU,
+  compared counter by counter, is planned; it would also cover transient faults.
 \end{enumerate}
 
 \section{Results}\label{sec:results}
@@ -276,12 +279,19 @@ run & main path & direct & odd & total \\
 \midrule
 $m\le 36{,}000$ & $46{,}626{,}195{,}781{,}376$ & $33{,}689{,}253{,}108$ & $50{,}490{,}005{,}607$ & $46{,}710{,}375{,}040{,}091$ \\
 $36{,}000<m\le40{,}000$ & $17{,}337{,}008{,}704{,}000$ & $7{,}903{,}308{,}000$ & $11{,}850{,}072{,}000$ & $17{,}356{,}762{,}084{,}000$ \\
+$40{,}000<m\le50{,}000$ & $60{,}979{,}301{,}760{,}000$ & $23{,}398{,}270{,}000$ & $35{,}085{,}180{,}000$ & $61{,}037{,}785{,}210{,}000$ \\
+$50{,}000<m\le60{,}000$ & $90{,}974{,}701{,}760{,}000$ & $28{,}598{,}270{,}000$ & $42{,}885{,}180{,}000$ & $91{,}046{,}185{,}210{,}000$ \\
+$60{,}000<m\le70{,}000$ & $126{,}970{,}101{,}760{,}000$ & $33{,}798{,}270{,}000$ & $50{,}685{,}180{,}000$ & $127{,}054{,}585{,}210{,}000$ \\
+$70{,}000<m\le80{,}000$ & $168{,}965{,}501{,}760{,}000$ & $38{,}998{,}270{,}000$ & $58{,}485{,}180{,}000$ & $169{,}062{,}985{,}210{,}000$ \\
+$80{,}000<m\le90{,}000$ & $216{,}960{,}901{,}760{,}000$ & $44{,}198{,}270{,}000$ & $66{,}285{,}180{,}000$ & $217{,}071{,}385{,}210{,}000$ \\
+$90{,}000<m\le100{,}000$ & $270{,}956{,}301{,}760{,}000$ & $49{,}398{,}270{,}000$ & $74{,}085{,}180{,}000$ & $271{,}079{,}785{,}210{,}000$ \\
 \midrule
-$m\le 40{,}000$ & & & & $64{,}067{,}137{,}124{,}091$ \\
+$m\le 100{,}000$ & & & & $1{,}000{,}419{,}848{,}384{,}091$ \\
 \bottomrule
 \end{tabular}
 \caption{Candidates examined (plus $4{,}483{,}467$ numbers below $10^{131}$ enumerated directly). No run produced a chain
-number.}
+number. The first two runs used AVX-512 CPUs (ECC memory) and were later re-executed on a GPU; the six shells beyond
+$m=40{,}000$ ran on a GPU in $86$ minutes.}\label{tab:runs}
 \end{table}
 
 \begin{theorem}[computational]\label{thm:comp}
@@ -297,15 +307,15 @@ Theorem~\ref{thm:main} follows from Theorem~\ref{thm:comp} and Corollary~\ref{co
 \begin{lemma}\label{lem:bridge}
 Assume Theorem~\ref{thm:comp} for $N=\NB$, and let $n$ have persistence at least $12$, with $c_i$ as in
 Lemma~\ref{lem:chain}. Then either $c_0,\dots,c_8$ all have $m>\NB$, or some $c_t$ ($t\le7$) is a \emph{bridge}: a chain
-number with more than $27{,}958$ digits whose digit product is one of the $1{,}117$ known chain numbers. A bridge has
-fewer than $162$ digits different from $1$, so more than $99.4\%$ of its digits are $1$s.
+number with more than $69{,}897$ digits whose digit product is one of the $1{,}117$ known chain numbers. A bridge has
+at most $161$ digits different from $1$, so more than $99.77\%$ of its digits are $1$s.
 \end{lemma}
 
 \begin{proof}
 By Theorem~\ref{thm:comp}, $m(c_0)>\NB$; let $t$ be the largest index $\le8$ with $m(c_t)>\NB$. If $t<8$ then
 $c_{t+1}=p(c_t)$ is a chain number with $m\le\NB$, hence known and below $2^{162}$, and each digit of $c_t$ other than
 $1$ contributes a factor at least $2$. Finally $m(x)\le\log_{10}x/\log_{10}5<1.431\log_{10}x$ for $7$-smooth $x$, so
-$m(c_t)>\NB$ forces more than $27{,}958$ digits.
+$m(c_t)>\NB$ forces more than $69{,}897$ digits.
 \end{proof}
 
 A bridge is a near-repunit: writing it as $(10^L-1)/9+\sum_i (d_i-1)10^{a_i}$ with at most $161$ digits $d_i\neq1$
@@ -327,8 +337,9 @@ they are not evidence in either direction about the conjecture.
 
 The repository~\cite{repo} contains the source, the production logs ($\sim$13\,MB, plus compressed archives for
 later shells), SHA-256 manifests, and all validation logs with the exact commands, build flags, binary hashes and
-commits. The production of the original run took about $5.5$ core-hours on a $2.1$\,GHz AVX-512 machine; the complete
-re-execution takes about $8$ minutes on an RTX~3060~Ti with a $20$-thread CPU.
+commits. The original run up to length $40{,}000$ took about $5.5$ core-hours on a $2.1$\,GHz AVX-512 machine; its
+complete re-execution takes about $8$ minutes on an RTX~3060~Ti with a $20$-thread CPU, and the six shells up to length
+$\NB$ ($9.36\cdot10^{14}$ candidates) took $86$ minutes there.
 
 \begin{thebibliography}{99}
 \bibitem{oeis} OEIS Foundation, Sequence A003001, \emph{The On-Line Encyclopedia of Integer Sequences},

@@ -1,0 +1,153 @@
+== launch 2026-10-20T21:14:56Z pid 280 host Kyle-PC NVIDIA GeForce RTX 3060 Ti, 610.88
+== run_shells both [40000:50000 50000:60000 60000:70000 70000:80000 80000:90000 90000:100000] start 2026-10-20T21:14:56Z commit 5b599af gpu 7fcff6cf105dee0d cpu 46f8308b714e3475 threads 20
+== production 40000 < m <= 50000 start 2026-10-20T21:14:56Z
+job main [0,50001) complete
+job direct [0,50001) complete
+job odd [0,50001) complete
+worker ALL finished all jobs
+main: c covered 50001/50001, missing []
+direct: c covered 50001/50001, missing []
+odd: c covered 50001/50001, missing []
+  direct_members = 0
+  direct_points = 23398270000
+  direct_s4 = 171177
+  main_members = 0
+  main_points = 60979301760000
+  main_s4 = 14
+  odd_members = 0
+  odd_points = 35085180000
+  odd_s4 = 36
+points total: 61037785210000
+members: none
+mode=direct dm=G N=50000 N0=40000 c=[0,50001) variant=cuda points=23398270000 s1=0 s2=0 s3=0 s4=171177 gmp=171177 full=0 time=686.54 threads=20 wall=44.48
+mode=main dm=G N=50000 N0=40000 c=[0,50001) variant=cuda points=60979301760000 s1=4190465737806 s2=230373239297 s3=92062786045 s4=14 gmp=14 full=0 time=5517.24 threads=20 wall=286.84
+mode=odd dm=G N=50000 N0=40000 c=[0,50001) variant=cuda points=35085180000 s1=1248050760 s2=0 s3=0 s4=36 gmp=36 full=0 time=346.61 threads=20 wall=33.10
+survival: s1/points = 0.06871948 (0.8^12 = 0.06871948, z = +0.01), s2/s1 = 0.05497557 (0.8^13 = 0.05497558, z = -0.11): match theory
+/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/gsieve/shells/prod_N50000_n040000.tar.xz: 507860 bytes, 3 files; SHA-256 a9a7d229bc411c43
+== production 40000 < m <= 50000 end 2026-10-20T21:21:06Z
+== production 50000 < m <= 60000 start 2026-10-20T21:21:06Z
+job main [0,60001) complete
+job direct [0,60001) complete
+job odd [0,60001) complete
+worker ALL finished all jobs
+main: c covered 60001/60001, missing []
+direct: c covered 60001/60001, missing []
+odd: c covered 60001/60001, missing []
+  direct_members = 0
+  direct_points = 28598270000
+  direct_s4 = 209068
+  main_members = 0
+  main_points = 90974701760000
+  main_s4 = 42
+  odd_members = 0
+  odd_points = 42885180000
+  odd_s4 = 55
+points total: 91046185210000
+members: none
+mode=direct dm=G N=60000 N0=50000 c=[0,60001) variant=cuda points=28598270000 s1=0 s2=0 s3=0 s4=209068 gmp=209068 full=0 time=831.68 threads=20 wall=54.51
+mode=main dm=G N=60000 N0=50000 c=[0,60001) variant=cuda points=90974701760000 s1=6251733870317 s2=343694020810 s3=137348477820 s4=42 gmp=42 full=0 time=8373.23 threads=20 wall=436.05
+mode=odd dm=G N=60000 N0=50000 c=[0,60001) variant=cuda points=42885180000 s1=1797660760 s2=0 s3=0 s4=55 gmp=55 full=0 time=417.44 threads=20 wall=39.47
+survival: s1/points = 0.06871948 (0.8^12 = 0.06871948, z = -0.01), s2/s1 = 0.05497579 (0.8^13 = 0.05497558, z = +2.31): match theory
+/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/gsieve/shells/prod_N60000_n050000.tar.xz: 564900 bytes, 3 files; SHA-256 cc7b55335e54cf77
+== production 50000 < m <= 60000 end 2026-10-20T21:30:03Z
+== production 60000 < m <= 70000 start 2026-10-20T21:30:03Z
+job main [0,70001) complete
+job direct [0,70001) complete
+job odd [0,70001) complete
+worker ALL finished all jobs
+main: c covered 70001/70001, missing []
+direct: c covered 70001/70001, missing []
+odd: c covered 70001/70001, missing []
+  direct_members = 0
+  direct_points = 33798270000
+  direct_s4 = 247224
+  main_members = 0
+  main_points = 126970101760000
+  main_s4 = 46
+  odd_members = 0
+  odd_points = 50685180000
+  odd_s4 = 75
+points total: 127054585210000
+members: none
+mode=direct dm=G N=70000 N0=60000 c=[0,70001) variant=cuda points=33798270000 s1=0 s2=0 s3=0 s4=247224 gmp=247224 full=0 time=940.24 threads=20 wall=72.13
+mode=main dm=G N=70000 N0=60000 c=[0,70001) variant=cuda points=126970101760000 s1=8725318983422 s2=479679346089 s3=191690956697 s4=46 gmp=46 full=0 time=11744.44 threads=20 wall=608.46
+mode=odd dm=G N=70000 N0=60000 c=[0,70001) variant=cuda points=50685180000 s1=2447270760 s2=0 s3=0 s4=75 gmp=75 full=0 time=488.18 threads=20 wall=51.79
+survival: s1/points = 0.06871948 (0.8^12 = 0.06871948, z = +0.01), s2/s1 = 0.05497557 (0.8^13 = 0.05497558, z = -0.20): match theory
+/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/gsieve/shells/prod_N70000_n060000.tar.xz: 743072 bytes, 3 files; SHA-256 e2fb4e39ccb3869c
+== production 60000 < m <= 70000 end 2026-10-20T21:42:26Z
+== production 70000 < m <= 80000 start 2026-10-20T21:42:26Z
+job main [0,80001) complete
+job direct [0,80001) complete
+job odd [0,80001) complete
+worker ALL finished all jobs
+main: c covered 80001/80001, missing []
+direct: c covered 80001/80001, missing []
+odd: c covered 80001/80001, missing []
+  direct_members = 0
+  direct_points = 38998270000
+  direct_s4 = 285853
+  main_members = 0
+  main_points = 168965501760000
+  main_s4 = 55
+  odd_members = 0
+  odd_points = 58485180000
+  odd_s4 = 102
+points total: 169062985210000
+members: none
+mode=direct dm=G N=80000 N0=70000 c=[0,80001) variant=cuda points=38998270000 s1=0 s2=0 s3=0 s4=285853 gmp=285853 full=0 time=1138.20 threads=20 wall=71.14
+mode=main dm=G N=80000 N0=70000 c=[0,80001) variant=cuda points=168965501760000 s1=11611220829997 s2=638335927939 s3=255094213266 s4=55 gmp=55 full=0 time=15346.22 threads=20 wall=786.65
+mode=odd dm=G N=80000 N0=70000 c=[0,80001) variant=cuda points=58485180000 s1=3196880760 s2=0 s3=0 s4=102 gmp=102 full=0 time=578.46 threads=20 wall=54.42
+survival: s1/points = 0.06871948 (0.8^12 = 0.06871948, z = -0.01), s2/s1 = 0.05497578 (0.8^13 = 0.05497558, z = +2.98): match theory
+/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/gsieve/shells/prod_N80000_n070000.tar.xz: 778280 bytes, 3 files; SHA-256 8fcf770adce817ee
+== production 70000 < m <= 80000 end 2026-10-20T21:57:48Z
+== production 80000 < m <= 90000 start 2026-10-20T21:57:48Z
+job main [0,90001) complete
+job direct [0,90001) complete
+job odd [0,90001) complete
+worker ALL finished all jobs
+main: c covered 90001/90001, missing []
+direct: c covered 90001/90001, missing []
+odd: c covered 90001/90001, missing []
+  direct_members = 0
+  direct_points = 44198270000
+  direct_s4 = 323273
+  main_members = 0
+  main_points = 216960901760000
+  main_s4 = 78
+  odd_members = 0
+  odd_points = 66285180000
+  odd_s4 = 137
+points total: 217071385210000
+members: none
+mode=direct dm=G N=90000 N0=80000 c=[0,90001) variant=cuda points=44198270000 s1=0 s2=0 s3=0 s4=323273 gmp=323273 full=0 time=1274.74 threads=20 wall=82.08
+mode=main dm=G N=90000 N0=80000 c=[0,90001) variant=cuda points=216960901760000 s1=14909439701309 s2=819655472370 s3=327553606494 s4=78 gmp=78 full=0 time=19805.53 threads=20 wall=1012.45
+mode=odd dm=G N=90000 N0=80000 c=[0,90001) variant=cuda points=66285180000 s1=4046490760 s2=0 s3=0 s4=137 gmp=137 full=0 time=649.22 threads=20 wall=61.71
+survival: s1/points = 0.06871948 (0.8^12 = 0.06871948, z = +0.02), s2/s1 = 0.05497561 (0.8^13 = 0.05497558, z = +0.41): match theory
+/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/gsieve/shells/prod_N90000_n080000.tar.xz: 919368 bytes, 3 files; SHA-256 5bf6aedbc2c460ad
+== production 80000 < m <= 90000 end 2026-10-20T22:17:14Z
+== production 90000 < m <= 100000 start 2026-10-20T22:17:14Z
+job main [0,100001) complete
+job direct [0,100001) complete
+job odd [0,100001) complete
+worker ALL finished all jobs
+main: c covered 100001/100001, missing []
+direct: c covered 100001/100001, missing []
+odd: c covered 100001/100001, missing []
+  direct_members = 0
+  direct_points = 49398270000
+  direct_s4 = 361496
+  main_members = 0
+  main_points = 270956301760000
+  main_s4 = 88
+  odd_members = 0
+  odd_points = 74085180000
+  odd_s4 = 165
+points total: 271079785210000
+members: none
+mode=direct dm=G N=100000 N0=90000 c=[0,100001) variant=cuda points=49398270000 s1=0 s2=0 s3=0 s4=361496 gmp=361496 full=0 time=1350.07 threads=20 wall=108.30
+mode=main dm=G N=100000 N0=90000 c=[0,100001) variant=cuda points=270956301760000 s1=18619975261345 s2=1023643775912 s3=409072526556 s4=88 gmp=88 full=0 time=25346.76 threads=20 wall=1298.64
+mode=odd dm=G N=100000 N0=90000 c=[0,100001) variant=cuda points=74085180000 s1=4996100760 s2=0 s3=0 s4=165 gmp=165 full=0 time=709.15 threads=20 wall=77.69
+survival: s1/points = 0.06871948 (0.8^12 = 0.06871948, z = -0.00), s2/s1 = 0.05497557 (0.8^13 = 0.05497558, z = -0.19): match theory
+/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/gsieve/shells/prod_N100000_n090000.tar.xz: 991216 bytes, 3 files; SHA-256 9fd9edaa070136d3
+== production 90000 < m <= 100000 end 2026-10-20T22:42:09Z
+== second pass (CPU) 40000 < m <= 50000 start 2026-10-20T22:42:09Z

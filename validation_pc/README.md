@@ -24,5 +24,9 @@ Later steps keep their logs in subdirectories.
 | `final_validation.out`, `val_cuda/`, `val_all/` | `val_cuda.sh` and `val_all.sh` on the final binaries (3.4) |
 | `rerun_cuda_final.txt`, `rerun_cuda_final.tar.xz` | full re-run of the logged production with the final CUDA binary (3.4) |
 
+`task4/` (task 4, shells 40,000 → 100,000; `docs/NOTEBOOK.md` 4.1–4.5): `driver.log` is the complete output of
+`work/gsieve/run_shells.sh` (binary hashes, per-shell coverage, DONE lines, survival rates, archive hashes), and
+`launch_task4.sh` is the exact launch command. The production logs themselves are archived in `work/gsieve/logs/`.
+
 The `.tar.xz` archives hold the re-run logs in `aggregate.py` format. Unpack one with `tar -xJf`, then run, for
 example, `python3 work/gsieve/aggregate.py 36000 -1 validation_pc/task3_cuda/rerun_cuda_final`.

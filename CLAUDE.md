@@ -59,6 +59,10 @@ Computer-assisted research on multiplicative persistence. Current state is summa
   - `./gsieve_k13_cuda kerneltest G|E NJ SEED` checks the GPU's stage-1/2 decisions on the whole table for NJ lift
     indices, and on 2^20 random points against 2^E mod 10^26.
   - `EXE=./gsieve_k13_cuda prod.py ...` runs production with it.
+- **Shells with checks.** `./run_shells.sh RUNDIR "N0:N ..." gpu|cpu|both` runs production shells with coverage,
+  survival-rate checks and log archives (gpu), and the independent second pass (cpu).
+  - A MEMBER tripwire stops everything at once.
+  - Coverage of archived runs: `scripts/check_coverage.py` (RUNS list).
 - **Base-10 node.** `python3 prove_cum.py NODE ...`. Resumable via `ckptC/` and `bagresC/`.
   `runner4.py` runs node lists.
 - **Small bases.** `python3 prove_cum_b.py BASE DEPTH [digits...]`.

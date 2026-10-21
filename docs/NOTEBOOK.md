@@ -598,3 +598,74 @@ Main path G, table build excluded.
   (GPU stages 1–2, twice) as evidence; it stays COMPUTATIONAL.
 - **For task 4.** Production uses `gsieve_k13_cuda` `7fcff6cf…`. This desktop has no ECC memory: the fail-stop table
   checks guard the tables, and an independent second pass guards against the remaining transient faults.
+
+---
+
+## 2026-10-20 · Session 3 (desktop PC) · Task 4: shells 40,000 → 100,000
+
+### 4.1 Setup
+- **Code.** Commit `5b599af`: the binaries of task 3 plus the driver `work/gsieve/run_shells.sh` and
+  `work/gsieve/check_member.py`.
+- **Binaries.** These are the validated binaries of 3.4:
+  - `gsieve_k13_cuda` `7fcff6cf…` (production);
+  - `gsieve_k13` `46f8308b…` (avx2, reserved for the second pass).
+- **Command.** `work/gsieve/shells/launch_task4.sh`, copied to `validation_pc/task4/`, ran
+  `bash run_shells.sh shells "40000:50000 50000:60000 60000:70000 70000:80000 80000:90000 90000:100000" both`.
+  - It was started detached from Windows with `Start-Process wsl.exe … --exec bash -l shells/launch_task4.sh`, so that
+    it did not depend on the Claude session.
+  - For each shell, the driver runs `EXE=gsieve_k13_cuda THREADS=20 prod.py N ALL 86400 N0` in
+    `work/gsieve/shells/prod_N<N>_n0<N0>/`. It then checks coverage (every c on all three paths, no members) and the
+    survival rates (binomial z within ±6), and archives the logs with `scripts/archive_logs.sh` into `work/gsieve/logs/`.
+- **Tripwire.** Any MEMBER line under the run directory kills every process of the step's session, records the line,
+  checks it with `check_member.py` (exact recomputation and persistence orbit), and exits with status 42.
+  - Tested beforehand: a MEMBER line (for 4996238671872) was planted 8 s into a live production run.
+  - The run stopped within seconds, with no process left.
+  - A first version killed only the process group, and `prod.py`'s `timeout` had moved the binary into its own group.
+    It was fixed to kill the whole session.
+- **The PC.** The Claude app's keep-awake held while the session was active, and the GPU also drove the desktop.
+
+### 4.2 Results (21:14–22:42 UTC; `validation_pc/task4/driver.log`)
+
+| shell | main | direct | odd | total | members | s1/points (z) | s2/s1 (z) | wall |
+|---|---|---|---|---|---|---|---|---|
+| 40,000 < m ≤ 50,000 | 60,979,301,760,000 | 23,398,270,000 | 35,085,180,000 | 61,037,785,210,000 | 0 | 0.06871948 (+0.01) | 0.05497557 (−0.11) | 6.1 min |
+| 50,000 < m ≤ 60,000 | 90,974,701,760,000 | 28,598,270,000 | 42,885,180,000 | 91,046,185,210,000 | 0 | 0.06871948 (−0.01) | 0.05497579 (+2.31) | 8.8 min |
+| 60,000 < m ≤ 70,000 | 126,970,101,760,000 | 33,798,270,000 | 50,685,180,000 | 127,054,585,210,000 | 0 | 0.06871948 (+0.01) | 0.05497557 (−0.20) | 12.2 min |
+| 70,000 < m ≤ 80,000 | 168,965,501,760,000 | 38,998,270,000 | 58,485,180,000 | 169,062,985,210,000 | 0 | 0.06871948 (−0.01) | 0.05497578 (+2.98) | 15.2 min |
+| 80,000 < m ≤ 90,000 | 216,960,901,760,000 | 44,198,270,000 | 66,285,180,000 | 217,071,385,210,000 | 0 | 0.06871948 (+0.02) | 0.05497561 (+0.41) | 19.3 min |
+| 90,000 < m ≤ 100,000 | 270,956,301,760,000 | 49,398,270,000 | 74,085,180,000 | 271,079,785,210,000 | 0 | 0.06871948 (−0.00) | 0.05497557 (−0.19) | 24.7 min |
+| **all six** | 935,806,810,560,000 | 218,389,620,000 | 327,511,080,000 | **936,352,711,260,000** | 0 | | | 86 min |
+
+- **Candidates.** With m ≤ 40,000 the total is 1,000,419,848,384,091 ≈ 1.0004·10^15, plus 4,483,467 numbers below
+  10^131.
+- **Main path:** about 2.1·10^11 candidates/s.
+- **GMP checks.** Candidates that reached the GMP check (s4), per shell:
+  - main 14, 42, 46, 55, 78, 88;
+  - odd 36 to 165;
+  - direct 171,177 to 361,496.
+
+  None passed the last-600-digit check (`full=0`), and there are no members.
+- **Survival.** On a binomial scale the stage-2 rates are within 3σ. The two larger deviations are excesses, i.e. more
+  candidates passed to the exact later stages. Stage 1 matches 0.8^12 to all printed digits in every shell.
+
+### 4.3 Records
+- **Archives.** `work/gsieve/logs/prod_N{50000…100000}_n0{40000…90000}.tar.xz` (0.5–1.0 MB each), each with a
+  `.sha256` list of its files. All twelve files were added to `MANIFEST.sha256` by `make manifest`; the diff has
+  additions only.
+- **Coverage check.** `scripts/check_coverage.py` now unpacks archived runs, checks every file against its list, and
+  requires full coverage, no members and the recorded totals.
+- **`make records-check`:** "all record files intact", and every run (two old, six new) OK.
+
+### 4.4 Second pass: TODO
+- After the last shell, the driver started the CPU second pass at 22:42:09. By decision of the user it was stopped at
+  once (driver, launcher and the `val_proddone.py` session were stopped by PID and session), and left as a TODO.
+  - Resume command: `run_shells.sh shells "…" cpu`, about 8.6 h. The partial `shells/check_N50000_n040000/` is
+    rewritten on resume.
+  - It is recommended before an OEIS submission, because the desktop has no ECC memory. The fail-stop table checks
+    cover the tables; the second pass would cover transient faults and add an independent implementation of stages 1–2.
+
+### 4.5 Status
+- `docs/RESULTS.md` 1.1: every chain number with m ≤ 100,000 is known. COMPUTATIONAL, with evidence and the TODO.
+- 1.2: no number below 10^100000 has persistence ≥ 12, so a(12) > 2.67·10^100000. THEOREM given 1.1.
+- 1.8: bridges have more than 69,897 digits, over 99.77% ones.
+- `docs/CHAIN_SIEVE.md`, README, ROADMAP, the paper and the OEIS draft are updated in the same commit.

@@ -46,7 +46,14 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
 3. **Extend in shells** with `n0`, archiving logs at each step: 40,000 → 50,000 → 60,000 → … → 100,000.
    - Acceptance: `aggregate.py N n0` shows full coverage of every path, no members, and survival rates
      that match theory.
+   - DONE in session 3 (20 Oct 2026): six shells, 9.36·10^14 candidates in 86 min, all acceptance checks pass
+     (`docs/CHAIN_SIEVE.md`, "Shells"; `docs/NOTEBOOK.md`, task 4).
 4. **New claim if successful:** no persistence-12 number below 10^100000.
+   - DONE: recorded in `docs/RESULTS.md` (1.1, 1.2) as COMPUTATIONAL / THEOREM given 1.1.
+5. **TODO: independent second pass of the six new shells** with the CPU binary (about 8.6 h on the desktop):
+   `cd work/gsieve && ./run_shells.sh shells "40000:50000 50000:60000 60000:70000 70000:80000 80000:90000 90000:100000" cpu`.
+   It re-runs every logged invocation (all eight DONE counters must match) and compares per-c counts. The desktop has
+   no ECC memory; recommended before submitting the OEIS comment.
 
 ## P3 — write-up and community verification
 - **Paper draft** (LaTeX):
@@ -65,8 +72,15 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
   bottom tests or reuse of facts across bags.
 
 ## P5 — research directions (speculative)
-- **Zero-free-mode sieve** to extend Chaffin's "no zero-free 7-smooth in (10^140, 10^20000)". This needs
-  vectorised later stages, since about 7% of candidates survive stage 2 in that mode.
+- **Zero-free-mode sieve** to extend Chaffin's "no zero-free 7-smooth in (10^140, 10^20000)" (OEIS A238985 has no
+  stated search bound; it "seems finite, 12615 terms"). NEXT (chosen in session 3). The form 2^a3^b7^c runs on the
+  GPU main path in E mode (region m ≤ 1.183·D covers x < 10^D). The form 3^a5^b7^c needs a 2-adic suffix collapse:
+  for 5^K | x the last K digits depend only on (−1)^(a+c)·5^(b + a·f3 + c·f7) mod 2^K, so a 2^(K−1)-bit bitmap
+  (4 MB for K = 26) and an affine lift mod 2^K replace point-by-point stepping. About 7% of candidates survive
+  stage 2 in this mode, so the CPU later stages set the pace.
+- **A007377** (2^n with no digit 0, "checked up to k = 10^10", Radcliffe 2022): the same machinery as a single row
+  could reach about 10^14–10^15. The ternary analogues (Erdős's digit-2 problem, zero-free 2^n in base 3) are
+  already verified to 2·3^45 ≈ 5.9·10^21 (arXiv 2202.13256); our sieve cannot compete there.
 - **Rigorous density theorem:** #chain numbers with m ≤ N is ≪ N^θ with θ < 3, via transfer operators
   plus effective equidistribution.
 - **Bridges:** special structure (≥ 99.4% ones), possibly with mixed archimedean/p-adic reductions for

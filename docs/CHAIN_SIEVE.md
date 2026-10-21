@@ -6,16 +6,19 @@ Let p(n) be the product of the decimal digits of n. Call a 7-smooth number x ≥
 if x has no digit 0 and does not contain both a digit 5 and an even digit. Write G for the set of
 chain numbers. For x = 2^a 3^b 5^d 7^c put m(x) = a/3 + b/2 + c + d ("digit length").
 
-**Theorem (computational).** Every chain number x with m(x) ≤ 40,000 is one of 1,117 known numbers,
+**Theorem (computational).** Every chain number x with m(x) ≤ 100,000 is one of 1,117 known numbers,
 the largest being 4613824623662469877463718941499166849983276122112 (49 digits).
+(m ≤ 40,000: sessions 1–2, re-executed in session 3; 40,000 < m ≤ 100,000: session 3. See "Production runs".)
 
-**Corollary.** No number below 10^40000 has multiplicative persistence ≥ 12 (any final digit).
+**Corollary.** No number below 10^100000 has multiplicative persistence ≥ 12 (any final digit). Hence, if
+a(12) exists, a(12) > 2.67·10^100000 (the smallest candidate with 100,001 digits is 2677…7; see
+`docs/LITERATURE.md`).
 
 Proof of the corollary. Let n have persistence ≥ 12 and c_i = p^(i+1)(n). Since p(x) < x for x ≥ 10,
 c_0 > c_1 > c_2 ≥ p^11(n) ≥ 10. c_1 and c_0 contain no 0 (their digit products are nonzero), so c_1 is a
 zero-free number ≥ 10, hence not divisible by 10; therefore c_0 cannot contain both a 5 and an even
 digit, i.e. c_0 ∈ G. Every digit d of n contributes at most 1 to m(p(n)) (2: 1/3, 3: 1/2, 4: 2/3, 5: 1,
-6: 5/6, 7, 8, 9: 1), so m(c_0) ≤ len(n). If len(n) ≤ 40,000, c_0 is one of the 1,117 known chain numbers;
+6: 5/6, 7, 8, 9: 1), so m(c_0) ≤ len(n). If len(n) ≤ 100,000, c_0 is one of the 1,117 known chain numbers;
 all of them have persistence ≤ 10, so n has persistence ≤ 11. ∎
 
 Previous record: Tim Peters (OEIS A003001, Sep 2023): if a(12) exists it is > 2.67·10^30000.
@@ -244,13 +247,40 @@ Stage survival on the main path: 0.06872 after the bitmap (theory 0.8^12 = 0.068
 0.05497 after the affine lift (theory 0.8^13 = 0.054976). Every c in [0, 36000] is covered by
 checkpointed logs for each path (aggregate.py). Wall time ≈ 2 h on 2 cores (Xeon, 2.1 GHz, AVX-512).
 
+### Shells 40,000 < m ≤ 100,000 (session 3, 20 Oct 2026)
+
+Six shells of width 10,000 (`run_shells.sh`, flag n0), run in one session on the desktop (RTX 3060 Ti + i7-12700F)
+with the CUDA variant `gsieve_k13_cuda` (`7fcff6cf…`, validated by `val_cuda.sh` and `val_all.sh` on the exact
+binaries). Fail-stop table checks every 60 s; MEMBER tripwire; logs archived in `work/gsieve/logs/prod_N*_n0*.tar.xz`
+(SHA-256 of every file in the `.sha256` lists, all in `MANIFEST.sha256`). Every c covered for every path, no chain
+numbers (`scripts/check_coverage.py`).
+
+| shell | main | direct | odd | total | s1/points | s2/s1 | wall |
+|---|---|---|---|---|---|---|---|
+| 40,000 < m ≤ 50,000 | 60,979,301,760,000 | 23,398,270,000 | 35,085,180,000 | 61,037,785,210,000 | 0.06871948 | 0.05497557 | 6.1 min |
+| 50,000 < m ≤ 60,000 | 90,974,701,760,000 | 28,598,270,000 | 42,885,180,000 | 91,046,185,210,000 | 0.06871948 | 0.05497579 | 8.8 min |
+| 60,000 < m ≤ 70,000 | 126,970,101,760,000 | 33,798,270,000 | 50,685,180,000 | 127,054,585,210,000 | 0.06871948 | 0.05497557 | 12.2 min |
+| 70,000 < m ≤ 80,000 | 168,965,501,760,000 | 38,998,270,000 | 58,485,180,000 | 169,062,985,210,000 | 0.06871948 | 0.05497578 | 15.2 min |
+| 80,000 < m ≤ 90,000 | 216,960,901,760,000 | 44,198,270,000 | 66,285,180,000 | 217,071,385,210,000 | 0.06871948 | 0.05497561 | 19.3 min |
+| 90,000 < m ≤ 100,000 | 270,956,301,760,000 | 49,398,270,000 | 74,085,180,000 | 271,079,785,210,000 | 0.06871948 | 0.05497557 | 24.7 min |
+| **40,000 < m ≤ 100,000** | 935,806,810,560,000 | 218,389,620,000 | 327,511,080,000 | **936,352,711,260,000** | | | 86 min |
+| **m ≤ 100,000 (all runs)** | | | | **1,000,419,848,384,091** (+ 4,483,467 below 10^131) | | | |
+
+Theory: 0.8^12 = 0.06871948, 0.8^13 = 0.05497558. On a binomial scale the s2/s1 deviations are within 3σ
+(z = −0.11, +2.31, −0.20, +2.98, +0.41, −0.19); the two larger ones are excesses, i.e. more candidates passed on to
+the exact later stages, not fewer. The main path ran at about 2.1·10^11 candidates/s.
+
+**Not yet done:** an independent second pass of these six shells (CPU binary, about 8.6 h:
+`run_shells.sh shells "40000:50000 … 90000:100000" cpu`). The desktop has no ECC memory; the fail-stop table checks
+cover the tables, and the second pass would also cover transient faults.
+
 ## Structure of any counterexample above the bound
 
 Let n have persistence ≥ 12 and c_i = p^(i+1)(n). Then c_0, …, c_8 are chain numbers and
-m(c_0) > 40,000. Let t be the largest index ≤ 8 with m(c_t) > 40,000. Either t = 8 (nine chain numbers
-beyond the bound), or c_t is a **bridge**: a chain number with more than 27,950 digits (m ≤ 1.431·log10 x)
-whose digit product is one of the 1,117 known chain numbers (< 2^163), so fewer than 163 of its digits
-differ from 1 — over 99.4% ones.
+m(c_0) > 100,000. Let t be the largest index ≤ 8 with m(c_t) > 100,000. Either t = 8 (nine chain numbers
+beyond the bound), or c_t is a **bridge**: a chain number with more than 69,897 digits (m ≤ 1.431·log10 x)
+whose digit product is one of the 1,117 known chain numbers (< 2^162), so at most 161 of its digits
+differ from 1 — over 99.77% ones.
 
 ## Heuristic (random-digit model)
 
