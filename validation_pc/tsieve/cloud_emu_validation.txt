@@ -1,0 +1,10 @@
+G N=300 N0=-1 M=4: points=22428176 s1=1543243 s2=84616 s3=34055 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+G N=900 N0=600 M=3: points=502702800 s1=34540773 s2=1898159 s3=759417 s4=0 gmp=0 full=0 members=0 -> IDENTICAL
+E N=300 N0=-1 M=3: points=22428176 s1=6328962 s2=1606545 s3=1069096 s4=30 gmp=30 full=30 members=1 -> IDENTICAL
+tsieve_gpu_emu M=7 N=100000 roots=0:1: CPU s1=4193339287 s2=230531451 s3=92117739 s4=0 gmp=0 full=0 members=0 leaves=4096 rows=83915213 hits=879403325
+   GPU-emu s1=4193339287 s2=230531451 s3=92117739 s4=0 gmp=0 full=0 members=0 leaves=4096 rows=83915213 hits=879403325 -> MATCH
+tsieve_gpu_emu16 M=6 N=100000 roots=1:2: CPU s1=4193339556 s2=230531340 s3=92120204 s4=0 gmp=0 full=0 members=0 leaves=4096 rows=83915076 hits=1099260248
+   GPU-emu s1=4193339556 s2=230531340 s3=92120204 s4=0 gmp=0 full=0 members=0 leaves=4096 rows=83915076 hits=1099260248 -> MATCH
+expected 314  found 314  missing 0  extra 0
+E-mode end-to-end (tree sieve on the main path): exact match
+VAL_EMU2_DONE

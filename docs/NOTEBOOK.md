@@ -1078,3 +1078,25 @@ Question from the user: can the N³ cost of the chain sieve be beaten?
     against gsieve's DONE line with timings.
   - Expected speed (estimate, not measured): about 10¹⁵ simple instructions for N = 10⁵, a few minutes. gsieve's CUDA
     variant takes about 64–86 min for the same region.
+
+### T.6 Validation of the GPU kernel in emulation (cloud, commit `03acd77`; `validation_pc/tsieve/cloud_emu_validation.txt`)
+- **Build.** `tsieve_gpu_emu`: tsieve_gpu.cu built with `-DTG_EMU`, `TG_EMU_THREADS=8`. This is version 2 of the
+  kernel: hit offsets from a 33-entry table and u32 leaf arithmetic.
+- **Against gsieve** (every DONE counter and the S2/R3/R4/S4/MEMBER dump lines), all IDENTICAL:
+  - G, N = 300, M = 4 (this region also exercises the points near 10^XMIN, which are handed to the host);
+  - G, shell N = 900 with n0 = 600, M = 3;
+  - E, N = 300, M = 3: s4 = 30, members = 1, which exercises the full limb path and the S4 output.
+- **Against tsieve6 at production scale** (N = 10⁵, one subtree of 4,096 cosets, 4.19·10⁹ points), every counter
+  (s1, s2, s3, s4, gmp, full, members, leaves, rows, hits) MATCHES:
+  - roots 0:1, M = 7: 8.79·10⁸ hits, 8.39·10⁷ rows;
+  - roots 1:2, M = 6, with a build that forces the i0 chunking (IMAX = 16): 1.10·10⁹ hits.
+- **Positive control.** `tsieve_gpu_emu_nl7` (M = 2) on the main path plus gsieve's direct and odd paths:
+  **314/314**, none missing, none extra.
+- **Not run.** An N = 4·10⁵ slice was stopped for time; its CPU side alone takes more than 16 min here.
+- **Earlier attempts, discarded.**
+  - An E-mode emulation at N = 600 with M = 5 took more than 2 CPU-hours (2.75·10⁸ cosets × 3,125 paths) and was
+    stopped.
+  - One shell comparison read DIFFERENT only because a cleanup command killed its gsieve process, so the gsieve
+    counters were empty. Re-run: IDENTICAL.
+- **Status.** The logic of the GPU kernel is validated. CUDA-specific behaviour (barriers, shared-memory atomics,
+  occupancy, speed) still needs the desktop run (`val_tsieve_gpu.sh`).
