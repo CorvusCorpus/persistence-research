@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <pthread.h>
 #include "tsieve_gpu.h"
 typedef unsigned long long u64; typedef long long i64; typedef unsigned int u32;
 
@@ -220,6 +221,15 @@ __global__ void k_coset(const tg_coset *cos, int ncos, tg_tabs tb, int dump, tg_
     PHASE_END
 }
 
+static u64 fnv(u64 h, const void *p, size_t n) { const unsigned char *c = (const unsigned char *)p; for (size_t i = 0; i < n; i++) h = (h ^ c[i]) * 1099511628211ULL; return h; }
+static const u32 *HT2, *HT3, *HT7; static const u64 *HTOP; static u64 HN2, HN3, HN7, HNTOP, HHASH; static tg_params HPAR;
+static u64 host_hash(void) {
+    u64 h = fnv(1469598103934665603ULL, &HPAR, sizeof HPAR);
+    h = fnv(h, HT2, HN2 * 4); h = fnv(h, HT3, HN3 * 4); h = fnv(h, HT7, HN7 * 4); return fnv(h, HTOP, HNTOP * 8);
+}
+static void keep_host(const tg_params *p, const u32 *T2, const u32 *T3, const u32 *T7, u64 n2, u64 n3, u64 n7, const u64 *TOP, u64 topwords) {
+    HPAR = *p; HT2 = T2; HT3 = T3; HT7 = T7; HTOP = TOP; HN2 = n2; HN3 = n3; HN7 = n7; HNTOP = topwords; HHASH = host_hash();
+}
 static size_t smem_bytes(const tg_params *p) {
     size_t nwords = (size_t)((2 * p->mm) / 32 + 3);
     return ((nwords * 4 + 15) & ~(size_t)15) + IMAX * 8 + (2 * IMAX + 2) * 4 + 8 * 8 + 10000;
@@ -230,8 +240,8 @@ static size_t smem_bytes(const tg_params *p) {
 struct tg_ctx { tg_point *out; u64 outcap; char *smem; };
 static tg_tabs TABS;
 extern "C" int tg_init(const tg_params *p, const u32 *T2, const u32 *T3, const u32 *T7, u64 n2, u64 n3, u64 n7, const u64 *TOP, u64 topwords) {
-    (void)n2; (void)n3; (void)n7; (void)topwords;
     P = *p; TABS.T2 = T2; TABS.T3 = T3; TABS.T7 = T7; TABS.TOP = TOP;
+    keep_host(p, T2, T3, T7, n2, n3, n7, TOP, topwords);
     if (getenv("TG_EMU_THREADS")) NTE = atoi(getenv("TG_EMU_THREADS"));
     return 0;
 }
@@ -249,13 +259,14 @@ extern "C" int tg_run(tg_ctx *x, const tg_coset *cos, int n, int dump, tg_point 
     return no > x->outcap;
 }
 extern "C" const char *tg_device(void) { return "emulation"; }
+extern "C" int tg_verify(void) { return host_hash() != HHASH || memcmp(&P, &HPAR, sizeof P) != 0; }
 #else
 /* ---------------- CUDA ---------------- */
 #define CK(call) do { cudaError_t e_ = (call); if (e_ != cudaSuccess) { fprintf(stderr, "CUDA error %s at %s:%d\n", cudaGetErrorString(e_), __FILE__, __LINE__); exit(5); } } while (0)
 struct tg_ctx { cudaStream_t st; tg_coset *dcos, *hcos; tg_point *dout, *hout; u64 *dno, *dcnt, *hno; u64 outcap; int maxcos; };
 static tg_tabs DTABS; static tg_params HP; static int NSM; static char DEVNAME[256];
 extern "C" int tg_init(const tg_params *p, const u32 *T2, const u32 *T3, const u32 *T7, u64 n2, u64 n3, u64 n7, const u64 *TOP, u64 topwords) {
-    HP = *p;
+    HP = *p; keep_host(p, T2, T3, T7, n2, n3, n7, TOP, topwords);
     cudaDeviceProp pr; CK(cudaGetDeviceProperties(&pr, 0)); NSM = pr.multiProcessorCount; snprintf(DEVNAME, sizeof DEVNAME, "%s", pr.name);
     CK(cudaMemcpyToSymbol(P, p, sizeof *p));
     u32 *d2, *d3, *d7; u64 *dtop;
@@ -295,4 +306,24 @@ extern "C" int tg_run(tg_ctx *x, const tg_coset *cos, int n, int dump, tg_point 
     return no > x->outcap;
 }
 extern "C" const char *tg_device(void) { return DEVNAME; }
+static int dev_equal(const void *dptr, const void *hptr, size_t bytes) {   /* device buffer == host buffer, in 64 MB pieces */
+    static char *buf; static size_t cap; int eq = 1;
+    if (!buf) { cap = (size_t)64 << 20; CK(cudaMallocHost(&buf, cap)); }
+    for (size_t off = 0; off < bytes && eq; off += cap) {
+        size_t n = bytes - off < cap ? bytes - off : cap;
+        CK(cudaMemcpy(buf, (const char *)dptr + off, n, cudaMemcpyDeviceToHost));        /* pinned, synchronous */
+        eq = memcmp(buf, (const char *)hptr + off, n) == 0;
+    }
+    return eq;
+}
+extern "C" int tg_verify(void) {
+    static pthread_mutex_t mu = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_lock(&mu);
+    tg_params dp; CK(cudaMemcpyFromSymbol(&dp, P, sizeof dp));
+    int bad = host_hash() != HHASH || memcmp(&dp, &HPAR, sizeof dp) != 0
+           || !dev_equal(DTABS.T2, HT2, HN2 * 4) || !dev_equal(DTABS.T3, HT3, HN3 * 4)
+           || !dev_equal(DTABS.T7, HT7, HN7 * 4) || !dev_equal(DTABS.TOP, HTOP, HNTOP * 8);
+    pthread_mutex_unlock(&mu);
+    return bad;
+}
 #endif

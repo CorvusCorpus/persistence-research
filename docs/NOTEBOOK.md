@@ -1039,3 +1039,42 @@ Question from the user: can the N³ cost of the chain sieve be beaten?
     about 64 min at 2.6·10¹¹/s (G mode with GSIEVE_GPU34).
   - It can only be validated on the desktop. Plan: a CUDA build with the same counters and dumps, and val_tsieve6.sh
     against gsieve as the acceptance test.
+
+### T.5 GPU port (`tsieve_gpu`): written and emulated here, not yet run on a GPU
+- **Files.**
+  - `work/tsieve/tsieve_gpu.cu`: the kernels. The same source builds for CUDA or, with `-DTG_EMU`, for the CPU.
+  - `tsieve_gpu.c`: the host. It includes tsieve6.c with `TSIEVE_NO_MAIN` and a leaf hook.
+  - `tsieve_gpu.h`, the Makefile and `val_tsieve_gpu.sh`.
+- **Design: one thread block per coset.**
+  1. U = δ⁻¹·T(h0) goes into shared memory as a doubled bitmap of 2·5^M bits (M ≤ 7, 19.5 KB). T(h0) is enumerated
+     leaf by leaf. In G mode, leaf l takes the (l >> 2i & 3)-th of the 4 admissible lifts at level i. In E mode all
+     5^M paths are tried and paths through a 0 are dropped.
+  2. For each chunk of up to 1,024 i0 values, the i1 ranges come from the exact projection, followed by prefix sums.
+  3. Rows are handed out by index: exact i2 range, then the window of U read 32 positions per word. Each hit's block
+     is checked, and gsieve's stage 3 (TOP) and `limb_check` digits 27..9NL run inline, low limbs first, then the full
+     product.
+  - The host computes each coset's constants and exact i0 range. Empty cosets are skipped.
+  - The GPU returns counters and the points that pass stage 4 (for `full_check` on the host). It also returns points
+    with b·lg3 + c·lg7 < XMIN + 2, which the host decides with gsieve's region rule. With `dump` it returns every s2
+    point with its decision.
+- **Emulation.** Blocks run one after another, and every phase between barriers is a loop over the thread ids
+  (`TG_EMU_THREADS`, 32 by default). The emulation follows the kernel's control flow, including the strided loops and
+  the hand-out of rows.
+- **Fail-stop checks for non-ECC memory.** `tg_verify` checks that device tables (T2, T3, T7, TOP) and constants equal
+  the host copies, and that the host copies still have their hash from `tg_init`.
+  - It runs before the run, every 60 s (`TG_VERIFY`) and at the end.
+  - The DONE line is written only after the last check passes. Any failure stops with status 3.
+- **Build.** `nvcc 12.0 -arch=sm_86`: 94 registers, a 128-byte stack frame, no spills, about 46 KB of dynamic shared
+  memory per block, so 2 blocks of 256 threads per SM. It links. Here it stops at "no CUDA-capable device".
+- **Pitfall hit twice.** `<unistd.h>` and `<signal.h>`, included before gsieve.c's `_GNU_SOURCE`, left `exp10l`
+  implicitly declared. That would make the TOP table wrong. The tsieve Makefile now builds with
+  `-Werror=implicit-function-declaration`, and each host file defines `_GNU_SOURCE` first. gsieve.c is unchanged
+  (`addf4d33…`).
+- **Validation here (emulated kernel against gsieve).** G N = 300: IDENTICAL (counters and dumps). The other regions
+  and 314/314 are in T.6.
+- **Acceptance on the desktop.**
+  - Build: `make -C work/tsieve cuda tsieve6`, then `./val_tsieve_gpu.sh`. It covers exact regions in G and E,
+    314/314, the GPU tree against the CPU tree on a slice of the N = 10⁵ cosets (every counter), and N = 16,000
+    against gsieve's DONE line with timings.
+  - Expected speed (estimate, not measured): about 10¹⁵ simple instructions for N = 10⁵, a few minutes. gsieve's CUDA
+    variant takes about 64–86 min for the same region.

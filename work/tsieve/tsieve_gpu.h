@@ -35,6 +35,9 @@ tg_ctx *tg_ctx_new(int maxcos, unsigned long long outcap);
  * and with dump every s2 point with its decision. Returns 0, or nonzero if out overflowed (rerun with a larger outcap). */
 int tg_run(tg_ctx *x, const tg_coset *cos, int n, int dump, tg_point **out, unsigned long long *nout, unsigned long long cnt[6]);
 const char *tg_device(void);
+/* Fail-stop check for non-ECC memory: the device tables and constants must equal the host copies, and the host copies
+ * must still have the hash they had at tg_init. Returns 0 if everything is unchanged. */
+int tg_verify(void);
 
 #ifdef __cplusplus
 }

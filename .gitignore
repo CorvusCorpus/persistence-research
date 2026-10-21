@@ -55,3 +55,4 @@ work/tsieve/tsieve_gpu_emu
 work/tsieve/*.o
 work/tsieve/tp13.txt
 work/tsieve/gpu_val/
+work/tsieve/tsieve_gpu_emu_nl7

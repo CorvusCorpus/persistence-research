@@ -1,3 +1,4 @@
+#define _GNU_SOURCE                                     /* exp10l in gsieve.c: before any header */
 /* tsieve_gpu: the tree sieve's main path with the cosets on the GPU (tsieve_gpu.cu); host part.
  * Same region, decisions, counters and dump lines as tsieve6 and `gsieve_k13 main`. The host walks the coset tree
  * (tsieve6.c, node()), computes each coset's constants and exact i0 range, and sends batches to the GPU, which returns
@@ -7,6 +8,7 @@
  *        TG_BATCH (cosets per launch), TG_OUTCAP (points per launch), TG_EMU_THREADS (emulation build)
  * build: see Makefile (tsieve_gpu: CUDA; tsieve_gpu_emu: the same kernel compiled for the CPU)
  */
+#include <unistd.h>
 #include "tsieve_gpu.h"
 #define TSIEVE_NO_MAIN
 #define TS_LEAF_HOOK gpu_leaf
@@ -67,6 +69,17 @@ static void *gworker(void *arg) {
     free(OB); mpz_clear(gx); mpz_clear(gm); mpz_clear(gt);
     return NULL;
 }
+static int VINT, VSTOP2; static u64 NVER;
+static void *verifier(void *arg) {                     /* every VINT seconds: fail-stop check of all tables (non-ECC) */
+    (void)arg;
+    for (int t = 0; !__atomic_load_n(&VSTOP2, __ATOMIC_SEQ_CST); t++) {
+        sleep(1);
+        if ((t + 1) % VINT) continue;
+        if (tg_verify()) { fprintf(stderr, "TABLE CHECK FAILED during the run (memory fault?): stopping, discard this run\n"); fflush(stdout); _exit(3); }
+        NVER++;
+    }
+    return NULL;
+}
 int main(int argc, char **argv) {
     int rc = ts_setup(argc, argv); if (rc) return rc;
     if (!R2OK) { fprintf(stderr, "the projected region does not fit 64-bit arithmetic\n"); return 1; }
@@ -88,10 +101,17 @@ int main(int argc, char **argv) {
     if (getenv("TG_BATCH")) BATCH = atoi(getenv("TG_BATCH"));
     OUTCAP = getenv("TG_OUTCAP") ? strtoull(getenv("TG_OUTCAP"), 0, 10) : (DUMP ? 1ULL << 22 : 1ULL << 20);
     fprintf(stderr, "tsieve_gpu: device %s, M=%d, block %d threads, batch %d cosets\n", tg_device(), TM, p.nt, BATCH);
+    if (tg_verify()) { fprintf(stderr, "TABLE CHECK FAILED before the run\n"); return 3; }
     struct timespec w0, w1; clock_gettime(CLOCK_MONOTONIC, &w0); clock_t c0 = clock();
-    pthread_t *tid = malloc(TS_NTH * sizeof *tid);
+    pthread_t *tid = malloc(TS_NTH * sizeof *tid), vt;
+    VINT = getenv("TG_VERIFY") ? atoi(getenv("TG_VERIFY")) : 60; if (VINT < 1) VINT = 1;
+    pthread_create(&vt, NULL, verifier, NULL);
     for (int i = 0; i < TS_NTH; i++) pthread_create(&tid[i], NULL, gworker, NULL);
     for (int i = 0; i < TS_NTH; i++) pthread_join(tid[i], NULL);
+    __atomic_store_n(&VSTOP2, 1, __ATOMIC_SEQ_CST); pthread_join(vt, NULL);
+    if (tg_verify()) { fprintf(stderr, "TABLE CHECK FAILED at the end of the run (memory fault?): discard this run\n"); return 3; }
+    fprintf(stderr, "table checks passed: %llu (device tables and constants against host copies, host copies against their hash)\n",
+            (unsigned long long)NVER + 1);
     clock_gettime(CLOCK_MONOTONIC, &w1);
     double wall = (double)(w1.tv_sec - w0.tv_sec) + 1e-9 * (double)(w1.tv_nsec - w0.tv_nsec), cpu = (double)(clock() - c0) / CLOCKS_PER_SEC;
     return ts_report(strcmp(tg_device(), "emulation") ? "treegpu" : "treeemu", cpu, wall);
