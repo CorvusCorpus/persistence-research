@@ -892,3 +892,15 @@ instead of the desktop. The desktop was unavailable for GPU work, and its memory
 - **Scope.** The first three shells take about 7 h. The last three (70,000 → 100,000, about 15 h here) are held for
   the user's approval, because together they exceed the 12 h limit.
 - **Results:** in S.4.
+
+### S.4 Results so far
+- **Shell 40,000 < m ≤ 50,000: PASSED** (14:01:46–15:27:34 UTC; archive `validation_pc/task4_check/check_N50000_n040000.tar.xz`,
+  SHA-256 `ee63d8ec…`).
+  - All eight DONE counters match production for each invocation:
+    - main: 60,979,301,760,000 points, s1 = 4,190,465,737,806, s2 = 230,373,239,297, s3 = 92,062,786,045, s4 = 14;
+    - direct: 23,398,270,000 points, s4 = 171,177;
+    - odd: 35,085,180,000 points, s1 = 1,248,050,760, s4 = 36.
+  - full = 0 and members = 0 on every path.
+  - Coverage is complete (50,001/50,001 c values on all three paths, no members).
+  - Per-c points, s4 and members are identical at all 50,001 boundaries on every path.
+  - Wall times at 4 threads: main 4,895 s, direct 157 s, odd 89 s. The projection was 1.4 h for main.
