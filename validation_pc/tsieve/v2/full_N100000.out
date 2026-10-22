@@ -1,0 +1,30 @@
+== 2026-10-21T23:55:32Z commit 560ddbf binary 31f95f00021f583b NVIDIA GeForce RTX 3060 Ti, 610.88, 1665 MHz, 39
+command: ./tsieve_gpu tp13.txt G 7 100000 threads=20
+tsieve_gpu: device NVIDIA GeForce RTX 3060 Ti, M=7, block 512 threads, batch 512 cosets
+table checks passed: 45 (device tables and constants against host copies, host copies against their hash)
+DONE mode=treegpu dm=G N=100000 N0=-1 K=13 M=7 NL=14 points=999770015045376 s1=68703672291929 s2=3777027389141 s3=1509389143313 s4=340 gmp=340 full=0 members=0 leaves=67108864 rows=1374867188319 hits=14408204076983 tt=1 roots=0:16384/16384 time=53299.62 threads=20 wall=2725.84
+	Command being timed: "./tsieve_gpu tp13.txt G 7 100000 threads=20"
+	User time (seconds): 53294.73
+	System time (seconds): 21.06
+	Percent of CPU this job got: 1944%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 45:42.35
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1072844
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 148
+	Minor (reclaiming a frame) page faults: 260600
+	Voluntary context switches: 206049
+	Involuntary context switches: 729704
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+exit 0
+== end 2026-10-22T00:41:15Z 1920 MHz, 71, 163.18 W

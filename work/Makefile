@@ -23,11 +23,29 @@ csrc/bottom:   csrc/bottom_v1.c ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
 
 zf7: zf7.c ; $(CC) -O3 -march=native -fopenmp -o $@ $< -lm
 
+# GPU bottom solver (drop-in for csrc/bottomc3 in 'cum' mode; see csrc/bottomgpu.cu). `make cuda` needs nvcc.
+NVCC      ?= nvcc
+CUDA_ARCH ?= sm_86
+BGDEPS = csrc/bottomgpu_host.c csrc/bottomgpu.cu csrc/bottomgpu.h csrc/bigfix.h csrc/bottom3.c
+csrc/bottomgpu_host.o: $(BGDEPS) ; $(CC) $(CFLAGS) -Wno-unused-function -c -o $@ csrc/bottomgpu_host.c
+csrc/bottomgpu_cuda.o: $(BGDEPS) ; $(NVCC) -O3 -arch=$(CUDA_ARCH) -c -o $@ csrc/bottomgpu.cu
+csrc/bottomgpu_emu.o: $(BGDEPS) ; g++ -O2 -march=native -DBG_EMU -x c++ -c -o $@ csrc/bottomgpu.cu
+csrc/bottomgpu: csrc/bottomgpu_host.o csrc/bottomgpu_cuda.o ; $(NVCC) -o $@ $^ $(LIBS)
+csrc/bottomgpu_emu: csrc/bottomgpu_host.o csrc/bottomgpu_emu.o ; g++ -o $@ $^ $(LIBS)
+# GPU top filter (drop-in for csrc/topc3; see csrc/topgpu.cu)
+TPDEPS = csrc/topgpu_host.c csrc/topgpu.cu csrc/topgpu.h csrc/bigfix.h
+csrc/topgpu_host.o: $(TPDEPS) ; $(CC) $(CFLAGS) -c -o $@ csrc/topgpu_host.c
+csrc/topgpu_cuda.o: $(TPDEPS) ; $(NVCC) -O3 -arch=$(CUDA_ARCH) -c -o $@ csrc/topgpu.cu
+csrc/topgpu_emu.o: $(TPDEPS) ; g++ -O2 -march=native -DTP_EMU -x c++ -c -o $@ csrc/topgpu.cu
+csrc/topgpu: csrc/topgpu_host.o csrc/topgpu_cuda.o ; $(NVCC) -o $@ $^ $(LIBS)
+csrc/topgpu_emu: csrc/topgpu_host.o csrc/topgpu_emu.o ; g++ -o $@ $^ $(LIBS)
+cuda: csrc/bottomgpu csrc/bottomgpu_emu csrc/topgpu csrc/topgpu_emu
+
 gsieve:
 	$(MAKE) -C gsieve
 
 clean:
-	rm -f $(HELPERS) zf7
+	rm -f $(HELPERS) zf7 csrc/bottomgpu csrc/bottomgpu_emu csrc/topgpu csrc/topgpu_emu csrc/*.o
 	$(MAKE) -C gsieve clean
 
-.PHONY: all helpers gsieve clean
+.PHONY: all helpers gsieve clean cuda

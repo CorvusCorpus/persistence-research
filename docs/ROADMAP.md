@@ -56,13 +56,16 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
    no ECC memory; recommended before submitting the OEIS comment.
    - Session 4 (cloud, ECC hardware likely): 40,000 → 60,000 done, every counter and per-c count equal
      (`validation_pc/task4_check/`); stopped by decision of the user. Remaining: `"60000:70000 … 90000:100000" cpu`.
+   - Session 5: the main path of all of m ≤ 100,000 re-executed by the GPU tree sieve, every counter equal (NOTEBOOK T.7).
+     Only the direct and odd paths of 60,000 → 100,000 (cheap: minutes each on the CPU) still lack a second execution.
 6. **Tree sieve (session 4, `work/tsieve/`, NOTEBOOK T).** The points that pass D digits form 4^D cosets of a lattice of
    index 4·5^(D−1). Walking the coset tree costs about N^(3 log 4 / log 5) = N^2.58, against N³ for the bitmap scan.
    - `tsieve6` (CPU): identical counters and dumps to gsieve (G and E); 314/314 positive control. About 1.2× slower
      than gsieve at N = 10⁵ on the cloud CPU; crossover estimated near N ≈ 3·10⁵.
-   - `tsieve_gpu` (CUDA): written; its CPU emulation is identical to gsieve and to `tsieve6` (production-scale slices).
-     NEXT: on the desktop, `make -C work/tsieve cuda tsieve6 && work/tsieve/val_tsieve_gpu.sh` (acceptance and
-     timings). Then tune it, and decide whether it replaces the CUDA gsieve main path for the next shells.
+   - `tsieve_gpu` (CUDA): accepted on the desktop and made 3× faster (kernel v3, NOTEBOOK T.7). The main path for
+     m ≤ 10⁵ takes 45 min on the RTX 3060 Ti against about 79 min for gsieve's CUDA variant, and its cost grows as
+     N^2.58. It is the faster main path for any next shell (estimate: 10⁵ < m ≤ 2·10⁵ in about 3.7 h; direct and odd paths
+     by gsieve). A new shell needs the user's go-ahead and a second execution before any claim.
 
 ## P3 — write-up and community verification
 - **Paper draft** (LaTeX):

@@ -1100,3 +1100,170 @@ Question from the user: can the N³ cost of the chain sieve be beaten?
     counters were empty. Re-run: IDENTICAL.
 - **Status.** The logic of the GPU kernel is validated. CUDA-specific behaviour (barriers, shared-memory atomics,
   occupancy, speed) still needs the desktop run (`val_tsieve_gpu.sh`).
+
+### T.7 Desktop acceptance, a 3× faster kernel, and the full N = 10⁵ run (session 5, 21–22 Oct 2026)
+- **Machine and builds.** The desktop and WSL distribution of D.1 (nvcc 13.3, driver 610.88, RTX 3060 Ti). Branch
+  `ccr-33b3eadb-tsaozk` at `f0a6868`: `make -C work/gsieve` had nothing to rebuild (`gsieve_k13` = `46f8308b…`, as in Z.2);
+  `make -C work/tsieve cuda tsieve6` built `tsieve_gpu` `f3abeb5b…` and `tsieve6` `4f9c35a8…`.
+- **Acceptance of kernel v2** (`./val_tsieve_gpu.sh`, `validation_pc/tsieve/gpu_val/`, 21:49–22:15 UTC): **ALL PASSED**, no
+  CUDA-specific failure.
+  - A: all 8 exact regions IDENTICAL to gsieve (counters and S2/R3/R4/S4/MEMBER dumps): G N = 300, 500, 2000 and shells
+    (900, n0 = 600), (1200, n0 = 1100); E N = 300, 600 (each with the member 2^77·3^64·7^98) and (900, n0 = 700).
+  - B: 314/314. C: N = 10⁵, roots 0:16, M = 6 and 7: every counter MATCHes the CPU tree (GPU 8.04 s, CPU tree 30.9 / 29.4 s at
+    20 threads). D: N = 16,000 MATCHes gsieve (tree 130.2 s, gsieve avx2 at 20 threads 126.9 s).
+- **Where the time went.** Nsight Compute needs the Windows GPU-counter permission (not changed), so timing-only probe builds
+  (kernels stopped after each phase; never used for counts) and host experiments were used.
+  - The host is not the bottleneck: 4, 10 and 20 host threads give the same wall time for 20 roots, the GPU is at 100%, and the
+    host's CPU time is spin-waiting in `cudaStreamSynchronize`.
+  - Per 20 roots at N = 10⁵, M = 7: rows, i2 ranges and window scan 0.5 s; with the per-hit block check 1.5 s; with the call of
+    `later()` (stages 3–4) 3.5 s; with the TOP lookup and the first limb test 3.7 s; complete 8.05 s. The eager 14-limb product
+    after the first limb test, done in local memory by the one to three lanes of a warp that had such a point, took more than
+    half. (An FP64 corner test looked costly in a probe with 1 s resolution; removing it changed little.)
+- **Kernel v3 (commit `560ddbf`), decisions unchanged:**
+  1. Candidate queue: phase 3 runs in rounds of one row per thread; points that pass digits 14–26 are queued in shared memory
+     (2,048 entries, a·2^42 + b·2^21 + c), and all threads then drain the queue through `later()`. A full queue falls back to the
+     inline call.
+  2. Lazy limbs: after the first test, limbs 4 … NL−1 of 3^b 7^c and of 2^a·M are computed in order from that test's carries and
+     the loop stops at the first bad limb, which is the same conjunction `limb_check` evaluates.
+  3. (a, b, c) of a hit from 32-bit row bases (exact, since a ≤ 3N, b ≤ 2N and c ≤ N are below 2^32 for N ≤ 10⁶; checked).
+  4. Points near 10^XMIN go to the host by the integer superset b < 278 and c < 157, which contains every point with
+     b·lg3 + c·lg7 < XMIN + 2; the host applies gsieve's region rule and stages 3–5 as before, so no FP64 remains on the GPU.
+  5. `floordiv` by a multiply-high with a precomputed reciprocal and an exact correction; `mods_br` without a 64-bit `%`; the
+     verifier sleeps in 0.1 s ticks (the final join had waited up to 1 s, which is why every earlier wall time ended in .04).
+  6. `TG_NT` defaults to 512 for M = 7 (one block per SM fits in shared memory, so 16 warps) and to 256 otherwise.
+  7. Test builds with a tiny queue and 16-value i0 chunks, `tsieve_gpu_emu_q8` (in `make test`) and `tsieve_gpu_q64` (new
+     section A2 of `val_tsieve_gpu.sh`), make the inline path and the chunking run often.
+- **Tuning** (wall s for roots 0:20 of 16,384 at N = 10⁵; kernel v3 unless marked):
+
+  | | TG_NT 128 | 256 | 512 | 1024 |
+  |---|---|---|---|---|
+  | M = 5 | — | 3.44 | 3.54 | — |
+  | M = 6 | — | 3.24 | 3.44 | — |
+  | M = 7 | — | 4.95 | **3.04** | does not launch (96 registers × 1024 threads) |
+  | M = 7, kernel v2 | 15.0 | 10.0 | 10.0 | — |
+
+  QCAP (M = 7 / 512, M = 6 / 256): 1,024: 4.34 / 3.34; 2,048: 3.04 / 3.24; 4,096: 3.54 / 5.25 (shared memory then limits the
+  blocks per SM). Chosen: M = 7, TG_NT = 512, QCAP = 2,048. The host now rejects an unlaunchable TG_NT with a clear message.
+- **Re-validation of v3** (`validation_pc/tsieve/v2/`): `make -C work/tsieve test` passed (12 min; the CPU tree and the emulated
+  kernel, including the tiny-queue build, against gsieve; 314/314 twice). `val_tsieve_gpu.sh`: **ALL PASSED**, binary
+  `31f95f00…` (A 8/8 and A2 3/3 IDENTICAL; B 314/314; C MATCH with the GPU at 2.64 s against 28.3 / 26.9 s for the CPU tree;
+  D MATCH, tree 98.8 s against gsieve 115.6 s).
+- **Full run, N = 10⁵ (the request of task 1).** Command (in `work/tsieve`): `./tsieve_gpu tp13.txt G 7 100000 threads=20`, commit
+  `560ddbf`, binary `31f95f00…` (nvcc 13.3 `-O3 -arch=sm_86`, host gcc 13.3 `-O3 -march=native`), defaults TG_NT = 512,
+  TG_BATCH = 512, QCAP = 2,048; 23:55:32–00:41:15 UTC; log `validation_pc/tsieve/v2/full_N100000.out`.
+  - **Wall 2,725.8 s (45 min 26 s)** for the sieve, 45 min 42 s with the table set-up; 1.07 GB host memory; GPU at 1,920 MHz,
+    71 °C, 163–193 W; 45 table checks passed (one per minute and at the end).
+  - DONE: points = 999,770,015,045,376, s1 = 68,703,672,291,929, s2 = 3,777,027,389,141, s3 = 1,509,389,143,313, s4 = 340,
+    gmp = 340, full = 0, members = 0; 4^13 leaves, 1.375·10¹² rows, 1.441·10¹³ hits.
+  - **Independent second pass of the main path for m ≤ 100,000.** `work/tsieve/main_totals.py` adds up the logged production
+    DONE counters of the main path (m ≤ 36,000 in two invocations, the killed range c < 7,540 from the session-3 re-run, checked
+    against the production CDONE line; 36,000 < m ≤ 40,000; the six shell archives, each checked against its `.sha256`). Every
+    counter MATCHes (`validation_pc/tsieve/v2/full_N100000_vs_production.txt`). The tree sieve enumerates the points by coset
+    instead of by bitmap scan and affine lift, and runs stages 3–4 in its own GPU code, so stages 1–4 of the whole main path
+    behind claim 1.1 now have two independent executions (the direct and odd paths are not covered by it).
+  - **Speed:** gsieve's CUDA variant took 4,429 s for the main paths of the six shells (their DONE lines) and about 5 min for
+    m ≤ 40,000, about 79 min in all; the tree sieve takes 45.4 min, **1.74× faster at N = 10⁵**, and its cost grows as N^2.58
+    against N³. Estimate (not measured): the shell 10⁵ < m ≤ 2·10⁵ in about 3.7 h on this GPU.
+- **Status.** Task 1 done: the GPU tree sieve passes its acceptance test, is 3× faster than the version written in session 4,
+  and has re-executed the main path for m ≤ 10⁵ with every counter equal. `docs/RESULTS.md` 1.1 gains this as evidence (main
+  path); its status stays COMPUTATIONAL.
+- **Pitfall hit:** a file rewritten with the Bash tool's Windows Python came out with CRLF line endings (Makefile,
+  `val_tsieve_gpu.sh`, `tsieve_gpu.c`); converted back before any build. Repository files are now edited only from WSL or the
+  editor (also in the session memory).
+
+## 2026-10-22 · Session 5 (desktop PC) · Even-target tree nodes on the GPU (task 2)
+
+Design notes: `docs/GPU_EVEN_TARGETS.md`. No result in `docs/RESULTS.md` changes in this entry.
+
+### E.1 Cost of the open nodes (`work/node_costs.py`, `work/logs/node_costs.out`)
+- For every bag of `bags.bags_of(node)`, `prove_cum.prove_bag(bag, dry=True)` replays the bootstrapping plan and adds up its
+  cost model (one unit per top case, `BOTTOM_COST = 4` per bottom solve). The split by side is recovered from the facts before
+  and after each step and is checked to add up to `res['stats']['cost']`.
+- Units, cheapest first: 131712 5.66·10⁹ (14 of 15 bags already proved), 122472 7.88·10⁹ (23 of 26), 24192 8.22·10⁹,
+  1229312 6.70·10¹⁰, 314928 1.33·10¹¹, 41472 1.40·10¹¹, 93312 1.72·10¹¹, 221184 2.23·10¹³, 1161216 1.39·10¹⁴,
+  11239424 1.32·10¹⁴ + 2 bags, 33718272 1.58·10¹⁵ + 6 bags. The bottom side is 64–74% of the units of every node.
+- "+ n bags": for k ≥ 18, `prove_cum.matveev_cum` cannot form the a-priori Matveev bound (its iteration starts at 10³⁰⁰ and
+  the bound leaves the float range; `assert nb <= B`). The cost of those bags is unknown until the bound is computed in log
+  space. The RESULTS figure "1161216 ≈ 1.4·10¹⁴ units" is reproduced.
+
+### E.2 Profile of topc3 and bottomc3
+- `work/bag_plan.py` prints a bag's plan; `work/prof_steps.py BAG N --keep DIR` runs one slice of each of the N costliest steps
+  exactly as ctop3/cbottom4 would (one ordering, one group) and saves the job files. Representative bag: 2·2·2·2·2·2·2·3·3·3·7
+  (k = 11, the largest bag of 24192).
+- Cycle counters in instrumented copies of top3.c and bottom3.c (scratch only; the machine was loaded by the GPU acceptance run
+  at the time, so the absolute figures are pessimistic):
+  - **topc3, per case:** MPFR logarithm 2,300–5,200 cycles (about two thirds), exact level-1 test 460–2,200, level 2 36–490,
+    the prefix 105–2,150 (amortised). Level-1 survival 1.2–2.4%, level-2 0.013–0.05%.
+  - **bottomc3, per solve:** about 12,000 cycles: `low(Flow)` 5,400–6,400 amortised (two p-adic logs and two inverses per lower
+    configuration, at precision Mmax = 4G + 8 although the solves need only 5^G), the 5-adic series about 2,000–2,500, the
+    lattice step 2,150–2,400, mt + β (CRT) 1,050–1,150, the 2-adic part 800–950.
+- **Which loop dominates:** the bottom solve, by a little: in time 52–63% of every node (3,000 cycles per bottom unit against
+  3,700–8,000 per top case). Both sides have to move for a large gain.
+
+### E.3 The bottom solver on the GPU (`work/csrc/bottomgpu.cu`, `bottomgpu_host.c`, `bottomgpu.h`, `bigfix.h`)
+- Drop-in replacement for bottomc3 in `cum` mode (same job file, same CAND/PROG/DONE output). One thread per lower
+  configuration: low(Flow) once, then every height of the top digit. Every quantity is the residue bottom3.c computes, with the
+  p-adic series rewritten so that no exact division is needed (Σ (−1)^{n+1} p^{nv−e} yⁿ/n′, Horner with tabulated
+  coefficients), Newton inverses, Garner's CRT, Montgomery products with one R for 5^{G+s}, 5^G and 5^{G−1}, and a certified
+  fixed-point floor for the lattice coordinates (ambiguous within 2^−60 → bottom3.c decides). Rare cases go back to bottom3.c's
+  own code (included unchanged); jobs with M varying, G > 200 or another mode go to bottomc3 (exec).
+- `work/bottom_ref.py`: Python transcription of bottom3.c next to the restructured form; self-check: the series, plog and β
+  agree on random inputs (13,063 (Flow, p) cases at G = 20, 37, 61) and 891/891 planted (t, u′, w) are recovered.
+- **Validation of the CPU emulation build** (`work/val_bottomgpu.py`; the GPU build comes next):
+  - K: kernel tests at production scale, G = 14 … 200 (all five size classes; boxes up to 10⁹⁴): 2,600 queries, every planted
+    point found (1,949/1,949), candidate lists equal to bottom_ref's exact lists, no deferrals; the direct 5-adic (p = 0) and
+    2-adic paths are exercised.
+  - C: 57 whole steps and slices of the plans of five bags (G = 51 … 383): byte-identical to bottomc3 (47 through the kernel,
+    10 handed to bottomc3 for G > 200); `bottom_ref.py job` also reproduces bottomc3 on a slice.
+  - P: 60 configurations from the digits of genuine zero-free numbers (small G, so that the configuration space contains the
+    genuine digits): byte-identical to bottomc3, the genuine solution found every time. (A first version found no such
+    numbers: zero-free numbers have runs of at most five 1s.)
+- CUDA build: 255 registers per thread with 40 B to 1.2 KB of spills depending on the size class; speed to be measured.
+
+### E.4 The top filter on the GPU (`work/csrc/topgpu.cu`, `topgpu_host.c`, `topgpu.h`)
+- **Observation.** top3.c's decisions depend on m only through m·θ and m·θ₂, and θ = qa/qb, θ₂ = a2/D are tiny (2^−79 at
+  G = 51, 2^−197 at G = 123, 2^−318 at G = 197), so m·θ = −Θ·λ + δθ with Θ = C·θ, λ = log(1 + z), |δ| ≤ 1/2 + 2^−50.
+  `work/top_filter_ref.py` checks this on 45,000 real cases (G = 51, 123, 197): dist(mθ, ℤ) and dist(ψ₁, ℤ) agree to the double
+  precision of the check, and a margin-guarded filter passes exactly the cases topc3 keeps at level 2 (2, 4, 8 of 15,000), with
+  no unsound kill.
+- **Design.** The kernel computes ψ₁ = frac(−Θλ), ψ₂ = frac(−Θ₂λ) in fixed point (FL ≥ bits(Θ) + 80 fraction bits; the prefix
+  logarithms down the prefix tree from host tables, Horner series with intermediates in (0, 1], only the low limbs of Θ·λ) and
+  classifies each case: certainly killed at level 1; certain level-1 pass and certainly killed at level 2 (counted in f1); or
+  sent to the host, which runs top3.c's own per-case code (copied unchanged in substance: same precision, same operations,
+  same run merging). Output and counters are therefore topc3's.
+- **First check (CPU emulation build):** on the four saved jobs (G = 51, 87, 123, 197; 989,095 cases) the output is
+  byte-identical to topc3: SURV runs and DONE cases, f1, f2, nsurv. The emulated kernel is already 2–4× faster than topc3 on
+  one core (fixed-point series instead of MPFR logarithms).
+- Drivers: `work/cbottom5.py` and `work/ctop4.py` run a whole step in one process (resumable at ordering boundaries, the same
+  checkpoint format as cbottom4/ctop3); `work/prove_cum_gpu.py` runs prove_cum's prove_bag unchanged with these modules and
+  proves the bags of a node in parallel; `work/val_prove_gpu.sh` proves a node from scratch with the CPU and the GPU paths and
+  compares every bag's facts, bound and counters and the proofC file.
+
+### E.5 Validation and speed on the GPU (`validation_pc/even_gpu/val_gpu.out`)
+- **Builds:** `make -C work cuda` (nvcc 13.3 `-O3 -arch=sm_86`): `csrc/bottomgpu` `12de58fd…`, `csrc/topgpu` `c0117bff…`; reference
+  binaries `csrc/bottomc3` `f47187db…`, `csrc/topc3` `af706775…`. The top filter's largest size class is L = 22 limbs (Θ up to
+  about 2^592, G up to about 180): nvcc 13.3 segfaults while generating PTX for L = 24 (cicc; also with ptxas -O1/-O2), so steps
+  with a larger Θ (G = 197 and up) are handed to topc3.
+- **bottomgpu:** K: 3,900 production-scale queries (G = 14 … 200), every planted point found (2,927/2,927), candidate lists equal
+  to bottom_ref's, no deferrals. C: the 57 jobs, byte-identical to bottomc3. P: 60/60 genuine configurations, identical and
+  found. **VALIDATION PASSED.**
+- **topgpu:** K (accuracy, dump mode against arb at prec + 128 bits): 24 jobs at G = 51 … 160, worst error 2 units of 2^−64
+  (the margins assume 4). C: 79 whole steps and slices of six bags' plans (k up to 13), byte-identical to topc3 (SURV runs and
+  DONE cases, f1, f2, nsurv). P: 150/150 planted genuine configurations kept (planted_top_cum3.py's construction, G = 16), outputs
+  identical. **VALIDATION PASSED.**
+- **The saved slices** of E.2 (four top, four bottom jobs) are byte-identical on the GPU too.
+- **Speed** (`work/bench_gpu_steps.py`, whole steps of the representative bag's plan, wall time including start-up):
+
+  | step | work | GPU | rate | CPU, one core (idle machine) |
+  |---|---|---|---|---|
+  | bottom j=6, G=87 | 4.19·10⁸ solves | 1.6 s | 2.6·10⁸/s | 3.0 µs per solve (bottomc3) → 1,250 s |
+  | bottom j=7, G=160 | 6.12·10⁷ | 1.0 s | 5.8·10⁷/s (start-up bound) | 4.0 µs → 245 s |
+  | top j=4, G=123 | 4.13·10⁸ cases | 6.3 s | 6.6·10⁷/s | 1.5 µs per case (topc3) → 620 s |
+  | top j=4, G=87 | 9.98·10⁷ | 2.1 s | 4.7·10⁷/s | ≈1.3 µs → 130 s |
+  | top j=5, G=51 | 2.14·10⁸ | 12.8 s | 1.7·10⁷/s | 1.7 µs → 360 s |
+  | top j=3, G=197 | 2.47·10⁷ | 64.8 s | (handed to topc3) | |
+
+  Against one core: about 800× (bottom, G = 87), 100× (top, G = 123), 30× (top, G = 51: prefixes with heights below 5 go to the
+  host, and at G = 51 about 3% of prefixes do). The idle-machine CPU rates are about half the loaded-machine profile of E.2.
+- **Next:** `work/val_prove_gpu.sh` on a proved node (both paths from scratch, identical facts and proofC), then the three
+  cheap open nodes.

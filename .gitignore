@@ -60,3 +60,6 @@ work/tsieve/tsieve_gpu_emu_q8
 work/tsieve/tsieve_gpu_q64
 work/csrc/bottomgpu
 work/csrc/bottomgpu_emu
+work/csrc/topgpu
+work/csrc/topgpu_emu
+work/csrc/*.o
