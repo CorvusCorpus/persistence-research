@@ -1,0 +1,10 @@
+== 2026-10-22T08:04:57Z commit 3951485 bottomgpu 6d277763ff963dd9 bottomc3 f47187db4a4171f4 topc3 af7067756cda9365
+re-proved on the CPU path: 2_2_2_2_4_7_7_7_7_8 2_3_3_3_3_3_3_3_3_3_8 2_2_2_2_2_2_3_3_8_9 2_2_2_2_2_2_3_6_9_9
+== end 2026-10-22T08:46:02Z
+-- summary
+bottomgpu (installed) validation: BOTTOMGPU VALIDATION PASSED
+re-proof 2_2_2_2_4_7_7_7_7_8: IDENTICAL (CPU re-proof: 1390 s)
+re-proof 2_3_3_3_3_3_3_3_3_3_8: IDENTICAL (CPU re-proof: 1271 s)
+re-proof 2_2_2_2_2_2_3_3_8_9: IDENTICAL (CPU re-proof: 1228 s)
+re-proof 2_2_2_2_2_2_3_6_9_9: IDENTICAL (CPU re-proof: 1230 s)
+direct/odd 60-100k counters: 8 MATCH lines, 4 mismatch lines; per-c: 4/4 shells identical

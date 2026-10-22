@@ -1267,3 +1267,134 @@ Design notes: `docs/GPU_EVEN_TARGETS.md`. No result in `docs/RESULTS.md` changes
   host, and at G = 51 about 3% of prefixes do). The idle-machine CPU rates are about half the loaded-machine profile of E.2.
 - **Next:** `work/val_prove_gpu.sh` on a proved node (both paths from scratch, identical facts and proofC), then the three
   cheap open nodes.
+
+### E.6 Four open nodes proved: 131712, 122472, 24192, 1229312 (22 Oct 2026)
+- **Command** (in `work/`): `python3 prove_cum_gpu.py --jobs 12 131712 122472 24192` at commit `5c34c2b` (bottomgpu
+  `12de58fd…`, topgpu `c0117bff…`: top size classes up to L = 22, so every step with Θ > 2^592 (G ≥ 183) went to topc3;
+  bottomc3 `f47187db…`, topc3 `af706775…`); log `work/logs/prove_gpu_131712_122472_24192.log`, 00:58–01:03 UTC.
+  - prove_cum's prove_bag unchanged, with ctop4/cbottom5 as its step modules; 12 bags at a time. The two bags left half done
+    by the paused CPU runs of session 2 resumed from their checkpoints in `ckptC/` (exact resume, E.4).
+  - **131712** (target 8, depth 2): 58 s; **122472** (target 6, depth 3): 135 s. Then 24192 stopped: one worker's atomic
+    checkpoint rename (`os.replace` in prove_cum._save) failed with EACCES on the Windows file system. A scanner or indexer
+    holding the file is the likely cause; 12 workers rewrite checkpoints often. Nothing was lost (checkpoints are written
+    atomically; the pool stopped; the bags resumed). `prove_cum_gpu.py` now retries the rename for up to 30 s (commit
+    `cb16cf5`); prove_cum.py is unchanged.
+  - **24192** (target 6, depth 3): resumed with `--jobs 12 24192` (log `work/logs/prove_gpu_24192.log`), 126 s.
+- **1229312** (target 2, depth 3; k up to 13): `python3 prove_cum_gpu.py --jobs 12 1229312 314928 41472 93312` at commit
+  `48fd1c7` (bottomgpu `12de58fd…`, topgpu `8204424a…`, classes up to L = 32), log `work/logs/prove_gpu_k13.log`,
+  01:18–01:47 UTC: 1229312 complete in 1,767 s. The run then stopped early in 314928: one topgpu process died without a
+  message. The likeliest cause is the 7.9 GB WSL VM running out of memory, because an nvcc build of the next bottomgpu (cicc
+  peak 3.7 GB) ran beside the 12 workers. A failed step records nothing, and the bags resume from `ckptC/` (E.7).
+- **Results** (records `work/proofC_131712.json`, `proofC_122472.json`, `proofC_24192.json`, `proofC_1229312.json`; every bag in
+  `work/bagresC/`):
+
+  | node | target, depth | bags (max k) | length bound | top cases | bottom solves | complete 7-smooth preimage set |
+  |---|---|---|---|---|---|---|
+  | 131712 | 8, 2 | 15 (11) | 101 | 1.45·10⁹ | 1.04·10⁹ | 112717121716224 |
+  | 122472 | 6, 3 | 26 (11) | 105 | 2.06·10⁹ | 1.46·10⁹ | none |
+  | 24192 | 6, 3 | 39 (11) | 105 | 2.13·10⁹ | 1.52·10⁹ | 642978, 2667168, 9437184, 13716864, 1162261467, 3281116734 |
+  | 1229312 | 2, 3 | 12 (13) | 138 | 2.31·10¹⁰ | 1.10·10¹⁰ | none |
+
+  (Counts include the steps done by the CPU runs of session 2.) Every bag ends with L ≤ 138 < 5000, so the exhaustive list
+  `Z.json` gives the complete preimage sets; each listed preimage has the node as its digit product.
+- **Independent check:** two bags proved here entirely through the GPU path were proved again from scratch on the CPU path
+  (`work/recheck_bag_cpu.py`: cbottom4/bottomc3, ctop3/topc3, empty scratch directories). Logs in `validation_pc/even_gpu/`.
+  - 2·3·3·3·3·3·3·3·4·7 (122472): 642 s on the CPU against 21 s; every fact, the bound and every counter IDENTICAL (top cases
+    209,293,913, bottom solves 123,163,479, survivor runs 45,333, 55 proof steps).
+  - 2·2·2·2·2·3·3·3·4·7 (24192, proved in two GPU runs around the EACCES stop): 1,263 s on the CPU; every fact, the bound and
+    every counter IDENTICAL (top cases 347,218,433, bottom solves 256,880,580, survivor runs 85,584, 55 proof steps).
+- **A bug caught before use** (commit `48fd1c7`): the next build of topgpu (classes up to L = 32, so that G ≤ 271 runs on the
+  GPU) failed val_topgpu.py part C on two jobs at G = 271. The prefix gaps were 8-bit, so a gap of 260 wrapped to 4 and a
+  kept case was killed. Fixed (16-bit gaps). Part K now also checks that the dumped cases are exactly the job's kernel cases;
+  it had recomputed ψ for the wrapped case and so could not see the error. The proofs of 131712, 122472 and 24192 used the
+  earlier build, which handed every step with Θ > 2^592 to topc3. Such steps include every step whose gaps can reach 256, so
+  those proofs are unaffected. The fixed build `8204424a` (used for 1229312) passes K (32 jobs, G ≤ 271), C (79 jobs) and P
+  (150/150), and val_prove_gpu.sh 49392.
+- Nothing in `docs/RESULTS.md` changes yet: 1229312 still needs its CPU recheck, and the docs and tables are updated once the
+  remaining k = 13 nodes are done.
+
+### E.7 Where the time went, and the v2 solvers (commit `3951485`)
+- **Measurements** (whole top steps of the largest bag of 1229312, 2⁹·7⁴; `TP_TIME=1` prints a breakdown on stderr):
+  - The kernel was not the bottleneck. On the step j = 4, G = 160 (4.1·10⁸ cases) it took 1.4 s, the host's exact code 5 s for
+    357,379 level-2 survivor runs (about 14 µs each), and the Python side about 110 s: ctop2.candidates runs an exact
+    Fincke–Pohst (fractions) on every survivor run, about 310 µs at G = 160 and 113 µs at G = 51. Every run has its own m, so
+    its cache never hits, and 0 of 5,500 sampled runs had a non-empty enumeration. Records = f2 = nsurv on every step: the
+    kernel's level-2 test already sends exactly the true level-2 survivors.
+  - At small G the host's MPFR code took every prefix with a digit below height 5 (3–4% of the cases at G = 51).
+  - Bottom steps with G > 200 ran on one core (bottomc3). For node 221184 that is 6·10¹⁰ solves at G = 234, 1.4·10¹⁰ at 271,
+    1.2·10⁹ at 308 and 2.3·10⁸ at 346, about 100 core-hours, with single steps of up to 40 h.
+  - prove_cum's planner weight (BOTTOM_COST) does not matter: dry-run plans of 221184's six largest bags priced at the GPU
+    rates give 19.3 h for weights 4 (current), 2, 1 and 0.5, and 30.7 h for 0.25. Left at 4.
+- **Changes:**
+  - *topgpu, small-height table:* log A and 1/A for every configuration of digits at heights 1–4 (8⁴ entries, rounded to
+    nearest like the level-1 tables); no host fallback remains. 3.3× at G = 87 and 13.8× at G = 51 on whole steps.
+  - *topgpu, recurrence:* along a prefix the cases have consecutive heights, so T_n = |Θ| uⁿ/n (96 fraction bits) is carried
+    by T_n(e + 1) = ⌊T_n(e)/10ⁿ⌋, an O(L) step instead of O(N·L²) products; level 2 (after a certain level-1 pass, 1–2% of
+    cases) uses the direct λ. The error argument is in the topgpu.cu header. Alone it gives about 5%, as the host dominated.
+  - *topgpu, survivor runs resolved in C:* ctop4 appends the lattice basis and R² (numerator and denominator: R² is not an
+    integer) to the job. A survivor run whose exact enumeration around (0, …, 0, −m) is empty is counted in a fifth PROG field
+    instead of printed, and ctop4 adds the counts to stats['enum'], so every record keeps the CPU path's statistics. The
+    enumeration is close_points in integers with fixed common denominators (topgpu_host.c, fp_setup). Its only large operations
+    are r_i = (−m a_i) mod D. topc3 never reads the section; a run with any lattice vector goes to Python as before.
+  - *bottomgpu:* size classes for G ≤ 240, 280, 320, 360 (16-bit positions), and a per-job check that the fixed widths cannot
+    overflow. The check bounds |K| + Q|R|, the coordinates ci, cj and up, ww; a failure sends the job to bottomc3. Before, the
+    sizes relied on the class sizing alone.
+  - *prove_cum_gpu.py:* one pool for the bags of all given nodes, the costliest first (estimates from
+    `logs/node_costs.json`), so that a node no longer ends with one bag running alone.
+- **Validation** (`validation_pc/even_gpu/*_v2_*`):
+  - val_topgpu.py on the installed binary `5ac4892e…`. K: 48 jobs, worst error 2 units of 2⁻⁶⁴ on every path (table, direct,
+    recurrence start and step), with samples of the small-height cases. C: 103 jobs byte-identical to topc3, now including the
+    first group of first gaps (the small heights). P: 150/150 planted genuine configurations.
+  - New part F. F1: the C enumeration agrees with Python's close_points on 3,400/3,400 values. These are random m, and m next to
+    genuine lattice vectors of the box at distances inside, on and just beyond R, in dimensions 4 and 3; 1,530 are non-empty.
+    F2: on 97 jobs, DONE and PROG equal topc3's, and the printed runs are exactly topc3's runs with a non-empty Python
+    enumeration (9,803 runs, 9,355 resolved), with the per-ordering counts matching. P with the section: 150/150 genuine runs
+    still printed.
+  - val_bottomgpu.py, emulation and GPU builds. K: planted queries at 21 sizes, G = 14 … 360, all found, 0 mismatches, 0
+    deferrals. C: 87 jobs byte-identical to bottomc3, including the G = 234 … 346 steps of 221184's largest bag through the
+    new classes. P: 60/60.
+- **Speed** (installed binaries, the same steps; "before" rebuilt from the measured per-case and per-survivor costs):
+
+  | top step | cases | before | now |
+  |---|---|---|---|
+  | j = 6, G = 51 | 4.9·10⁸ | ≈ 30 s | 2.2 s |
+  | j = 5, G = 87 | 4.9·10⁸ | ≈ 30 s | 3.4 s |
+  | j = 4, G = 160 | 4.1·10⁸ | ≈ 115 s | 11.0 s |
+  | j = 4, G = 197 | 4.8·10⁸ | ≈ 85 s | 9.3 s |
+
+  Kernel rates are now 2.4–5.7·10⁸ cases/s. The host part (exact m and the enumeration, about 25 µs per survivor run) runs in
+  each worker process, in parallel. Estimate for node 221184 (2.2·10¹³ units): about 5 h of top kernel and 5 h of bottom
+  kernel on the shared GPU, so roughly 10–12 h, against about a week for the pipeline of E.6 and about 6,400 core-hours on the
+  CPU. To be checked against the k = 13 nodes.
+- **Pitfalls:** never run a large nvcc build beside production in the WSL VM: memory is 7.9 GB, cicc for bottomgpu peaks at
+  3.7 GB, and 12 workers with CUDA contexts use most of the rest. A shell-quoted commit message with an apostrophe committed
+  a truncated message (fixed by amending before anything used the hash); messages now go through a file.
+
+### E.8 314928, 41472 and 93312 proved with v2; independent checks; claim 1.1's second pass complete (22 Oct 2026)
+- **Run:** `python3 prove_cum_gpu.py --jobs 10 314928 41472 93312` at commit `3951485` (bottomgpu `6d277763…`, topgpu `5ac4892e…`,
+  built by `make -C work cuda`; bottomc3 `f47187db…`, topc3 `af706775…`), log `work/logs/prove_gpu_k13b.log`, 07:05:34–07:59:29 UTC
+  (53:55 wall), all 219 bags in one pool, the costliest first. Exit status 0; every bag has its `bagresC` record and each proof
+  file lists exactly its node's bags.
+- **Results:** 314928 (target 2): no 7-smooth preimage; 93312 (target 2): 116169984, 1811939328; 41472 (target 6): 1843968, 9483264,
+  46294416, 69441624, 226492416. Length bounds L ≤ 138 for every bag. With 1229312 (E.6), each tree now has a single open node
+  at its first incomplete level (11239424, 1161216, 221184, 33718272); the levels in RESULTS 2.2 are unchanged.
+- **Timing, and two disturbances.** For the first 30 minutes the machine also ran the direct/odd sieve re-runs (6 threads), the
+  installed-bottomgpu validation, a CPU recheck and a dry-run cost analysis (load about 19 of 20 threads). An attempt to pause
+  production for a clean benchmark (SIGSTOP on the job processes, then SIGCONT) was interrupted after the STOP, so production,
+  the validation and the recheck stood frozen from 07:24 to about 07:33 UTC. Nothing was lost: the processes resumed where they
+  stopped. The side jobs were then ended, and production ran alone. The k = 12 bags took about 1,100 s each under that load, the
+  three k = 13 bags 2,843–3,049 s (including the freeze), while the k = 11 bags that ran alone took 150–270 s. **So per-bag times
+  measured under contention say little; benchmark with nothing else running.**
+- **Independent checks** (`validation_pc/even_gpu/checks_after_k13.out`, 08:04–08:46 UTC, nothing else running):
+  - val_bottomgpu.py K C P on the installed binary `6d277763…`: VALIDATION PASSED (`val_bottomgpu_v2_installed.out`).
+  - One bag of each node re-proved from scratch on the CPU path (`work/recheck_bag_cpu.py`; bags chosen by estimated cost near
+    1.2·10⁹ units): 2⁴·4·7⁴·8 (1229312, 1,390 s), 2·3⁹·8 (314928, 1,271 s), 2⁶·3²·8·9 (41472, 1,228 s), 2⁶·3·6·9² (93312, 1,230 s).
+    All four IDENTICAL: facts, bound and every counter, including stats['enum'], which on the GPU path counts the survivor runs
+    topgpu resolved in C, so the fp bookkeeping matches the CPU path on production bags.
+- **Second execution of the direct and odd paths, shells 60,000–100,000** (claim 1.1). `val_proddone.py ./gsieve_k13 6` (avx2,
+  `46f8308b…`, commit `3951485`) re-ran the seven missing invocations; direct 60–70k was reused from S.4. All eight DONE lines match
+  production. `compare_cdone.py N N0 PROD RERUN --modes direct,odd` (the new option compares only some paths) gives identical
+  per-c counts at every boundary in all four shells. Records: `validation_pc/task4_check/do2_val_proddone.out`,
+  `do2_compare_cdone.out`, `check_do_N70000-100000.tar.xz` (`.sha256`). With the tree sieve's re-run of the main path (T.7), every
+  path for m ≤ 100,000 has now been executed twice. RESULTS 1.1 and 2.1/2.3 updated; `work/certificate.json`,
+  `work/results.md` (= `docs/results_base10.md`) and `MANIFEST.sha256` regenerated (99 nodes).

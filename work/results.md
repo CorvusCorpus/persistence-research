@@ -21,8 +21,11 @@ Each row: every integer y = 2^a 3^b 7^c whose digit product equals the node, ove
 | 2 | 3 | 14336 | 12 | 16 | 101 | none |
 | 2 | 3 | 33614 | 6 | 1 | 307 | none |
 | 2 | 3 | 61236 | 10 | 15 | 101 | 9633792 |
+| 2 | 3 | 93312 | 13 | 85 | 138 | 116169984, 1811939328 |
 | 2 | 3 | 268912 | 9 | 4 | 101 | none |
+| 2 | 3 | 314928 | 13 | 50 | 138 | none |
 | 2 | 3 | 321489 | 10 | 5 | 101 | none |
+| 2 | 3 | 1229312 | 13 | 12 | 138 | none |
 | 2 | 4 | 8748 | 9 | 15 | 101 | none |
 | 2 | 4 | 1411788 | 9 | 3 | 101 | none |
 | 4 | 0 | 4 | 2 | 2 | 101 | 14 |
@@ -56,7 +59,10 @@ Each row: every integer y = 2^a 3^b 7^c whose digit product equals the node, ove
 | 6 | 3 | 8192 | 13 | 21 | 138 | none |
 | 6 | 3 | 11664 | 10 | 35 | 101 | 139968, 1492992, 2113929216 |
 | 6 | 3 | 18144 | 10 | 32 | 101 | 96768, 1382976, 913217421312 |
+| 6 | 3 | 24192 | 11 | 39 | 105 | 642978, 2667168, 9437184, 13716864, 1162261467, 3281116734 |
+| 6 | 3 | 41472 | 13 | 84 | 138 | 1843968, 9483264, 46294416, 69441624, 226492416 |
 | 6 | 3 | 71442 | 9 | 7 | 101 | none |
+| 6 | 3 | 122472 | 11 | 26 | 105 | none |
 | 6 | 4 | 378 | 5 | 4 | 252 | none |
 | 6 | 4 | 686 | 4 | 1 | 202 | none |
 | 6 | 4 | 1764 | 6 | 6 | 307 | none |
@@ -83,6 +89,7 @@ Each row: every integer y = 2^a 3^b 7^c whose digit product equals the node, ove
 | 8 | 2 | 1323 | 5 | 2 | 252 | none |
 | 8 | 2 | 1372 | 5 | 2 | 252 | 177147 |
 | 8 | 2 | 4116 | 6 | 3 | 307 | none |
+| 8 | 2 | 131712 | 11 | 15 | 101 | 112717121716224 |
 | 8 | 3 | 49 | 2 | 1 | 101 | none |
 | 8 | 3 | 343 | 3 | 1 | 187 | none |
 | 8 | 3 | 486 | 6 | 6 | 307 | none |
@@ -98,7 +105,7 @@ Each row: every integer y = 2^a 3^b 7^c whose digit product equals the node, ove
 | 8 | 4 | 1361367 | 9 | 3 | 101 | none |
 
 ## Tree levels determined exactly
-- target 2: every node at depth <= 3 is known; open nodes at depth 3: [93312, 314928, 1229312, 11239424]
+- target 2: every node at depth <= 3 is known; open nodes at depth 3: [11239424]
 - target 4: every node at depth <= 3 is known; open nodes at depth 3: [1161216]
-- target 6: every node at depth <= 3 is known; open nodes at depth 3: [24192, 41472, 122472, 221184]
-- target 8: every node at depth <= 2 is known; open nodes at depth 2: [131712, 33718272]
+- target 6: every node at depth <= 3 is known; open nodes at depth 3: [221184]
+- target 8: every node at depth <= 2 is known; open nodes at depth 2: [33718272]

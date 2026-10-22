@@ -2,8 +2,10 @@
 
 Design notes for moving the case loops of the base-10 even-target prover (`work/prove_cum.py`, C loops `csrc/topc3`
 and `csrc/bottomc3`) to the RTX 3060 Ti. Status: **both implemented and validated on the GPU** (bottom solver `csrc/bottomgpu`,
-top filter `csrc/topgpu`; NOTEBOOK E.3–E.5): byte-identical output to bottomc3/topc3 on whole configuration spaces, planted
-solutions found, kernel tests at production scale. Nothing here changes a claim in `docs/RESULTS.md`.
+top filter `csrc/topgpu`; NOTEBOOK E.3–E.5, v2 in E.7): byte-identical output to bottomc3/topc3 on whole configuration spaces
+(for topgpu with the "fp" section: the same decisions, with the survivor runs that have an empty exact lattice enumeration
+counted instead of printed), planted solutions found, kernel tests at production scale. Nothing here changes a claim in
+`docs/RESULTS.md`.
 
 ## 1. Where the time goes
 
@@ -69,15 +71,17 @@ a covered job) and mod 2^n (n = M − t), obtained without exact divisions:
 - CRT by Garner: β = β₂ + 2^{n−2}((β₅ − β₂)·2^{−(n−2)} mod 5^{G−1}).
 - 5-adic products are Montgomery products (CIOS) with one R = 2^{32 L} for the three moduli 5^{G+s}, 5^G, 5^{G−1};
   tables hold one operand in Montgomery form so that products come out as plain residues. Every loop bound is a
-  compile-time constant (five size classes: L = 6, 8, 11, 13, 16 limbs for G ≤ 60, 90, 125, 165, 200), so limbs stay in
-  registers; runtime shifts use a barrel of compile-time limb offsets.
+  compile-time constant (nine size classes: L = 6, 8, 11, 13, 16, 19, 22, 25, 28 limbs for G ≤ 60, 90, 125, 165, 200, 240,
+  280, 320, 360), so limbs stay in registers; runtime shifts use a barrel of compile-time limb offsets. The host checks per
+  job that the lattice estimates and coordinates cannot overflow the class's fixed widths (else bottomc3).
 - Lattice step: the coset point nearest the box centre has coordinates ⌊K − off0·R⌋ / 2^F in the Gauss-reduced basis
   (R = b/det, K tabulated; F = bits(Q) + 64, error < 2^−64). When the fraction is within 2^−60 of an integer the solve is
   handed back; the candidate coordinates are then exact two's-complement products.
 
 **Handed back to the host** (bottom3.c's own `low()` and `solutions()`): ambiguous lattice estimates, v2(Flow) beyond the
 2-adic width, and any t for which bottom3.c's `mt()` would stop ("lattice too fine"). **Handed to bottomc3 itself**
-(exec): other modes, jobs with heff[0] > G (M would vary), G > 200 (only cheap steps in practice).
+(exec): other modes, jobs with heff[0] > G (M would vary), G > 360 (for node 221184 about 10⁷ solves in all), and any job
+failing the width check.
 
 **Exactness argument.** Each step computes the same residue of the same exact expression as bottom3.c (the series and
 plog identities above, with all truncated terms ≡ 0 mod p^M), so β is identical; the class tests and the lattice step are
@@ -104,10 +108,18 @@ bound and counters and the proofC file.
 ## 3. The top side on the GPU (`work/csrc/topgpu*.{cu,c,h}`) — implemented
 
 Implemented as designed below, except that the prefix logarithms come from host tables at level 1 and from the series at
-levels ≥ 2, with prefixes whose heights fall below 5 handed to the host. Validation (`work/val_topgpu.py`, NOTEBOOK E.5): ψ
-errors at most 2 units of 2^−64 against arb (the margins assume 4), 79 jobs byte-identical to topc3, 150/150 planted genuine
-configurations kept. Speed: 100× one core at G = 123, 30× at G = 51; steps with Θ > 2^592 (G ≥ ~180) go to topc3 because
-nvcc 13.3 crashes on the L = 24 instantiation.
+levels ≥ 2. v2 (NOTEBOOK E.7):
+- digits at heights 1–4 take log A and 1/A from a table over every such configuration (8⁴ entries), so no case goes to the
+  host for its height;
+- level 1 along a prefix uses the recurrence T_n(e + 1) = T_n(e)/10ⁿ for T_n = |Θ| uⁿ/n (O(L) per case);
+- size classes up to L = 32 limbs (products out of line for L ≥ 24: nvcc 13.3 crashes on the inlined L = 24 kernel), so steps
+  up to G = 271 run on the GPU;
+- with the job section "fp" (basis and R², written by ctop4.py) the host resolves every survivor run whose exact lattice
+  enumeration around (0, …, 0, −m) is empty, which is Python's close_points in integers. These were 99.96% of the runs, and
+  Python's per-run enumeration (about 300 µs) had been the bottleneck.
+Validation (`work/val_topgpu.py` K, C, P and F): ψ errors at most 2 units of 2^−64 against arb on every path (the margins
+assume 4), 103 jobs byte-identical to topc3, 150/150 planted genuine configurations kept; F checks the C enumeration against
+Python on 3,400 values and on every survivor run of 97 jobs. Speed: whole steps of 4–5·10⁸ cases in 2–11 s.
 
 **Exact test (top3.c).** For a case (ordering c_1..c_j, gaps), m = round(v) with v = −C·log(1+z) (MPFR); level 1 kills
 when dist(m·θ, ℤ) > ρ, θ = qa/qb = (B⁻¹)ₙₙ, ρ = √(R²/g_{n−1}); level 2 is the next Fincke–Pohst level with
@@ -144,4 +156,8 @@ on every one; SURV output and DONE counters byte-identical to topc3 on whole ste
 2. The three cheap open nodes (131712: one bag left; 122472: three; 24192: 39) with prove_cum_gpu (GPU bottom, CPU top,
    bags in parallel): about an hour. Claims only after the proofs complete and the outputs are checked.
 3. The k = 13 nodes need the top filter (their largest bags have ~10¹⁰ top cases each, about 5 core-hours per bag on the
-   CPU even with the bottom on the GPU).
+   CPU even with the bottom on the GPU). Done: 1229312 (29.5 min, NOTEBOOK E.6); 314928, 41472 and 93312 with v2 (54 min for
+   4.4·10¹¹ units, partly under contention; E.8).
+4. Node 221184 (2.2·10¹³ units, now the only open node of target 6's next level): step benchmarks suggested 10–12 h, the
+   k = 13 run's throughput about 1.5–3 days. Its largest bag alone is 5.2·10¹² units. Measure the pool on an idle machine first;
+   the run needs the user's go-ahead (over about 12 h) and an independent check before any claim.

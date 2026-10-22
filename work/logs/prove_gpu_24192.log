@@ -1,0 +1,72 @@
+== 2026-10-22T01:04:06Z commit cb16cf5 bottomgpu 12de58fd71ccf708 topgpu c0117bff41b1d744 bottomc3 f47187db4a4171f4 topc3 af7067756cda9365
+command: python3 prove_cum_gpu.py --jobs 12 24192 (resumes the run of logs/prove_gpu_131712_122472_24192.log)
+node 24192: 39 digit multisets, 12 workers, bottom on GPU, top on GPU
+  bag (3, 4, 4, 7, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 6, 7, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 6, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 6, 6, 6, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (3, 4, 6, 6, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 7, 8, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 6, 7, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 4, 6, 7, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (4, 4, 4, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 3, 3, 7, 8, 8): proved earlier (cumulative) -> L <= 101
+  bag (6, 7, 8, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 3, 4, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 4, 4, 4, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 6, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 6, 6, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (3, 3, 4, 4, 4, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 4, 4, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 4, 4, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 4, 7, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 3, 4, 6, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 3, 7, 8, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 3, 3, 3, 4, 4, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 6, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 4, 6, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 3, 3, 4, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 3, 3, 3, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 3, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 3, 4, 4, 7, 9): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 3, 3, 6, 7, 8): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 3, 4, 7, 9): proved earlier (cumulative) -> L <= 105
+  bag (2, 2, 2, 3, 4, 6, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 3, 3, 4, 4, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 3, 3, 3, 4, 4, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 3, 3, 4, 6, 7): proved earlier (cumulative) -> L <= 101
+  bag (2, 2, 2, 2, 2, 2, 2, 3, 7, 9): resuming top={0: 51, 1: 87, 2: 87, 3: 87, 4: 87} bot={10: 2, 9: 51, 8: 87, 7: 87, 6: 87} partial=None
+  bag (2, 2, 2, 2, 2, 2, 2, 3, 7, 9): k=10 tmax=35 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 209293913, bottom solves 123163479, survivor runs 51002, proofs 55, 3s)
+  bag (2, 2, 2, 2, 2, 2, 3, 3, 6, 7): resuming top={0: 123, 1: 123, 2: 123, 3: 123} bot={10: 2, 9: 123, 8: 123, 7: 123} partial=None
+  bag (2, 2, 2, 2, 2, 2, 3, 3, 6, 7): k=10 tmax=40 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 317897634, bottom solves 215972756, survivor runs 82880, proofs 55, 18s)
+  bag (2, 2, 2, 2, 2, 3, 3, 3, 4, 7): resuming top={0: 123, 1: 123, 2: 123, 3: 123} bot={10: 2, 9: 123, 8: 123, 7: 123} partial=None
+  bag (2, 2, 2, 2, 2, 3, 3, 3, 4, 7): k=10 tmax=38 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 347218433, bottom solves 256880580, survivor runs 85584, proofs 55, 19s)
+  bag (2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 7): resuming top={0: 197, 1: 197, 2: 197} bot={11: 2, 10: 197, 9: 197, 8: 197} partial=None
+  bag (2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 7): k=11 tmax=38 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51, 5: 51} bot {6: 51, 7: 51, 8: 51, 9: 51, 10: 51, 11: 2} -> every solution has L <= 101 (top cases 784515159, bottom solves 566345923, survivor runs 202643, proofs 66, 126s)
+node 24192: all 7-smooth y with digit product 24192: [642978, 2667168, 9437184, 13716864, 1162261467, 3281116734]   (126s)
+	Command being timed: "python3 prove_cum_gpu.py --jobs 12 24192"
+	User time (seconds): 186.29
+	System time (seconds): 3.54
+	Percent of CPU this job got: 150%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 2:05.92
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 129992
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 5959
+	Minor (reclaiming a frame) page faults: 2137788
+	Voluntary context switches: 59878
+	Involuntary context switches: 569
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+exit 0
+== end 2026-10-22T01:06:13Z

@@ -1,0 +1,38 @@
+== 2026-10-22T07:09:15Z commit 3951485 exe gsieve_k13 46f8308b714e3475 threads 6
+prod_N70000_n060000/prod_N70000_n060000_direct_0_70001.log: OK
+prod_N70000_n060000/prod_N70000_n060000_main_0_70001.log: OK
+prod_N70000_n060000/prod_N70000_n060000_odd_0_70001.log: OK
+-- shell 60000 < m <= 70000: 07:09:15
+direct N=70000 N0=60000 c=[0,70001): points=33798270000 s1=0 s2=0 s3=0 s4=247224 gmp=247224 full=0 members=0 | variant=ifma threads=4 wall=0s | prod time=940.24s -> MATCH
+odd N=70000 N0=60000 c=[0,70001): points=50685180000 s1=2447270760 s2=0 s3=0 s4=75 gmp=75 full=0 members=0 | variant=avx2 threads=6 wall=84s | prod time=488.18s -> MATCH
+all counters match the production DONE lines
+coverage ends at c=-1, not N=70000
+COMPARE FAILED prod_N70000_n060000
+prod_N80000_n070000/prod_N80000_n070000_direct_0_80001.log: OK
+prod_N80000_n070000/prod_N80000_n070000_main_0_80001.log: OK
+prod_N80000_n070000/prod_N80000_n070000_odd_0_80001.log: OK
+-- shell 70000 < m <= 80000: 07:10:40
+direct N=80000 N0=70000 c=[0,80001): points=38998270000 s1=0 s2=0 s3=0 s4=285853 gmp=285853 full=0 members=0 | variant=avx2 threads=6 wall=182s | prod time=1138.20s -> MATCH
+odd N=80000 N0=70000 c=[0,80001): points=58485180000 s1=3196880760 s2=0 s3=0 s4=102 gmp=102 full=0 members=0 | variant=avx2 threads=6 wall=105s | prod time=578.46s -> MATCH
+all counters match the production DONE lines
+coverage ends at c=-1, not N=80000
+COMPARE FAILED prod_N80000_n070000
+prod_N90000_n080000/prod_N90000_n080000_direct_0_90001.log: OK
+prod_N90000_n080000/prod_N90000_n080000_main_0_90001.log: OK
+prod_N90000_n080000/prod_N90000_n080000_odd_0_90001.log: OK
+-- shell 80000 < m <= 90000: 07:15:29
+direct N=90000 N0=80000 c=[0,90001): points=44198270000 s1=0 s2=0 s3=0 s4=323273 gmp=323273 full=0 members=0 | variant=avx2 threads=6 wall=208s | prod time=1274.74s -> MATCH
+odd N=90000 N0=80000 c=[0,90001): points=66285180000 s1=4046490760 s2=0 s3=0 s4=137 gmp=137 full=0 members=0 | variant=avx2 threads=6 wall=122s | prod time=649.22s -> MATCH
+all counters match the production DONE lines
+coverage ends at c=-1, not N=90000
+COMPARE FAILED prod_N90000_n080000
+prod_N100000_n090000/prod_N100000_n090000_direct_0_100001.log: OK
+prod_N100000_n090000/prod_N100000_n090000_main_0_100001.log: OK
+prod_N100000_n090000/prod_N100000_n090000_odd_0_100001.log: OK
+-- shell 90000 < m <= 100000: 07:21:00
+direct N=100000 N0=90000 c=[0,100001): points=49398270000 s1=0 s2=0 s3=0 s4=361496 gmp=361496 full=0 members=0 | variant=avx2 threads=6 wall=246s | prod time=1350.07s -> MATCH
+odd N=100000 N0=90000 c=[0,100001): points=74085180000 s1=4996100760 s2=0 s3=0 s4=165 gmp=165 full=0 members=0 | variant=avx2 threads=6 wall=90s | prod time=709.15s -> MATCH
+all counters match the production DONE lines
+coverage ends at c=-1, not N=100000
+COMPARE FAILED prod_N100000_n090000
+== end 2026-10-22T07:26:37Z

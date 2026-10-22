@@ -56,8 +56,9 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
    no ECC memory; recommended before submitting the OEIS comment.
    - Session 4 (cloud, ECC hardware likely): 40,000 → 60,000 done, every counter and per-c count equal
      (`validation_pc/task4_check/`); stopped by decision of the user. Remaining: `"60000:70000 … 90000:100000" cpu`.
-   - Session 5: the main path of all of m ≤ 100,000 re-executed by the GPU tree sieve, every counter equal (NOTEBOOK T.7).
-     Only the direct and odd paths of 60,000 → 100,000 (cheap: minutes each on the CPU) still lack a second execution.
+   - Session 5: the main path of all of m ≤ 100,000 re-executed by the GPU tree sieve, every counter equal (NOTEBOOK T.7);
+     the direct and odd paths of 60,000 → 100,000 re-executed with the CPU binary, every counter and per-c count equal
+     (NOTEBOOK E.8). DONE: every path for m ≤ 100,000 has been executed twice.
 6. **Tree sieve (session 4, `work/tsieve/`, NOTEBOOK T).** The points that pass D digits form 4^D cosets of a lattice of
    index 4·5^(D−1). Walking the coset tree costs about N^(3 log 4 / log 5) = N^2.58, against N³ for the bitmap scan.
    - `tsieve6` (CPU): identical counters and dumps to gsieve (G and E); 314/314 positive control. About 1.2× slower
@@ -77,11 +78,20 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
 - **Independent verification kit:** a minimal re-implementation (e.g. a slow, simple Python/numpy
   version of stages 1–2 for spot regions) so that others can audit without trusting the fast code.
 
-## P4 — base-10 even-target trees (CPU-heavy)
-- Resume `runner4.py 122472` and `runner4.py 131712 24192`. Checkpoints are in `work/ckptC`, `work/bagresC`.
-- Then 24192, 41472, 221184, 93312, 314928, 1229312, 11239424 by cost.
-- 1161216 needs about 40,000 core-hours with the current method. It would need a new idea, e.g. stronger
-  bottom tests or reuse of facts across bags.
+## P4 — base-10 even-target trees (now on the GPU)
+- Session 5: both case loops of prove_cum run on the GPU (`work/prove_cum_gpu.py`, `docs/GPU_EVEN_TARGETS.md`).
+  - 131712, 122472, 24192, 1229312 (E.6) and 314928, 41472, 93312 (E.8, with v2) are proved; one bag of six of them was
+    re-proved on the CPU path, all identical (RESULTS 2.1: 99 nodes).
+  - v2 of the solvers (E.7) is about 10× faster on the large steps.
+- **Next: 221184** (2.2·10¹³ units), now the only blocker of target 6's next level. The 10–12 h estimate came from step
+  benchmarks; the k = 13 run (4.4·10¹¹ units in 54 min, partly under contention) suggests about 1.5–3 days. Measure the
+  pool's throughput on an idle machine first (and try fewer workers). Needs the user's go-ahead and CPU re-proofs of some
+  bags before any claim.
+- **1161216** (target 4's only blocker, 1.4·10¹⁴ units): about 6× 221184; needs approval.
+- **11239424 and 33718272** contain bags with k ≥ 17. Their a-priori Matveev bound (about 10^355 for k = 19) overflows the
+  floats of `prove_cum.matveev_cum`. XL also enters float expressions elsewhere (box sizes U, W in prove_cum and
+  solver.TopLattice). A big-XL path is needed that leaves every existing bag's parameters unchanged (keep the float
+  expressions below 10^300). Until then their cost cannot be estimated.
 
 ## P5 — research directions (speculative)
 - **Zero-free-mode sieve** to extend Chaffin's "no zero-free 7-smooth in (10^140, 10^20000)" (OEIS A238985 has no

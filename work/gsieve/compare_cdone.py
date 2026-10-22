@@ -3,9 +3,11 @@
 # lines gives the counts of an interval of c values. Both log sets are reduced to cumulative totals G(c) at their
 # CDONE boundaries, and G is compared at every boundary the two sets share (all production boundaries when the
 # re-run has a CDONE line per c). Killed invocations (no DONE line) contribute up to their last CDONE line.
-# usage: compare_cdone.py N N0 DIR_A DIR_B
+# usage: compare_cdone.py N N0 DIR_A DIR_B [--modes main,direct,odd]   (--modes: compare only these paths)
 import collections, glob, sys
-N, N0, DA, DB = int(sys.argv[1]), int(sys.argv[2]), sys.argv[3], sys.argv[4]
+args = sys.argv[1:]; MODES = ("main", "direct", "odd")
+if '--modes' in args: i = args.index('--modes'); MODES = tuple(args[i + 1].split(',')); del args[i:i + 2]
+N, N0, DA, DB = int(args[0]), int(args[1]), args[2], args[3]
 KEYS = ("points", "s4", "members")
 def intervals(d):
     out = collections.defaultdict(list)              # mode -> [(lo, hi, deltas)], interval = lo <= c <= hi
@@ -31,7 +33,7 @@ def cumulative(ivs):
     return G
 A, B = intervals(DA), intervals(DB)
 ok = True
-for mode in ("main", "direct", "odd"):
+for mode in MODES:
     GA, GB = cumulative(A[mode]), cumulative(B[mode])
     common = sorted(set(GA) & set(GB))
     bad = [c for c in common if GA[c] != GB[c]]

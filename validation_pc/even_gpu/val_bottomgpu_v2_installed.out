@@ -1,0 +1,171 @@
+K G= 14 XL=1e1: 300 queries, planted 231/231 found, mismatches 0, deferred 0  [KDONE 300 39 138 device NVIDIA GeForce RTX 3060 Ti]
+K G= 25 XL=1e6: 300 queries, planted 236/236 found, mismatches 0, deferred 0  [KDONE 300 22 125 device NVIDIA GeForce RTX 3060 Ti]
+K G= 40 XL=1e14: 300 queries, planted 223/223 found, mismatches 0, deferred 0  [KDONE 300 22 108 device NVIDIA GeForce RTX 3060 Ti]
+K G= 51 XL=1e19: 300 queries, planted 226/226 found, mismatches 0, deferred 0  [KDONE 300 26 87 device NVIDIA GeForce RTX 3060 Ti]
+K G= 60 XL=1e24: 300 queries, planted 223/223 found, mismatches 0, deferred 0  [KDONE 300 27 101 device NVIDIA GeForce RTX 3060 Ti]
+K G= 87 XL=1e37: 300 queries, planted 227/227 found, mismatches 0, deferred 0  [KDONE 300 19 75 device NVIDIA GeForce RTX 3060 Ti]
+K G= 90 XL=1e39: 300 queries, planted 218/218 found, mismatches 0, deferred 0  [KDONE 300 20 78 device NVIDIA GeForce RTX 3060 Ti]
+K G=123 XL=1e55: 300 queries, planted 218/218 found, mismatches 0, deferred 0  [KDONE 300 25 78 device NVIDIA GeForce RTX 3060 Ti]
+K G=125 XL=1e56: 300 queries, planted 224/224 found, mismatches 0, deferred 0  [KDONE 300 20 80 device NVIDIA GeForce RTX 3060 Ti]
+K G=160 XL=1e74: 300 queries, planted 220/220 found, mismatches 0, deferred 0  [KDONE 300 15 72 device NVIDIA GeForce RTX 3060 Ti]
+K G=165 XL=1e76: 300 queries, planted 220/220 found, mismatches 0, deferred 0  [KDONE 300 30 95 device NVIDIA GeForce RTX 3060 Ti]
+K G=197 XL=1e92: 300 queries, planted 213/213 found, mismatches 0, deferred 0  [KDONE 300 21 85 device NVIDIA GeForce RTX 3060 Ti]
+K G=200 XL=1e94: 300 queries, planted 228/228 found, mismatches 0, deferred 0  [KDONE 300 19 74 device NVIDIA GeForce RTX 3060 Ti]
+K G=234 XL=1e111: 300 queries, planted 218/218 found, mismatches 0, deferred 0  [KDONE 300 20 65 device NVIDIA GeForce RTX 3060 Ti]
+K G=240 XL=1e114: 300 queries, planted 217/217 found, mismatches 0, deferred 0  [KDONE 300 19 69 device NVIDIA GeForce RTX 3060 Ti]
+K G=271 XL=1e129: 300 queries, planted 218/218 found, mismatches 0, deferred 0  [KDONE 300 21 84 device NVIDIA GeForce RTX 3060 Ti]
+K G=280 XL=1e134: 300 queries, planted 226/226 found, mismatches 0, deferred 0  [KDONE 300 16 77 device NVIDIA GeForce RTX 3060 Ti]
+K G=308 XL=1e148: 300 queries, planted 221/221 found, mismatches 0, deferred 0  [KDONE 300 19 73 device NVIDIA GeForce RTX 3060 Ti]
+K G=320 XL=1e154: 300 queries, planted 226/226 found, mismatches 0, deferred 0  [KDONE 300 14 74 device NVIDIA GeForce RTX 3060 Ti]
+K G=346 XL=1e167: 300 queries, planted 218/218 found, mismatches 0, deferred 0  [KDONE 300 20 87 device NVIDIA GeForce RTX 3060 Ti]
+K G=360 XL=1e174: 300 queries, planted 232/232 found, mismatches 0, deferred 0  [KDONE 300 13 68 device NVIDIA GeForce RTX 3060 Ti]
+C 2_2_3 j=2 G=87 whole [kernel]: DONE 4 2 3 -> IDENTICAL
+C 2_2_3 j=2 G=51 whole [kernel]: DONE 4 2 3 -> IDENTICAL
+C 2_3_7_7 j=3 G=123 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_3_7_7 j=3 G=87 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_3_7_7 j=3 G=51 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_3_7_7 j=2 G=51 whole [kernel]: DONE 693 0 8 -> IDENTICAL
+C 2_2_2_3_3_7 j=5 G=197 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_3_3_7 j=5 G=160 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_3_3_7 j=5 G=123 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_3_3_7 j=4 G=123 whole [kernel]: DONE 1944 0 12 -> IDENTICAL
+C 2_2_2_3_3_7 j=5 G=87 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_3_3_7 j=4 G=87 whole [kernel]: DONE 1368 0 12 -> IDENTICAL
+C 2_2_2_3_3_7 j=5 G=51 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_3_3_7 j=4 G=51 whole [kernel]: DONE 792 0 12 -> IDENTICAL
+C 2_2_2_3_3_7 j=3 G=51 whole [kernel]: DONE 45619 0 29 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=6 G=234 whole [kernel]: DONE 14 7 10 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=6 G=197 whole [kernel]: DONE 14 7 10 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=6 G=160 whole [kernel]: DONE 14 7 10 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=5 G=160 whole [kernel]: DONE 13314 0 60 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=6 G=123 whole [kernel]: DONE 14 7 10 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=5 G=123 whole [kernel]: DONE 10206 0 60 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=6 G=87 whole [kernel]: DONE 14 7 10 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=5 G=87 whole [kernel]: DONE 7182 0 60 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=4 G=87 whole [kernel]: DONE 1517250 0 297 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=6 G=51 whole [kernel]: DONE 14 7 10 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=5 G=51 whole [kernel]: DONE 4158 0 60 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=4 G=51 whole [kernel]: DONE 504210 0 297 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=10 G=383 whole [bottomc3 (exec)]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=10 G=346 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=10 G=308 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=9 G=308 whole [kernel]: DONE 4904 0 12 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=10 G=271 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=9 G=271 whole [kernel]: DONE 4312 0 12 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=10 G=234 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=9 G=234 whole [kernel]: DONE 3720 0 12 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=8 G=234 whole [kernel]: DONE 1076480 0 29 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=10 G=197 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=9 G=197 whole [kernel]: DONE 3128 0 12 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=8 G=197 whole [kernel]: DONE 760500 0 29 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=10 G=160 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=9 G=160 whole [kernel]: DONE 2536 0 12 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=8 G=160 whole [kernel]: DONE 499280 0 29 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=7 G=160 slice [kernel]: DONE 644956 0 0 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=10 G=123 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=9 G=123 whole [kernel]: DONE 1944 0 12 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=8 G=123 whole [kernel]: DONE 292820 0 29 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=7 G=123 slice [kernel]: DONE 287980 0 0 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=10 G=87 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=9 G=87 whole [kernel]: DONE 1368 0 12 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=8 G=87 whole [kernel]: DONE 144500 0 29 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=7 G=87 slice [kernel]: DONE 98770 0 0 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=6 G=87 slice [kernel]: DONE 2024785 0 0 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=10 G=51 whole [kernel]: DONE 6 3 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=9 G=51 whole [kernel]: DONE 792 0 12 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=8 G=51 whole [kernel]: DONE 48020 0 29 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=7 G=51 whole [kernel]: DONE 1787128 0 69 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=6 G=51 slice [kernel]: DONE 211876 0 0 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=15 G=572 whole [bottomc3 (exec)]: DONE 4 2 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=15 G=534 whole [bottomc3 (exec)]: DONE 4 2 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=15 G=496 whole [bottomc3 (exec)]: DONE 4 2 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=14 G=496 whole [bottomc3 (exec)]: DONE 3956 0 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=15 G=458 whole [bottomc3 (exec)]: DONE 4 2 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=14 G=458 whole [bottomc3 (exec)]: DONE 3652 0 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=15 G=421 whole [bottomc3 (exec)]: DONE 4 2 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=14 G=421 whole [bottomc3 (exec)]: DONE 3356 0 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=13 G=421 whole [bottomc3 (exec)]: DONE 1404488 0 14 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=15 G=383 whole [bottomc3 (exec)]: DONE 4 2 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=14 G=383 whole [bottomc3 (exec)]: DONE 3052 0 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=13 G=383 whole [bottomc3 (exec)]: DONE 1161288 0 14 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=15 G=346 whole [kernel]: DONE 4 2 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=14 G=346 whole [kernel]: DONE 2756 0 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=13 G=346 whole [kernel]: DONE 946688 0 14 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=12 G=346 slice [kernel]: DONE 6725544 0 0 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=15 G=308 whole [kernel]: DONE 4 2 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=14 G=308 whole [kernel]: DONE 2452 0 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=13 G=308 whole [kernel]: DONE 749088 0 14 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=12 G=308 slice [kernel]: DONE 4728720 0 0 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=15 G=271 whole [kernel]: DONE 4 2 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=14 G=271 whole [kernel]: DONE 2156 0 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=13 G=271 whole [kernel]: DONE 578888 0 14 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=12 G=271 slice [kernel]: DONE 3208094 0 0 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=11 G=271 slice [kernel]: DONE 213338251 0 0 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=15 G=234 whole [kernel]: DONE 4 2 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=14 G=234 whole [kernel]: DONE 1860 0 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=13 G=234 whole [kernel]: DONE 430592 0 14 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=12 G=234 slice [kernel]: DONE 2054360 0 0 -> IDENTICAL
+C 2_2_2_2_2_2_2_2_2_2_2_2_2_3_3_3 j=11 G=234 slice [kernel]: DONE 117612110 0 0 -> IDENTICAL
+C: 87 jobs
+P y=78121827 j=0 b=6 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 28 0 0]
+P y=133413966 j=0 b=7 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 36 0 0]
+P y=141776649 j=0 b=7 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 36 0 0]
+P y=182284263 j=0 b=8 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 9 0 0]
+P y=242121642 j=0 b=7 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 36 0 0]
+P y=363182463 j=1 b=7 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 8 0 0]
+P y=466948881 j=1 b=7 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 8 0 0]
+P y=661624362 j=0 b=8 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 9 0 0]
+P y=726364926 j=0 b=9 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=933897762 j=0 b=9 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=1162261467 j=0 b=7 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 120 0 0]
+P y=1323248724 j=0 b=9 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 10 0 0]
+P y=1977326743 j=1 b=8 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=2711943423 j=2 b=6 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 28 0 0]
+P y=3268642167 j=2 b=7 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 8 0 0]
+P y=3281116734 j=1 b=6 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 84 0 0]
+P y=3969746172 j=0 b=9 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 10 0 0]
+P y=6327867987 j=2 b=8 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=7626831723 j=2 b=7 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 8 0 0]
+P y=8931928887 j=2 b=7 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 8 0 0]
+P y=13124466936 j=0 b=9 G=11: IDENTICAL, 1 CAND, genuine found  [DONE 55 0 0]
+P y=16874314632 j=0 b=9 G=11: IDENTICAL, 1 CAND, genuine found  [DONE 55 0 0]
+P y=22967817138 j=2 b=7 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 36 0 0]
+P y=26149137336 j=0 b=9 G=11: IDENTICAL, 1 CAND, genuine found  [DONE 55 0 0]
+P y=41841412812 j=1 b=6 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 210 0 0]
+P y=43226124984 j=0 b=10 G=11: IDENTICAL, 1 CAND, genuine found  [DONE 11 0 0]
+P y=48814981614 j=2 b=6 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 84 0 0]
+P y=62762119218 j=2 b=6 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 84 0 0]
+P y=64839187476 j=1 b=9 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 10 0 0]
+P y=71183762748 j=1 b=8 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 45 0 0]
+P y=73222472421 j=3 b=7 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 8 0 0]
+P y=83364669612 j=1 b=9 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 10 0 0]
+P y=94143178827 j=2 b=7 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 36 0 0]
+P y=97629963228 j=1 b=10 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=146444944842 j=2 b=9 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=166729339224 j=0 b=11 G=12: IDENTICAL, 1 CAND, genuine found  [DONE 12 0 0]
+P y=214366293288 j=1 b=10 G=11: IDENTICAL, 1 CAND, genuine found  [DONE 11 0 0]
+P y=219667417263 j=3 b=7 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 8 0 0]
+P y=249143169618 j=3 b=6 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 84 0 0]
+P y=291776343642 j=2 b=9 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 10 0 0]
+P y=292889889684 j=2 b=10 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=498286339236 j=2 b=10 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=723486239847 j=4 b=8 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=797311366362 j=3 b=7 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 36 0 0]
+P y=826841416968 j=1 b=9 G=11: IDENTICAL, 1 CAND, genuine found  [DONE 55 0 0]
+P y=964648319796 j=2 b=9 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 10 0 0]
+P y=1121144263281 j=1 b=7 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 120 0 0]
+P y=1162668124884 j=1 b=9 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 10 0 0]
+P y=1361622936996 j=2 b=9 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 10 0 0]
+P y=1446972479694 j=3 b=9 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=2126163643632 j=1 b=10 G=12: IDENTICAL, 1 CAND, genuine found  [DONE 66 0 0]
+P y=2343119117472 j=0 b=9 G=13: IDENTICAL, 1 CAND, genuine found  [DONE 715 0 0]
+P y=2712892291396 j=2 b=9 G=11: IDENTICAL, 1 CAND, genuine found  [DONE 55 0 0]
+P y=2882942391294 j=4 b=8 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 9 0 0]
+P y=3363432789843 j=5 b=8 G=8: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P y=3376269119286 j=4 b=7 G=9: IDENTICAL, 1 CAND, genuine found  [DONE 36 0 0]
+P y=3843923188392 j=2 b=10 G=11: IDENTICAL, 1 CAND, genuine found  [DONE 11 0 0]
+P y=4668421498272 j=0 b=12 G=13: IDENTICAL, 1 CAND, genuine found  [DONE 13 0 0]
+P y=4783868198172 j=3 b=8 G=10: IDENTICAL, 1 CAND, genuine found  [DONE 45 0 0]
+P y=7687846376784 j=1 b=12 G=12: IDENTICAL, 1 CAND, genuine found  [DONE 1 0 0]
+P: 60 genuine configurations
+BOTTOMGPU VALIDATION PASSED

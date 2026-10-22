@@ -1,0 +1,5 @@
+  bag (2, 3, 3, 3, 3, 3, 3, 3, 4, 7): k=10 tmax=30 top {0: 51, 1: 51, 2: 51, 3: 51, 4: 51} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 51, 10: 2} -> every solution has L <= 101 (top cases 209293913, bottom solves 123163479, survivor runs 45333, proofs 55, 642s)
+CPU re-proof: 642 s
+record: {'top': 209293913, 'bottom': 123163479, 'enum': 45333, 'proofs': 55, 'cost': 701947839.0}
+CPU:    {'top': 209293913, 'bottom': 123163479, 'enum': 45333, 'proofs': 55, 'cost': 701947839.0}
+IDENTICAL

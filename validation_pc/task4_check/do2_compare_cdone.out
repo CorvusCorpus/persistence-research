@@ -1,0 +1,16 @@
+-- prod_N70000_n060000
+direct: boundaries 70001 vs 70001, compared at 70001; totals {'points': 33798270000, 's4': 247224, 'members': 0} vs {'points': 33798270000, 's4': 247224, 'members': 0}; all equal
+odd: boundaries 70001 vs 70001, compared at 70001; totals {'points': 50685180000, 's4': 75, 'members': 0} vs {'points': 50685180000, 's4': 75, 'members': 0}; all equal
+per-c counts identical
+-- prod_N80000_n070000
+direct: boundaries 80001 vs 80001, compared at 80001; totals {'points': 38998270000, 's4': 285853, 'members': 0} vs {'points': 38998270000, 's4': 285853, 'members': 0}; all equal
+odd: boundaries 80001 vs 80001, compared at 80001; totals {'points': 58485180000, 's4': 102, 'members': 0} vs {'points': 58485180000, 's4': 102, 'members': 0}; all equal
+per-c counts identical
+-- prod_N90000_n080000
+direct: boundaries 90001 vs 90001, compared at 90001; totals {'points': 44198270000, 's4': 323273, 'members': 0} vs {'points': 44198270000, 's4': 323273, 'members': 0}; all equal
+odd: boundaries 90000 vs 90001, compared at 90000; totals {'points': 66285180000, 's4': 137, 'members': 0} vs {'points': 66285180000, 's4': 137, 'members': 0}; all equal
+per-c counts identical
+-- prod_N100000_n090000
+direct: boundaries 100001 vs 100001, compared at 100001; totals {'points': 49398270000, 's4': 361496, 'members': 0} vs {'points': 49398270000, 's4': 361496, 'members': 0}; all equal
+odd: boundaries 100000 vs 100001, compared at 100000; totals {'points': 74085180000, 's4': 165, 'members': 0} vs {'points': 74085180000, 's4': 165, 'members': 0}; all equal
+per-c counts identical
