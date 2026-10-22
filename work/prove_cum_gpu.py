@@ -8,8 +8,12 @@ file, as runner4/prove_cum do). The node's proofC_<node>.json is written exactly
 is proved.
 usage (from work/): python3 prove_cum_gpu.py [--jobs J] [--cpu-bottom] [--cpu-top] NODE ...
   --cpu-bottom / --cpu-top keep cbottom4 / ctop3 (the CPU paths), for comparisons."""
-import sys, os, json, time
+import sys
+_here = sys.path.pop(0)           # work/struct.py (the Z.json script) would shadow the standard struct that pickle and
+import struct, pickle             # multiprocessing need: import them with work/ off the path, then put it back
 from multiprocessing import Pool
+sys.path.insert(0, _here)
+import os, json, time
 
 def _prove(args):
     bag, cpu_b, cpu_t = args
