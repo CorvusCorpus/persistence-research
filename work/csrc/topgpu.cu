@@ -38,10 +38,20 @@ template <int L> DF void ldb(Big<L> &x, const u32 *p) {
     for (int i = 0; i < L; i++) x.w[i] = LDG(p + i);
 }
 /* fixed point product: limbs [L - 1, 2L - 1) of a b (truncation); FL = 32 (L - 1) */
-template <int L> DF void fmul(Big<L> &r, const Big<L> &a, const Big<L> &b) {
+template <int L> DF void fmul_body(Big<L> &r, const Big<L> &a, const Big<L> &b) {
     u32 t[2 * L]; bmul_full<L>(t, a, b);
 #pragma unroll
     for (int i = 0; i < L; i++) r.w[i] = t[L - 1 + i];
+}
+#ifndef TP_EMU
+/* for L >= 24 the product stays out of line: nvcc 13.3 crashes (cicc, exit 139) on the fully inlined kernel */
+template <int L> __device__ __noinline__ void fmul_ni(Big<L> &r, const Big<L> &a, const Big<L> &b) { fmul_body<L>(r, a, b); }
+#endif
+template <int L> DF void fmul(Big<L> &r, const Big<L> &a, const Big<L> &b) {
+#ifndef TP_EMU
+    if constexpr (L >= 24) { fmul_ni<L>(r, a, b); return; }
+#endif
+    fmul_body<L>(r, a, b);
 }
 /* log1p(w), 0 <= w < 2^-10, N >= 1 terms: w (1 - w (1/2 - w (1/3 - ... - w / N))); inv + n L = 1/n */
 template <int L> DF void flog1p(Big<L> &r, const Big<L> &w, int N, const u32 *inv) {
@@ -160,7 +170,7 @@ DF void do_prefix(const TCtx &C, const tp_prefix &pf, unsigned idx, tp_out *out,
 }
 
 /* ---------------- size classes: L = LF + 1 limbs ---------------- */
-#define TP_CLASSES(X) X(0, 6) X(1, 8) X(2, 10) X(3, 12) X(4, 14) X(5, 16) X(6, 20) X(7, 22)   /* L = 24: nvcc 13.3 crashes (exit 139) */
+#define TP_CLASSES(X) X(0, 6) X(1, 8) X(2, 10) X(3, 12) X(4, 14) X(5, 16) X(6, 20) X(7, 22) X(8, 24) X(9, 28) X(10, 32)
 
 #ifdef TP_EMU
 static tp_params HP; static const u32 *HT;

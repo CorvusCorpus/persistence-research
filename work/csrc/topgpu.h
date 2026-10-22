@@ -12,7 +12,7 @@ extern "C" {
 typedef struct {                   /* one prefix (all digits but the last) and the range of the last gap */
     unsigned int o;                /* ordering index */
     unsigned short glo, ghi;       /* last gap gl in [glo, ghi] */
-    unsigned char g[TP_MAXJ];      /* gaps g_0 .. g_{j-2} */
+    unsigned short g[TP_MAXJ];     /* gaps g_0 .. g_{j-2} (16 bits: gaps reach G ~ 411; 8 bits wrapped at 256) */
 } tp_prefix;
 
 /* a case the host decides exactly (top3.c's code): kind 1 = not certainly killed (or uncertain), kind 2 = the whole prefix

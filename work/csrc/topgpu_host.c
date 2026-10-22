@@ -28,8 +28,8 @@ static long rdl(FILE *f, const char *name) {
 static void die(const char *m) { fprintf(stderr, "%s\n", m); exit(3); }
 
 /* size classes: must match TP_CLASSES in topgpu.cu (L limbs; FL = 32 (L - 1)); larger Theta: topc3 */
-#define NCLS 8
-static const int CLS[NCLS] = {6, 8, 10, 12, 14, 16, 20, 22};
+#define NCLS 11
+static const int CLS[NCLS] = {6, 8, 10, 12, 14, 16, 20, 22, 24, 28, 32};
 static const int CVAL[TP_NC] = {9, 18, 27, 45, 54, 63, 72};
 
 static unsigned int *TB; static long long TW, TCAP;
@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
     if (mpz_sgn(Q_) <= 0 || mpz_sgn(D) <= 0 || mpz_sgn(qb) <= 0) { fprintf(stderr, "bad denominators\n"); return 2; }
     long smax = 0; for (long i = 0; i < j; i++) if (rng[i] > smax) smax = rng[i];
     /* filter coverage; anything else is topc3's (exec) */
-    int ok = cum == 1 && debug == 0 && j <= TP_MAXJ && smax < 590;
+    int ok = cum == 1 && debug == 0 && j <= TP_MAXJ && smax < 590;  /* every height and gap < 590: tables, 16-bit gaps */
     int ci_[TP_NC * 64]; (void)ci_;
     for (long o = 0; o < nord && ok; o++) for (long i = 0; i < j; i++) { int found = 0; for (int c = 0; c < TP_NC; c++) found |= CVAL[c] == cs[o * j + i]; ok &= found; }
     /* |theta|, |theta2| < 2^-60 (theta = qa/qb, theta2 = a2/D) */
@@ -295,7 +295,7 @@ int main(int argc, char **argv) {
             if (glo <= ghi) {
                 tp_prefix *q = &pf[np++]; memset(q, 0, sizeof *q);
                 q->o = (unsigned)o; q->glo = (unsigned short)glo; q->ghi = (unsigned short)ghi;
-                for (long s = 0; s < j - 1; s++) q->g[s] = (unsigned char)g[s];
+                for (long s = 0; s < j - 1; s++) q->g[s] = (unsigned short)g[s];   /* g[s] < smax < 590 (checked) */
                 if (np == batch) { run_batch(pf, np, o); np = 0; }
             }
             if (j < 2) break;

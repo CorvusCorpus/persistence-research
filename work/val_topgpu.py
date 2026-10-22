@@ -57,6 +57,20 @@ def part_k(exe, sample, seed=1):
             outp = run(exe, text, env=dict(os.environ, TP_DUMP='1'))
             rows = [l.split() for l in outp.splitlines() if l.startswith('PSI')]
             if not rows: continue
+            # the dumped cases must be exactly the job's cases (a wrapped field once made the kernel see other cases)
+            import ctop4
+            j_ = int(text.split("\nj ")[1].split()[0]); rng_ = list(map(int, text.split("\nranges ")[1].split("\n")[0].split()))
+            g0lo_ = int(text.split("\ng0lo ")[1].split()[0]); g0hi_ = int(text.split("\ng0hi ")[1].split()[0])
+            import top_filter_ref
+            kv = {'j': j_, 'ranges': rng_, 'orders': sel, 'skip': 0, 'g0lo': g0lo_, 'g0hi': g0hi_}
+            def kernel_case(g):                          # the kernel hands heights below Smin = 5 to the host (no dump)
+                if j_ >= 3 and g[0] + g[1] < 5: return False
+                return sum(g) >= 5
+            want = sorted((o, tuple(g)) for o, g in top_filter_ref.cases(kv) if kernel_case(g))
+            got = sorted((int(f[1]), tuple(map(int, f[2:2 + j_]))) for f in rows)
+            if got != want:
+                ok = False; print(f"K {name}: dumped cases differ from the job's cases ({len(got)} vs {len(want)}) -> WRONG CASES", flush=True)
+                continue
             flint.ctx.prec = prec + 128
             C, qa, qb, a2, D = d['C'], d['qa'], d['qb'], d['a2'], d['D']
             Th = flint.arb(C) * qa / qb; Th2 = flint.arb(C) * a2 / D
