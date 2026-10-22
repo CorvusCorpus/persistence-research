@@ -15,9 +15,22 @@ from multiprocessing import Pool
 sys.path.insert(0, _here)
 import os, json, time
 
+def _save_retry(path, obj):
+    """prove_cum._save (temp file + atomic rename), retrying the rename: on the Windows file system (WSL drvfs) a scanner or
+    indexer briefly holding the target makes os.replace fail with EACCES (seen once with 12 workers)"""
+    tmp = path + '.tmp'
+    with open(tmp, 'w') as fh: json.dump(obj, fh)
+    for i in range(60):
+        try:
+            os.replace(tmp, path); return
+        except PermissionError:
+            if i == 59: raise
+            time.sleep(0.5)
+
 def _prove(args):
     bag, cpu_b, cpu_t = args
     import prove_cum, cbottom5, ctop4
+    prove_cum._save = _save_retry
     if not cpu_b: prove_cum.cbottom4 = cbottom5
     if not cpu_t: prove_cum.ctop3 = ctop4
     out = []
@@ -50,4 +63,4 @@ if __name__ == "__main__":
         pre = sorted(y for y in Z if y >= 10 and '0' not in str(y)
                      and tuple(sorted(int(c) for c in str(y) if c != '1')) in bset)
         print(f"node {s}: all 7-smooth y with digit product {s}: {pre}   ({time.time()-t0:.0f}s)", flush=True)
-        prove_cum._save(f'proofC_{s}.json', {s: {'preimages': pre, 'Lbound': Lb, 'bags': recs, 'method': 'cumulative'}})
+        _save_retry(f'proofC_{s}.json', {s: {'preimages': pre, 'Lbound': Lb, 'bags': recs, 'method': 'cumulative'}})
