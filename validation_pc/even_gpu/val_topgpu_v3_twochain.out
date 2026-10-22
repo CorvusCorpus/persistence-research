@@ -1,0 +1,270 @@
+K 2_2_2_2_2_2_2_3_3_3_7 j=1 G=145 whole: 432 cases dumped (12 with a digit below height 5), 627 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:12/1 1:117/1 2:3/1 3:300/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=1 G=131 whole: 390 cases dumped (12 with a digit below height 5), 617 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:12/1 1:108/0 2:3/0 3:267/0]
+K 2_2_2_2_2_2_2_3_3_3_7 j=1 G=112 whole: 333 cases dumped (12 with a digit below height 5), 553 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:12/0 1:93/0 2:3/0 3:225/0]
+K 2_2_2_2_2_2_2_3_3_3_7 j=2 G=112 whole: 48840 cases dumped (3472 with a digit below height 5), 848 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:48/2 1:4712/2 2:880/2 3:43200/2]
+K 2_2_2_2_2_2_2_3_3_3_7 j=1 G=107 whole: 318 cases dumped (12 with a digit below height 5), 535 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:12/1 1:90/0 2:3/0 3:213/0]
+K 2_2_2_2_2_2_2_3_3_3_7 j=2 G=107 whole: 44520 cases dumped (3312 with a digit below height 5), 848 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:48/2 1:4440/2 2:840/1 3:39192/2]
+K 2_2_2_2_2_2_2_3_3_3_7 j=1 G=84 whole: 249 cases dumped (12 with a digit below height 5), 448 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:12/1 1:72/0 2:3/0 3:162/0]
+K 2_2_2_2_2_2_2_3_3_3_7 j=2 G=84 whole: 27224 cases dumped (2576 with a digit below height 5), 848 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:48/1 1:2976/1 2:656/0 3:23544/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=3 G=84 slice-mid: 91881 cases dumped (12802 with a digit below height 5), 804 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/1 1:3272/1 2:3321/1 3:85284/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=3 G=84 slice-first: 91881 cases dumped (12802 with a digit below height 5), 804 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/1 1:3272/1 2:3321/1 3:85284/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=1 G=79 whole: 234 cases dumped (12 with a digit below height 5), 430 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:12/1 1:69/0 2:3/0 3:150/0]
+K 2_2_2_2_2_2_2_3_3_3_7 j=2 G=79 whole: 24024 cases dumped (2416 with a digit below height 5), 848 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:48/1 1:2760/1 2:616/0 3:20600/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=3 G=79 slice-mid: 76076 cases dumped (11252 with a digit below height 5), 804 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/1 1:2921/1 2:2926/1 3:70225/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=3 G=79 slice-first: 76076 cases dumped (11252 with a digit below height 5), 804 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/1 1:2921/1 2:2926/1 3:70225/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=1 G=61 whole: 180 cases dumped (12 with a digit below height 5), 361 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:12/1 1:54/1 2:3/1 3:111/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=2 G=61 whole: 14160 cases dumped (1840 with a digit below height 5), 848 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:48/1 1:1800/1 2:472/1 3:11840/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=3 G=61 slice-mid: 34220 cases dumped (6500 with a digit below height 5), 804 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/1 1:1536/1 2:1711/1 3:30969/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=3 G=61 slice-first: 34220 cases dumped (6500 with a digit below height 5), 804 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/1 1:1536/1 2:1711/1 3:30969/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=4 G=60 slice-mid: 204680 cases dumped (0 with a digit below height 5), 700 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 1:1001/1 2:13685/1 3:189994/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=4 G=60 slice-first: 216910 cases dumped (120345 with a digit below height 5), 801 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:1/1 1:6313/2 2:11684/2 3:198912/2]
+K 2_2_2_2_2_2_2_3_3_3_7 j=1 G=47 whole: 138 cases dumped (12 with a digit below height 5), 288 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:12/0 1:45/0 2:3/0 3:78/0]
+K 2_2_2_2_2_2_2_3_3_3_7 j=2 G=47 whole: 8280 cases dumped (1392 with a digit below height 5), 848 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:48/1 1:1320/0 2:360/0 3:6552/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=3 G=47 slice-mid: 15180 cases dumped (3700 with a digit below height 5), 804 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/0 1:965/1 2:990/0 3:13221/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=3 G=47 slice-first: 15180 cases dumped (3700 with a digit below height 5), 804 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/0 1:965/1 2:990/0 3:13221/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=4 G=47 slice-mid: 163185 cases dumped (51255 with a digit below height 5), 801 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:1/1 1:3875/2 2:14190/1 3:145119/2]
+K 2_2_2_2_2_2_2_3_3_3_7 j=4 G=47 slice-first: 163185 cases dumped (51255 with a digit below height 5), 801 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:1/1 1:3875/2 2:14190/2 3:145119/2]
+K 2_2_2_2_2_2_2_3_3_3_7 j=1 G=37 whole: 108 cases dumped (12 with a digit below height 5), 228 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:12/1 1:36/0 2:3/0 3:57/0]
+K 2_2_2_2_2_2_2_3_3_3_7 j=2 G=37 whole: 5040 cases dumped (1072 with a digit below height 5), 848 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:48/1 1:912/1 2:280/1 3:3800/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=3 G=37 slice-mid: 7140 cases dumped (2180 with a digit below height 5), 804 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/1 1:556/1 2:595/1 3:5985/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=3 G=37 slice-first: 7140 cases dumped (2180 with a digit below height 5), 804 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/1 1:556/1 2:595/1 3:5985/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=4 G=37 slice-mid: 58905 cases dumped (22945 with a digit below height 5), 801 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:1/0 1:1819/1 2:6545/1 3:50540/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=4 G=37 slice-first: 58905 cases dumped (22945 with a digit below height 5), 801 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:1/0 1:1819/1 2:6545/1 3:50540/1]
+K 2_2_2_2_2_2_2_3_3_3_7 j=5 G=37 slice-mid: 169911 cases dumped (0 with a digit below height 5), 700 checked, worst error 0 units of 2^-64 -> OK  [psi1 path:cases/worst 1:462/0 2:27405/0 3:142044/0]
+K 2_2_2_2_2_2_2_3_3_3_7 j=5 G=37 slice-first: 207081 cases dumped (175616 with a digit below height 5), 800 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 1:3906/1 2:24955/1 3:178220/1]
+K 2_3_4_6_7_8_9 j=1 G=84 whole: 581 cases dumped (28 with a digit below height 5), 663 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:28/1 1:168/0 2:7/0 3:378/0]
+K 2_3_4_6_7_8_9 j=1 G=79 whole: 546 cases dumped (28 with a digit below height 5), 663 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:28/1 1:161/0 2:7/0 3:350/0]
+K 2_3_4_6_7_8_9 j=1 G=61 whole: 420 cases dumped (28 with a digit below height 5), 663 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:28/1 1:126/1 2:7/1 3:259/1]
+K 2_3_4_6_7_8_9 j=2 G=60 slice-mid: 1770 cases dumped (230 with a digit below height 5), 765 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:6/0 1:225/1 2:59/1 3:1480/1]
+K 2_3_4_6_7_8_9 j=2 G=60 slice-first: 1770 cases dumped (230 with a digit below height 5), 765 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:6/0 1:225/1 2:59/1 3:1480/1]
+K 2_3_4_6_7_8_9 j=1 G=47 whole: 322 cases dumped (28 with a digit below height 5), 585 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:28/1 1:105/0 2:7/0 3:182/0]
+K 2_3_4_6_7_8_9 j=2 G=47 whole: 43470 cases dumped (7308 with a digit below height 5), 900 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:252/2 1:6930/2 2:1890/2 3:34398/2]
+K 2_3_4_6_7_8_9 j=1 G=37 whole: 252 cases dumped (28 with a digit below height 5), 499 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:28/1 1:84/0 2:7/0 3:133/0]
+K 2_3_4_6_7_8_9 j=2 G=37 whole: 26460 cases dumped (5628 with a digit below height 5), 900 checked, worst error 1 units of 2^-64 -> OK  [psi1 path:cases/worst 0:252/1 1:4788/1 2:1470/1 3:19950/1]
+K 2_3_4_6_7_8_9 j=3 G=37 slice-mid: 7140 cases dumped (2180 with a digit below height 5), 804 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/1 1:556/1 2:595/1 3:5985/1]
+K 2_3_4_6_7_8_9 j=3 G=37 slice-first: 7140 cases dumped (2180 with a digit below height 5), 804 checked, worst error 2 units of 2^-64 -> OK  [psi1 path:cases/worst 0:4/1 1:556/1 2:595/1 3:5985/1]
+C 2_2_3 j=1 G=37 whole: DONE 72 3 3 3 -> IDENTICAL
+C 2_3_7_7 j=1 G=47 whole: DONE 138 7 4 4 -> IDENTICAL
+C 2_3_7_7 j=1 G=37 whole: DONE 108 8 4 4 -> IDENTICAL
+C 2_2_2_3_3_7 j=1 G=79 whole: DONE 243 23 13 13 -> IDENTICAL
+C 2_2_2_3_3_7 j=1 G=60 whole: DONE 180 16 8 8 -> IDENTICAL
+C 2_2_2_3_3_7 j=1 G=47 whole: DONE 138 8 4 4 -> IDENTICAL
+C 2_2_2_3_3_7 j=2 G=47 whole: DONE 8280 131 8 8 -> IDENTICAL
+C 2_2_2_3_3_7 j=1 G=37 whole: DONE 108 8 4 4 -> IDENTICAL
+C 2_2_2_3_3_7 j=2 G=37 whole: DONE 5040 116 12 12 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=1 G=84 whole: DONE 581 25 4 4 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=1 G=79 whole: DONE 546 31 6 6 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=1 G=61 whole: DONE 420 8 5 5 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=2 G=60 whole: DONE 74340 1851 77 77 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=1 G=47 whole: DONE 322 15 7 7 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=2 G=47 whole: DONE 43470 789 34 34 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=1 G=37 whole: DONE 252 14 4 4 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=2 G=37 whole: DONE 26460 716 33 33 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=3 G=37 slice-mid: DONE 7140 150 3 3 -> IDENTICAL
+C 2_3_4_6_7_8_9 j=3 G=37 slice-first: DONE 7140 150 3 3 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=1 G=145 whole: DONE 432 20 7 7 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=1 G=131 whole: DONE 390 12 4 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=1 G=112 whole: DONE 333 13 4 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=2 G=112 whole: DONE 48840 1480 45 45 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=1 G=107 whole: DONE 318 21 4 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=2 G=107 whole: DONE 44520 1122 29 29 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=1 G=84 whole: DONE 249 14 4 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=2 G=84 whole: DONE 27224 641 13 13 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=3 G=84 slice-mid: DONE 91881 1671 31 31 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=3 G=84 slice-first: DONE 91881 1671 31 31 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=1 G=79 whole: DONE 234 14 4 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=2 G=79 whole: DONE 24024 911 41 41 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=3 G=79 slice-mid: DONE 76076 3243 93 93 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=3 G=79 slice-first: DONE 76076 3243 93 93 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=1 G=61 whole: DONE 180 5 4 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=2 G=61 whole: DONE 14160 158 9 9 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=3 G=61 slice-mid: DONE 34220 365 8 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=3 G=61 slice-first: DONE 34220 365 8 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=4 G=60 slice-mid: DONE 204680 4552 95 95 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=4 G=60 slice-first: DONE 216910 4988 107 107 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=1 G=47 whole: DONE 138 9 5 5 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=2 G=47 whole: DONE 8280 167 11 11 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=3 G=47 whole: DONE 303600 5745 165 165 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=4 G=47 slice-mid: DONE 163185 2947 81 81 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=4 G=47 slice-first: DONE 163185 2947 81 81 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=1 G=37 whole: DONE 108 8 4 4 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=2 G=37 whole: DONE 5040 148 8 8 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=3 G=37 whole: DONE 142800 4078 124 124 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=4 G=37 slice-mid: DONE 58905 1711 45 45 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=4 G=37 slice-first: DONE 58905 1711 45 45 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=5 G=37 slice-mid: DONE 169911 5707 170 170 -> IDENTICAL
+C 2_2_2_2_2_2_2_3_3_3_7 j=5 G=37 slice-first: DONE 207081 6938 219 219 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=179 whole: DONE 356 6 4 4 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=155 whole: DONE 308 15 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=146 whole: DONE 290 6 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=145 whole: DONE 41760 1332 41 41 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=131 whole: DONE 260 10 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=131 whole: DONE 33540 785 19 19 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=112 whole: DONE 222 12 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=112 whole: DONE 24420 833 22 22 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=112 slice-mid: DONE 20825 627 15 15 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=112 slice-first: DONE 200990 6186 157 157 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=107 whole: DONE 212 13 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=107 whole: DONE 22260 569 12 12 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=107 slice-mid: DONE 192920 4783 131 131 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=107 slice-first: DONE 192920 4783 131 131 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=84 whole: DONE 166 11 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=84 whole: DONE 13612 306 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=84 slice-mid: DONE 91881 2125 42 42 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=84 slice-first: DONE 91881 2125 42 42 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=84 slice-mid: DONE 239855 4716 114 114 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=84 slice-first: DONE 256040 4857 117 117 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=79 whole: DONE 156 10 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=79 whole: DONE 12012 459 12 12 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=79 slice-mid: DONE 76076 2872 93 93 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=79 slice-first: DONE 76076 2872 93 93 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=79 slice-mid: DONE 208635 9110 294 294 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=79 slice-first: DONE 210975 9003 325 325 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=61 whole: DONE 120 4 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=61 whole: DONE 7080 88 4 4 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=61 whole: DONE 273760 3089 40 40 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=61 slice-mid: DONE 204680 2332 24 24 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=61 slice-first: DONE 216910 2341 22 22 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=60 slice-mid: DONE 230300 5098 107 107 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=60 slice-first: DONE 455126 10219 215 215 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=47 whole: DONE 92 6 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=47 whole: DONE 4140 85 5 5 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=47 whole: DONE 121440 2244 65 65 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=47 slice-mid: DONE 163185 3112 92 92 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=47 slice-first: DONE 163185 3112 92 92 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=47 slice-mid: DONE 251125 4404 125 125 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=47 slice-first: DONE 284746 4960 134 134 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=6 G=47 slice-mid: DONE 376992 5232 134 134 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=6 G=47 slice-first: DONE 1221759 16722 445 445 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=37 whole: DONE 72 3 3 3 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=37 whole: DONE 2520 88 2 2 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=37 whole: DONE 57120 2021 59 59 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=37 slice-mid: DONE 58905 2115 55 55 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=37 slice-first: DONE 58905 2115 55 55 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=37 slice-mid: DONE 169911 6020 165 165 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=37 slice-first: DONE 207081 7457 229 229 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=6 G=37 slice-mid: DONE 312417 11337 315 315 -> IDENTICAL
+C 2_2_2_2_3_3_3_3_3_3_3_3_3 j=6 G=37 slice-first: DONE 324632 11717 357 357 -> IDENTICAL
+C: 102 jobs
+P G=16: 150/150 planted genuine configurations kept, outputs identical to topc3: True
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=145 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=131 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=112 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=2 G=112 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=107 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=2 G=107 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=84 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=3 G=84 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=79 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=3 G=79 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=61 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=4 G=60 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=47 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=4 G=47 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=37 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=5 G=37 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 3_3_7_7_9 j=1 G=60 slice-mid dim=3: 200 values, C and Python agree on 200 (non-empty 90)
+F1 3_3_7_7_9 j=1 G=47 slice-mid dim=3: 200 values, C and Python agree on 200 (non-empty 90)
+F1 3_3_7_7_9 j=1 G=37 slice-mid dim=3: 200 values, C and Python agree on 200 (non-empty 90)
+F1 3_3_7_7_9 j=2 G=37 slice-mid dim=3: 200 values, C and Python agree on 200 (non-empty 90)
+F1: 4000/4000 agree (1800 non-empty)
+F2 2_2_3 j=1 G=37 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_3_7_7 j=1 G=47 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_3_7_7 j=1 G=37 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=1 G=84 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=1 G=79 whole: 6 survivor runs, 2 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=1 G=61 whole: 5 survivor runs, 1 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=2 G=60 whole: 77 survivor runs, 43 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=1 G=47 whole: 7 survivor runs, 3 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=2 G=47 whole: 34 survivor runs, 19 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=1 G=37 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=2 G=37 whole: 33 survivor runs, 19 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=3 G=37 slice-mid: 3 survivor runs, 3 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=3 G=37 slice-first: 3 survivor runs, 3 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=145 whole: 7 survivor runs, 3 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=131 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=112 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=112 whole: 45 survivor runs, 39 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=107 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=107 whole: 29 survivor runs, 23 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=84 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=84 whole: 13 survivor runs, 7 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=84 slice-mid: 31 survivor runs, 31 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=84 slice-first: 31 survivor runs, 31 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=79 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=79 whole: 41 survivor runs, 34 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=79 slice-mid: 93 survivor runs, 93 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=79 slice-first: 93 survivor runs, 93 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=61 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=61 whole: 9 survivor runs, 3 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=61 slice-mid: 8 survivor runs, 8 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=61 slice-first: 8 survivor runs, 8 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=60 slice-mid: 95 survivor runs, 94 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=60 slice-first: 107 survivor runs, 107 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=47 whole: 5 survivor runs, 1 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=47 whole: 11 survivor runs, 5 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=47 whole: 165 survivor runs, 162 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=47 slice-mid: 81 survivor runs, 81 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=47 slice-first: 81 survivor runs, 81 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=37 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=37 whole: 8 survivor runs, 2 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=37 whole: 124 survivor runs, 122 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=37 slice-mid: 45 survivor runs, 45 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=37 slice-first: 45 survivor runs, 45 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=5 G=37 slice-mid: 170 survivor runs, 169 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=5 G=37 slice-first: 219 survivor runs, 219 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=179 whole: 4 survivor runs, 1 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=155 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=146 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=145 whole: 41 survivor runs, 33 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=131 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=131 whole: 19 survivor runs, 17 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=112 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=112 whole: 22 survivor runs, 20 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=112 slice-mid: 15 survivor runs, 15 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=112 slice-first: 157 survivor runs, 157 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=107 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=107 whole: 12 survivor runs, 10 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=107 slice-mid: 131 survivor runs, 131 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=107 slice-first: 131 survivor runs, 131 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=84 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=84 whole: 3 survivor runs, 1 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=84 slice-mid: 42 survivor runs, 42 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=84 slice-first: 42 survivor runs, 42 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=84 slice-mid: 114 survivor runs, 114 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=84 slice-first: 117 survivor runs, 117 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=79 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=79 whole: 12 survivor runs, 10 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=79 slice-mid: 93 survivor runs, 93 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=79 slice-first: 93 survivor runs, 93 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=79 slice-mid: 294 survivor runs, 294 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=79 slice-first: 325 survivor runs, 325 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=61 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=61 whole: 4 survivor runs, 2 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=61 whole: 40 survivor runs, 40 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=61 slice-mid: 24 survivor runs, 24 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=61 slice-first: 22 survivor runs, 22 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=60 slice-mid: 107 survivor runs, 107 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=60 slice-first: 215 survivor runs, 214 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=47 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=47 whole: 5 survivor runs, 3 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=47 whole: 65 survivor runs, 64 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=47 slice-mid: 92 survivor runs, 92 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=47 slice-first: 92 survivor runs, 92 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=47 slice-mid: 125 survivor runs, 125 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=47 slice-first: 134 survivor runs, 134 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=6 G=47 slice-mid: 134 survivor runs, 134 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=6 G=47 slice-first: 445 survivor runs, 445 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=37 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=37 whole: 2 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=37 whole: 59 survivor runs, 59 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=37 slice-mid: 55 survivor runs, 55 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=37 slice-first: 55 survivor runs, 55 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=37 slice-mid: 165 survivor runs, 165 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=37 slice-first: 229 survivor runs, 229 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=6 G=37 slice-mid: 315 survivor runs, 315 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=6 G=37 slice-first: 357 survivor runs, 357 resolved by topgpu -> CONSISTENT
+F2: 96 jobs, 6217 survivor runs, 5978 resolved
+P (fp) G=16: 150/150 planted genuine configurations kept, outputs consistent with topc3: True
+TOPGPU VALIDATION PASSED
+exit 0

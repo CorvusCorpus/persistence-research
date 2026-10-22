@@ -3,8 +3,9 @@
  *
  * top3.c kills a case at level 1 when dist(m theta, Z) > rho and at level 2 by the next Fincke-Pohst level, with
  * m = round(-C lambda), lambda = log(1 + z). Since m = -C lambda + delta (|delta| <= 1/2 + 2^-50) and theta, theta2 are tiny
- * (the host checks |theta|, |theta2| < 2^-60), m theta = -Theta lambda + delta theta with Theta = C theta: both levels are
- * decided by psi1 = frac(-Theta lambda) and psi2 = frac(-Theta2 lambda) up to eta = 0.6 max(|theta|, |theta2|). The kernel
+ * (the host checks |theta|, |theta2| < 2^-40), m theta = -Theta lambda + delta theta with Theta = C theta: both levels are
+ * decided by psi1 = frac(-Theta lambda) and psi2 = frac(-Theta2 lambda) up to eta = 0.6 max(|theta|, |theta2|), which the
+ * host adds to every margin (4 (eps + eta), at least 64 units of 2^-64). The kernel
  * computes psi1, psi2 in fixed point with a rigorous error bound and reports a case as killed only when the exact test is
  * certain to kill it; it also counts the certain level-1 passes among the cases it kills at level 2 (top3.c's f1).
  *

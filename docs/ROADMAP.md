@@ -83,15 +83,23 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
   - 131712, 122472, 24192, 1229312 (E.6) and 314928, 41472, 93312 (E.8, with v2) are proved; one bag of six of them was
     re-proved on the CPU path, all identical (RESULTS 2.1: 99 nodes).
   - v2 of the solvers (E.7) is about 10× faster on the large steps.
-- **Next: 221184** (2.2·10¹³ units), now the only blocker of target 6's next level. The 10–12 h estimate came from step
-  benchmarks; the k = 13 run (4.4·10¹¹ units in 54 min, partly under contention) suggests about 1.5–3 days. Measure the
-  pool's throughput on an idle machine first (and try fewer workers). Needs the user's go-ahead and CPU re-proofs of some
-  bags before any claim.
-- **1161216** (target 4's only blocker, 1.4·10¹⁴ units): about 6× 221184; needs approval.
-- **11239424 and 33718272** contain bags with k ≥ 17. Their a-priori Matveev bound (about 10^355 for k = 19) overflows the
-  floats of `prove_cum.matveev_cum`. XL also enters float expressions elsewhere (box sizes U, W in prove_cum and
-  solver.TopLattice). A big-XL path is needed that leaves every existing bag's parameters unchanged (keep the float
-  expressions below 10^300). Until then their cost cannot be estimated.
+- **Two-chain bootstrapping** (session 5, `docs/BOOTSTRAP_TWO_CHAINS.md`, NOTEBOOK E.9): implemented
+  (`PC_BOOTSTRAP=twochain`) and validated (`val_twochain.py`, end-to-end re-proofs of proved nodes).
+  - The pool runs at 9.5·10⁷ units/s (10 workers, idle machine).
+  - The bags with k ≥ 17 can now be planned: their a-priori bound is about the square root of Matveev's and fits the floats.
+  - Costs of the open nodes:
+
+    | Node | Cost (units) | Gain | Time |
+    |---|---|---|---|
+    | 221184 | 8.0·10¹¹ | 28× | ≈ 2.3 h |
+    | 1161216 | 6.3·10¹² | 22× | ≈ 18 h |
+    | 11239424 | 7.1·10¹² | — | ≈ 21 h |
+    | 33718272 | 1.6·10¹⁴ | — | ≈ 20 days |
+- **Next: 221184 with two chains** (`PC_BOOTSTRAP=twochain python3 prove_cum_gpu.py --jobs 10 221184`, about 2–3 h; the user
+  decides), then CPU re-proofs of some bags (as in E.8) before any claim. Then 1161216 and 11239424 (about a day each, so they
+  need approval under the 12 h rule).
+- **Meet-in-the-middle steps** (`docs/MITM_STEPS.md`, cost model `work/plan_mitm.py`): another 7.8–9.1× on the largest bags.
+  33718272 needs them to be practical. Design and implementation order in that document; nothing built yet.
 
 ## P5 — research directions (speculative)
 - **Zero-free-mode sieve** to extend Chaffin's "no zero-free 7-smooth in (10^140, 10^20000)" (OEIS A238985 has no

@@ -1,0 +1,5 @@
+node 24192: all 7-smooth y with digit product 24192: [642978, 2667168, 9437184, 13716864, 1162261467, 3281116734]   (323s)
+wall 322.78 s
+39 bags: twochain cost 1.180e+09 units; committed records 8.215e+09 (7.0x); 6 genuine solutions checked against the facts; preimages [642978, 2667168, 9437184, 13716864, 1162261467, 3281116734]
+E2E OK
+exit 0

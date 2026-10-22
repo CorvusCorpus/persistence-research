@@ -1,0 +1,5 @@
+node 1229312: all 7-smooth y with digit product 1229312: []   (1859s)
+wall 1858.90 s
+12 bags: twochain cost 5.766e+09 units; committed records 6.704e+10 (11.6x); 0 genuine solutions checked against the facts; preimages none
+E2E OK
+exit 0

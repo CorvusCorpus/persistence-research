@@ -1,0 +1,13 @@
+C YU_C2  =        105318685.89607  float 1.053186858960701e+08  rel 3.36e-16
+C YU_K   =       900601484.863711  float 9.006014857643131e+08  rel 1.0e-9
+C C4     =       15676416000000.0  float 1.567641600000000e+13  rel -1.25e-16
+C PI     =       3.41199499539069  float 3.411994995394101e+00  rel 1.0e-12
+C PI3    =       4.92246825938811  float 4.922468259393032e+00  rel 1.0e-12
+C YU_HMIN = 0.074560;  C2 = 1.05319e+8 (Theorem 2), per-level factor at log B = 170: 3.525e+11
+R default bound == original code on 3000 random states;  D twochain <= matveev on them
+D plan of (2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 7): twochain <= matveev on all 67 states
+D plan of (2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 7, 7, 7): twochain <= matveev on all 91 states
+D plan of (3, 3, 3, 3, 4, 4, 4, 6, 8): twochain <= matveev on all 46 states
+G 1003 genuine numbers, 10040 bottom-chain inequalities and every top inequality checked
+ALL OK
+exit 0

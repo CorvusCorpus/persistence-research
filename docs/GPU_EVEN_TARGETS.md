@@ -117,6 +117,9 @@ levels ≥ 2. v2 (NOTEBOOK E.7):
 - with the job section "fp" (basis and R², written by ctop4.py) the host resolves every survivor run whose exact lattice
   enumeration around (0, …, 0, −m) is empty, which is Python's close_points in integers. These were 99.96% of the runs, and
   Python's per-run enumeration (about 300 µs) had been the bottleneck.
+- v3 (NOTEBOOK E.9): jobs with |θ| or |θ₂| up to 2⁻⁴⁰ run on the GPU; before, everything at or above 2⁻⁶⁰ went to topc3.
+  Every margin is 4(ε + η) with η = 0.6·max(|θ|, |θ₂|), at least 64 units of 2⁻⁶⁴ as before. That covers the last rounds of
+  the two-chain plans: G ≈ 37–38, |θ| ≈ 2⁻⁵¹, about 30% of 221184's plan. The kernel is unchanged.
 Validation (`work/val_topgpu.py` K, C, P and F): ψ errors at most 2 units of 2^−64 against arb on every path (the margins
 assume 4), 103 jobs byte-identical to topc3, 150/150 planted genuine configurations kept; F checks the C enumeration against
 Python on 3,400 values and on every survivor run of 97 jobs. Speed: whole steps of 4–5·10⁸ cases in 2–11 s.

@@ -1398,3 +1398,61 @@ Design notes: `docs/GPU_EVEN_TARGETS.md`. No result in `docs/RESULTS.md` changes
   `do2_compare_cdone.out`, `check_do_N70000-100000.tar.xz` (`.sha256`). With the tree sieve's re-run of the main path (T.7), every
   path for m ≤ 100,000 has now been executed twice. RESULTS 1.1 and 2.1/2.3 updated; `work/certificate.json`,
   `work/results.md` (= `docs/results_base10.md`) and `MANIFEST.sha256` regenerated (99 nodes).
+
+### E.9 Research: two-sided bootstrapping (implemented) and meet-in-the-middle steps (cost model) (22 Oct 2026)
+- **Pool throughput** (`work/pool_bench.py`, log `work/logs/pool_bench_221184.out`; idle machine; cost-weighted sample of
+  221184's step slices):
+  - 10 workers: 9.5·10⁷ units/s; 6 workers: 8.0·10⁷ units/s. The 4-worker run was stopped (slices too large, over an hour).
+  - At 10 workers 221184 would have taken about 65 h with Matveev's chain alone.
+- **Two chains** (`docs/BOOTSTRAP_TWO_CHAINS.md`). A 5-adic Baker chain bounds each bottom digit's height from the next lower
+  one (Yu, Acta Math. 211 (2013), Theorem 2, p = 5, three logarithms 3, 7, 2^t/F). The top chain uses four logarithms
+  (3, 7, 10, N_j/2^t, Matveev n = 4).
+  - The constants were read on the typeset pages. The PDF's text layer drops ϰ: C₂ = 1.053·10⁸, not the 2.1·10⁷ first
+    transcribed. Per level the bottom chain gains about 10^11.5 and the top chain about 10^16.5.
+  - Cost model, `PC_BOOTSTRAP=twochain python3 node_costs.py --json logs/node_costs_twochain.json …`, log
+    `work/logs/node_costs_twochain.out`. Times at 9.5·10⁷ units/s:
+    - 221184: 8.03·10¹¹ units (2.23·10¹³ before, 28×), ≈ 2.3 h;
+    - 1161216: 6.27·10¹² (1.39·10¹⁴ before, 22×), ≈ 18 h;
+    - 11239424: 7.05·10¹² (before: 1.32·10¹⁴ plus two bags without estimate), ≈ 21 h;
+    - 33718272: 1.64·10¹⁴ (before: 1.58·10¹⁵ plus six bags without estimate), ≈ 20 days.
+  - The bags with k ≥ 18 had no estimate (a-priori bound beyond the float range); now every bag can be planned.
+- **Implementation.** `prove_cum.twochain_cum` with `PC_BOOTSTRAP=twochain`; the default is unchanged.
+  - Records gain `"bootstrap": "twochain"` (bagresC) and a fifth element `"twochain"` per bag entry of proofC.
+  - `prove_cum_gpu.py` writes the same entries.
+  - Facts are independent of the bootstrap, so checkpoints of either kind can be mixed.
+- **Validation.**
+  - `work/val_twochain.py`: ALL OK. Constants at 60 digits. Default bound equal to the original code on 3,000 random
+    states. Two chains never weaker than Matveev's chain. Exact checks on 1,003 genuine numbers (k ≤ 20): 10,040 bottom-chain
+    inequalities, every top inequality, and the bound with every partial set of their true facts.
+  - The first attempt died silently: `twoadic.tmax` on 20-digit bags used about 5 GB, so WSL ran out of memory. The check now
+    uses each number's own t.
+  - `work/val_twochain_e2e.sh` re-proves a proved node from scratch with two chains on the GPU (empty scratch directory) and
+    checks preimages, bounds, tags and facts against genuine solutions. Outputs in `validation_pc/twochain/`; topgpu v2
+    `5ac4892e…`, bottomgpu `6d277763…`, 8 workers, other jobs running:
+    - 24192: E2E OK. The 6 committed preimages; 1.18·10⁹ units against 8.2·10⁹ in the committed records (7.0×); 323 s.
+    - 1229312: E2E OK. No preimages, as committed; 5.8·10⁹ units against 6.7·10¹⁰ (11.6×); 1,859 s.
+- **GPU coverage of the last rounds.** The two-chain plans end at G ≈ 37–38 (XL ≈ 10^12.6), where |θ| ≈ 2⁻⁵¹. topgpu v2 handed
+  every job with |θ| ≥ 2⁻⁶⁰ to topc3, so these steps ran on the CPU. That is most of 1229312's wall time above, and 30% of
+  221184's two-chain plan (2.4·10¹¹ of 8.0·10¹¹ units; the largest steps are 1–2.6·10¹⁰ cases each).
+  - topgpu v3 accepts |θ|, |θ₂| < 2⁻⁴⁰ and widens every margin to 4(ε + η), η = 0.6·max(|θ|, |θ₂|). The margin is unchanged
+    (64 units of 2⁻⁶⁴) whenever both are below 2⁻⁶⁰. The kernel is unchanged; only the host's coverage test and margins.
+  - Build: `make -C work csrc/topgpu csrc/topgpu_emu` gives topgpu `f0afed4f…` and topgpu_emu `14904d28…`. The previous binary
+    `5ac4892e…` is kept at /root/scratch/topgpu_v2_5ac4892e.
+  - Validation, `validation_pc/even_gpu/val_topgpu_v3_twochain.out`: `PC_BOOTSTRAP=twochain python3 val_topgpu.py csrc/topgpu
+    K C P F`, i.e. the jobs of the two-chain plans, many at G = 37–38. PASSED:
+    - K: 45 jobs, worst ψ error 2 units of 2⁻⁶⁴;
+    - C: 102 jobs byte-identical to topc3;
+    - P: 150/150 planted genuine configurations kept, and the same with fp;
+    - F1: 4000/4000 enumerations agree; F2: 96 jobs, 6,217 survivor runs, consistent.
+  - `val_topgpu_v3_default_C.out` (today's plans, part C): 103 jobs byte-identical. Every small-G job of two plans now takes
+    the GPU path, identical to topc3. A 2.8·10⁶-case job takes 0.23 s instead of 3.3 s, mostly launch overhead.
+- **Meet-in-the-middle steps** (`docs/MITM_STEPS.md`, cost model `work/plan_mitm.py`; not implemented):
+  - A top step paired with a table of bottom windows through a common lattice (hash join on a 3-torus). Each side needs
+    only part of the precision.
+  - A deep-digit split inside one step: the digits beyond the linear boundary are matched in two halves.
+  - On the largest bag of each open node, either step chosen per round gains another 7.8–9.1× over two chains (347–394× over
+    Matveev's chain alone). The middle rounds then dominate.
+- **Tried and dropped** (cost model only):
+  - a closing step with every digit in one of two windows: never competitive;
+  - dropping the bottom threshold's tm + 8 floor: 1.7× on 2¹³·3³ (tmax = 55);
+  - a smaller margin than +12: about 1.3–1.5× at tm = 55.

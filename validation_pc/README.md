@@ -30,3 +30,15 @@ Later steps keep their logs in subdirectories.
 
 The `.tar.xz` archives hold the re-run logs in `aggregate.py` format. Unpack one with `tar -xJf`, then run, for
 example, `python3 work/gsieve/aggregate.py 36000 -1 validation_pc/task3_cuda/rerun_cuda_final`.
+
+`twochain/` (two-chain bootstrapping of the even-target prover; `docs/BOOTSTRAP_TWO_CHAINS.md`, `docs/NOTEBOOK.md` E.9):
+
+| file | run |
+|---|---|
+| `val_twochain.out` | `work/val_twochain.py`: constants, regression of the default bound, dominance, chain inequalities on genuine numbers |
+| `e2e_24192.out`, `e2e_24192_run.log` | `work/val_twochain_e2e.sh 24192`: re-proof from scratch with two chains (topgpu v2) |
+| `e2e_1229312.out`, `e2e_1229312_run.log` | the same for 1229312 |
+
+`even_gpu/val_topgpu_v3_twochain.out` and `even_gpu/val_topgpu_v3_default_C.out`: `work/val_topgpu.py` on topgpu v3
+(`f0afed4f…`, coverage up to |θ| < 2⁻⁴⁰). The first uses the two-chain plans (parts K, C, P, F), the second today's plans
+(part C).

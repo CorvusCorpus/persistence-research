@@ -71,7 +71,7 @@ if __name__ == "__main__":
             Lb = 0; recs = []
             for b in bags[s]:                             # prove_cum.py's order and record format
                 Lmax, res = results[tuple(sorted(b))]
-                Lb = max(Lb, Lmax); recs.append([list(b), Lmax, res['top'], res['bot']])
+                Lb = max(Lb, Lmax); recs.append([list(b), Lmax, res['top'], res['bot']] + ([res['bootstrap']] if res.get('bootstrap') else []))
             assert Lb <= 5000
             bset = {tuple(sorted(b)) for b in bags[s]}
             pre = sorted(y for y in Z if y >= 10 and '0' not in str(y)

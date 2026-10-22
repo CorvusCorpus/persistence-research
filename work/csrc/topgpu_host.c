@@ -3,7 +3,7 @@
  * Every case the kernel does not certainly kill is decided here by top3.c's own code, copied below unchanged in substance
  * (same MPFR precision, the same operations in the same order, the same exact level-1 and level-2 tests and run merging); a
  * killed case is one top3.c kills (level 1, or level 2 after a level-1 pass, which the kernel counts in f1). Jobs outside the
- * filter (cum 0, debug != 0, |theta| >= 2^-60, more than 40 digits, heights >= 600) are handed to topc3 (exec).
+ * filter (cum 0, debug != 0, |theta| or |theta2| >= 2^-40, more than 40 digits, heights >= 600) are handed to topc3 (exec).
  * With the optional job section "fp" (lattice basis and R2, appended by ctop4.py; topc3 never reads it) a survivor run whose
  * exact lattice enumeration is empty (see fp_setup) is not printed but counted: PROG then carries a fifth field, the runs
  * resolved in that ordering; DONE is unchanged (nsurv counts every run).
@@ -299,9 +299,16 @@ int main(int argc, char **argv) {
     int ok = cum == 1 && debug == 0 && j <= TP_MAXJ && smax < 590;  /* every height and gap < 590: tables, 16-bit gaps */
     int ci_[TP_NC * 64]; (void)ci_;
     for (long o = 0; o < nord && ok; o++) for (long i = 0; i < j; i++) { int found = 0; for (int c = 0; c < TP_NC; c++) found |= CVAL[c] == cs[o * j + i]; ok &= found; }
-    /* |theta|, |theta2| < 2^-60 (theta = qa/qb, theta2 = a2/D) */
-    if (ok) { mpz_t x; mpz_init(x); mpz_abs(x, qa); mpz_mul_2exp(x, x, 60); ok &= mpz_cmp(x, qb) < 0;
-              mpz_abs(x, a2); mpz_mul_2exp(x, x, 60); ok &= mpz_cmp(x, D) < 0; mpz_clear(x); }
+    /* |theta|, |theta2| < 2^-40 (theta = qa/qb, theta2 = a2/D); eta_u = ceil(0.6 max(|theta|, |theta2|) 2^64) bounds
+       |delta theta| in units of 2^-64 and widens the margins below (it is < 10 units when both are < 2^-60) */
+    unsigned long long eta_u = 0;
+    if (ok) { mpz_t x, y; mpz_inits(x, y, NULL);
+              mpz_abs(x, qa); mpz_mul_2exp(x, x, 40); ok &= mpz_cmp(x, qb) < 0;
+              mpz_abs(x, a2); mpz_mul_2exp(x, x, 40); ok &= mpz_cmp(x, D) < 0;
+              for (int s = 0; s < 2 && ok; s++) {                     /* ceil(3 |num| 2^64 / (5 den)) */
+                  mpz_abs(x, s ? a2 : qa); mpz_mul_ui(x, x, 3); mpz_mul_2exp(x, x, 64); mpz_mul_ui(y, s ? D : qb, 5);
+                  mpz_cdiv_q(x, x, y); unsigned long long e = mpz_get_ui(x); if (e > eta_u) eta_u = e; }
+              mpz_clears(x, y, NULL); }
     if (!ok) { execv(cpu, argv); perror("exec topc3"); return 2; }
     if (fpn) fp_setup(fpn, fpB, fpR2, fpR2d);
 
@@ -389,9 +396,10 @@ int main(int argc, char **argv) {
         }
         mpz_clears(n_, dd, q_, NULL);
     }
-    /* margins (units 2^-64): eps + eta < 2^-59.5 (topgpu.cu header); take 64 units = 2^-58 */
+    /* margins (units 2^-64): 4 (eps + eta), eps < 3 units (topgpu.cu header); 64 units = 2^-58 whenever |theta|, |theta2|
+       < 2^-60 (eta < 10 units), as before */
     {
-        const unsigned long long EM = 64;
+        const unsigned long long EM = 4 * (3 + eta_u) > 64 ? 4 * (3 + eta_u) : 64;
         mpz_t a_, b_, s_; mpz_inits(a_, b_, s_, NULL);
         mpz_mul(a_, Rn, g3d); mpz_mul_2exp(a_, a_, 128); mpz_mul(b_, Rd, g3n);                /* rho^2 2^128 */
         mpz_fdiv_q(s_, a_, b_); mpz_sqrt(s_, s_);                                            /* floor(rho 2^64) */

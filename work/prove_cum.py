@@ -46,7 +46,48 @@ CK = 'ckptC'; RES = 'bagresC'
 USE_GAP_RESULTS = True        # accept digit sets already proved by the gap-chain prover
 os.makedirs(CK, exist_ok=True); os.makedirs(RES, exist_ok=True)
 
+# Bootstrapping bound: 'matveev' (Matveev's top chain only; every record so far) or 'twochain' (top chain with four
+# logarithms and a 5-adic bottom chain, docs/BOOTSTRAP_TWO_CHAINS.md). Records written with 'twochain' carry a 'bootstrap' field.
+BOOTSTRAP = os.environ.get('PC_BOOTSTRAP', 'matveev')
+assert BOOTSTRAP in ('matveev', 'twochain'), BOOTSTRAP
+PI3 = LN(3) * LN(7) * LN(10) * (1 + 1e-12)
+# Yu, Acta Math. 211 (2013), Theorem 2 with K = Q, p = 5 (case III.2: c2 = 557 (p-1)/(p-2), a2 = 7, kappa2 = 25), n = 3,
+# q = 2, u = 1, e_p = f_p = 1, kappa = 0 (1.2), delta >= 1:  ord_5(Xi - 1) < (n+1) C2 Omega max{log B, log 5} (1.10), (1.26)
+YU_C2 = 557 * 4 / 3 * 7**3 * 4**4 / (2 * 2 * LN(5)**3) * max(5, (math.e / 3)**3 * LN(5)**4) * max(4 + LN(4), 1, LN(5))
+YU_K = 4 * YU_C2 * LN(3) * LN(7) * (1 + 1e-9)       # (n+1) C2 h(3) h(7)
+YU_HMIN = max(3 / LN(5), 1) / 25                     # floor of h^(n) in (1.25)
+
+def twochain_cum(k, tm, top, bot):
+    """Bound on L from the facts with two chains.  Top (D_j = L - a_(j+1)): Matveev with n = 4 for j = 0 (2, 3, 7, 10) and
+    for j >= 1 (3, 7, 10, N_j/2^t with N_j = 10^(D_(j-1)) (1 + z_j) < 9*10^(D_(j-1)), the same Lam_j).  Bottom: for i < k,
+    F = -1 + sum_{m>i} c_m 10^(a_m) is a 5-adic unit and 5^(a_i) | 9y - F = F (Xi - 1), Xi = 3^u' 7^w (2^t/F), so
+    a_i < YU_K max(h(2^t/F), YU_HMIN) max(log B, log 5) with h(2^t/F) <= max(log(1 + 80*10^(a_(i+1))), t log 2); a_0 = L."""
+    INF = float('inf')
+    def f(B):
+        beta = 1 + LN(B); lB = max(LN(B), LN(5))
+        s = [0.0] * k
+        for j in range(k):
+            if j == 0: m = (LN(80) + C4 * beta * PI) / LN(10)
+            else: m = (LN(80) + C4 * beta * PI3 * max(tm * LN(2), s[j - 1] * LN(10) + LN(9))) / LN(10)
+            s[j] = min(m, top[j] - 1) if j in top else m
+        b = [INF] * (k + 1); b[k] = bot[k] - 1
+        for i in range(k - 1, -1, -1):
+            yb = YU_K * max(max(LN(80) + b[i + 1] * LN(10), tm * LN(2)) + LN(2), YU_HMIN) * lB
+            b[i] = min(bot[i] - 1, yb) if i in bot else yb
+        Lb = min([b[0]] + [s[j] + b[j + 1] for j in range(k)])
+        return max(2.0960 * Lb + 2.2, tm + 1), Lb
+    B = 1e300
+    for _ in range(300):
+        nb, _ = f(B)
+        if nb >= B * (1 - 1e-9): break
+        B = nb
+    B = max(B * 1.01, 10.0)
+    nb, Lb = f(B)
+    assert nb <= B
+    return max(10, math.ceil(Lb * 1.01))
+
 def matveev_cum(k, tm, top, bot):
+    if BOOTSTRAP == 'twochain': return twochain_cum(k, tm, top, bot)
     INF = float('inf')
     def f(B):
         beta = 1 + LN(B)
@@ -125,6 +166,7 @@ def prove_bag(bag, log=print, limit=LIMIT, dry=False):
         Gb = max(G, tm + 8)
         if XL <= limit:
             res = {'bag': list(bag), 'Lmax': XL, 'top': top, 'bot': bot, 'stats': stats}
+            if BOOTSTRAP != 'matveev': res['bootstrap'] = BOOTSTRAP
             if not dry: _save(rpath, res)
             log(f"  bag {bag}: k={k} tmax={tm} top {dict(sorted(top.items()))} bot {dict(sorted(bot.items()))} -> every solution has "
                 f"L <= {XL} (top cases {stats['top']}, bottom solves {stats['bottom']}, survivor runs {stats['enum']}, "
@@ -184,7 +226,7 @@ if __name__ == "__main__":
         Lb = 0; recs = []
         for b in sorted(bs, key=len):
             Lmax, res = prove_bag(b, log=lambda x: print(x, flush=True))
-            Lb = max(Lb, Lmax); recs.append([list(b), Lmax, res['top'], res['bot']])
+            Lb = max(Lb, Lmax); recs.append([list(b), Lmax, res['top'], res['bot']] + ([res['bootstrap']] if res.get('bootstrap') else []))
         assert Lb <= 5000
         bset = {tuple(sorted(b)) for b in bs}
         pre = sorted(y for y in Z if y >= 10 and '0' not in str(y)

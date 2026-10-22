@@ -1,0 +1,5 @@
+== 2026-10-22T17:16:12Z commit 47bcf7a topgpu 5ac4892eaced4f27 bottomgpu 6d277763ff963dd9; command: python3 pool_bench.py 221184 480 10 6 4 1
+node 221184: 2.227e+13 units in its plans; 300 sampled slices, mean 6.40e+09 units, 103 top / 197 bottom
+N = 10: 21 slices in the window, steady rate 9.545e+07 units/s -> whole node 64.8 h of shared GPU time (mean slice 672.6 s)
+N =  6: 12 slices in the window, steady rate 8.019e+07 units/s -> whole node 77.1 h of shared GPU time (mean slice 499.6 s)
+stopped by request at 2026-10-22T18:22:09Z during the N = 4 window (N = 4 and N = 1 not measured)

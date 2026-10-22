@@ -1,0 +1,15 @@
+node 1229312: 12 digit multisets
+12 bags, 8 workers, bottom on GPU, top on GPU
+  bag (2, 2, 2, 7, 7, 7, 7, 8, 8): k=9 tmax=43 top {0: 38, 1: 38, 2: 38, 3: 38, 4: 38} bot {5: 51, 6: 51, 7: 51, 8: 51, 9: 2} -> every solution has L <= 88 (top cases 6266071, bottom solves 3013573, survivor runs 2695, proofs 41, 26s)
+  bag (2, 2, 4, 4, 7, 7, 7, 7, 8): k=9 tmax=38 top {0: 37, 1: 37, 2: 37, 3: 37, 4: 37} bot {5: 47, 6: 47, 7: 47, 8: 47, 9: 2} -> every solution has L <= 83 (top cases 12691290, bottom solves 5393101, survivor runs 11698, proofs 41, 41s)
+  bag (2, 4, 4, 4, 4, 7, 7, 7, 7): k=9 tmax=33 top {0: 37, 1: 37, 2: 37, 3: 37, 4: 37} bot {5: 47, 6: 41, 7: 41, 8: 41, 9: 2} -> every solution has L <= 83 (top cases 4038528, bottom solves 1675488, survivor runs 3368, proofs 44, 20s)
+  bag (4, 4, 4, 7, 7, 7, 7, 8): k=8 tmax=29 top {0: 37, 1: 37, 2: 37, 3: 37} bot {4: 37, 5: 37, 6: 37, 7: 37, 8: 2} -> every solution has L <= 73 (top cases 499131, bottom solves 782665, survivor runs 261, proofs 36, 11s)
+  bag (7, 7, 7, 7, 8, 8, 8): k=7 tmax=15 top {0: 37, 1: 37, 2: 37, 3: 37} bot {4: 37, 5: 37, 6: 37, 7: 2} -> every solution has L <= 73 (top cases 71466, bottom solves 27768, survivor runs 59, proofs 27, 8s)
+  bag (2, 4, 7, 7, 7, 7, 8, 8): k=8 tmax=32 top {0: 37, 1: 37, 2: 37, 3: 37, 4: 37} bot {5: 40, 6: 40, 7: 40, 8: 2} -> every solution has L <= 76 (top cases 7825603, bottom solves 307404, survivor runs 4396, proofs 36, 28s)
+  bag (2, 2, 2, 2, 2, 2, 7, 7, 7, 7, 8): k=11 tmax=40 top {0: 37, 1: 37, 2: 37, 3: 37, 4: 37, 5: 37} bot {6: 48, 7: 48, 8: 48, 9: 48, 10: 48, 11: 2} -> every solution has L <= 84 (top cases 80577322, bottom solves 50380188, survivor runs 61595, proofs 61, 131s)
+  bag (2, 2, 2, 2, 2, 4, 4, 7, 7, 7, 7): k=11 tmax=44 top {0: 38, 1: 38, 2: 38, 3: 38, 4: 38, 5: 38} bot {6: 52, 7: 52, 8: 52, 9: 52, 10: 52, 11: 2} -> every solution has L <= 89 (top cases 402734231, bottom solves 110959827, survivor runs 164569, proofs 62, 210s)
+  bag (2, 2, 2, 4, 4, 4, 7, 7, 7, 7): k=10 tmax=46 top {0: 38, 1: 38, 2: 38, 3: 38, 4: 38, 5: 38} bot {6: 54, 7: 54, 8: 54, 9: 54, 10: 2} -> every solution has L <= 91 (top cases 117745083, bottom solves 9385603, survivor runs 56253, proofs 51, 240s)
+  bag (2, 2, 2, 2, 4, 7, 7, 7, 7, 8): k=10 tmax=40 top {0: 37, 1: 37, 2: 37, 3: 37, 4: 37, 5: 37} bot {6: 48, 7: 48, 8: 48, 9: 48, 10: 2} -> every solution has L <= 84 (top cases 166428108, bottom solves 13376432, survivor runs 148217, proofs 51, 314s)
+  bag (2, 2, 2, 2, 2, 2, 2, 4, 7, 7, 7, 7): k=12 tmax=45 top {0: 38, 1: 38, 2: 38, 3: 38, 4: 38, 5: 38, 6: 38} bot {7: 53, 8: 53, 9: 53, 10: 53, 11: 53, 12: 2} -> every solution has L <= 90 (top cases 876941939, bottom solves 184372690, survivor runs 436046, proofs 72, 1241s)
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 7, 7, 7): k=13 tmax=47 top {0: 38, 1: 38, 2: 38, 3: 38, 4: 38, 5: 38, 6: 38, 7: 38} bot {8: 55, 9: 55, 10: 55, 11: 55, 12: 55, 13: 2} -> every solution has L <= 92 (top cases 1979963352, bottom solves 147954787, survivor runs 883632, proofs 84, 1859s)
+node 1229312: all 7-smooth y with digit product 1229312: []   (1859s)
