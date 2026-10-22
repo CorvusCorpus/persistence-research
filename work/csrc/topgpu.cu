@@ -13,12 +13,23 @@
  *   1/(1 + c 10^-S); level i >= 2: w = c_i 10^-S_i / A_{i-1}, lambda_i = lambda_{i-1} + log1p(w), 1/A_i = (1/A_{i-1}) / (1 + w)
  *   by Horner: log1p(w) = w (1 - w (1/2 - w (1/3 - ...))), 1/(1 + w) = 1 - w (1 - w (1 - ...)), every intermediate in (0, 1].
  *   case (last digit c at height e): lambda = lambda_A + log1p(c 10^-e / A).
- *   Heights below Smin (|w| > 2^-10) are left to the host. nterm[S] series terms: |w|^(n+1) / (1 - |w|) < 2^-FL.
+ *   Digits at heights below Smin = 5 (|w| could exceed 2^-10; at most four digits, heights 1 .. 4) are not summed: the leading
+ *   digits below Smin take lambda_A and 1/A from a host table over every such configuration (8^4 entries), and so does a case
+ *   whose last digit is below Smin. nterm[S] series terms: |w|^(n+1) / (1 - |w|) < 2^-FL.
  *   frac(|Theta| lambda): the low LF + 2 limbs of TH Lambda (TH = round(|Theta| 2^64), Lambda = lambda 2^FL), whose top two limbs
  *   are the top 64 fraction bits (only TH mod 2^(FL + 64) matters).
  * Error (ulps of 2^-FL): tables 1 each; per level w 3, log1p and 1/(1+w) 2 nterm + 2 each, 1/A_i 3; per case 3 + 2 nterm.
  *   The host takes FL >= bits(Theta) + 80, so |Theta| err(lambda) < 2^-66 for any j <= 40, and adds lambda 2^-65 (rounding of
- *   TH), 2^-64 (truncated product), eta and a factor 4 to every margin. */
+ *   TH), 2^-64 (truncated product), eta and a factor 4 to every margin.
+ * Level 1 along a prefix (recurrence; the cases of one prefix have consecutive heights e): frac(|Theta| lambda) =
+ *   frac(phi_A + T_1 - T_2 + T_3 ...) with phi_A = frac(|Theta| lambda_A) (96 bits of TH Lambda_A) and T_n = |Theta| u^n / n,
+ *   u = c 10^-e / A, in fixed point with 96 fraction bits. At the prefix's first height with nrec[e] > 0: T_1 = TH U / 2^(FL - 32)
+ *   (U = u 2^FL), T_n = T_(n-1) U (n - 1) / n; at each next height T_n = floor(T_n / 10^n), as u(e + 1) = u(e) / 10 exactly.
+ *   nrec[e] (host): the fewest N <= TP_NREC terms with omitted tail |Theta| (72 10^-e)^(N+1) / (N + 1) / (1 - 2^-10) < 2^-90, else
+ *   0 (direct series). Errors: T_1 at the start |Theta| err(U) 2^-FL + u 2^-65 + 2^-96 < 2^-70 (err(U) a few ulps plus 2^-6 err(1/A),
+ *   |Theta| < 2^(FL - 80)), T_n alike but smaller; each step adds at most 2^-96 and divides the earlier error by 10^n; tail < 2^-90;
+ *   the 96-bit sum is truncated to 64 bits. So psi1 stays within the budget of the direct path. Level 2 (after a certain level-1
+ *   pass, 1-2% of cases) and the dump mode's psi2 use the direct lambda. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -78,14 +89,55 @@ template <int L> DF u64 frac_theta(const Big<L> &lam, const u32 *th) {
     return LDG(th) ? f : (u64)0 - f;                     /* Theta < 0: frac(-Theta lambda) = frac(|Theta| lambda) */
 }
 
-/* 0: certainly killed at level 1; 1: certain level-1 pass, certainly killed at level 2; 2: the host decides */
-template <int L> DF int classify(const Big<L> &lam, const TCtx &C) {
-    const tp_params &P = *C.P;
-    const u64 psi1 = frac_theta<L>(lam, C.T + P.o_th);
+/* the top 96 bits of frac(|Theta| lambda), low limb first (as frac_theta, before the sign) */
+template <int L> DF void frac_theta96(u32 f[3], const Big<L> &lam, const u32 *th) {
+    Big<L + 1> a, b, p;
+#pragma unroll
+    for (int i = 0; i < L + 1; i++) { a.w[i] = LDG(th + 1 + i); b.w[i] = i < L ? lam.w[i] : 0u; }
+    bmul_lo<L + 1>(p, a, b);
+    f[0] = p.w[L - 2]; f[1] = p.w[L - 1]; f[2] = p.w[L];
+}
+/* recurrence start: T = floor(|Theta| u 2^96) from TH = round(|Theta| 2^64) and U = u 2^FL: limbs [L - 2, 2L - 2) of TH U
+ * (|Theta| < 2^(FL - 80) and u < 2^-10, so the value is below 2^(32 L - 26) and the limbs above are zero) */
+template <int L> DF void th_mul_body(Big<L> &r, const u32 *th, const Big<L> &U) {
+    Big<L + 1> a, b; u32 t[2 * L + 2];
+#pragma unroll
+    for (int i = 0; i < L + 1; i++) { a.w[i] = LDG(th + 1 + i); b.w[i] = i < L ? U.w[i] : 0u; }
+    bmul_full<L + 1>(t, a, b);
+#pragma unroll
+    for (int i = 0; i < L; i++) r.w[i] = t[L - 2 + i];
+}
+#ifndef TP_EMU
+template <int L> __device__ __noinline__ void th_mul_ni(Big<L> &r, const u32 *th, const Big<L> &U) { th_mul_body<L>(r, th, U); }
+#endif
+template <int L> DF void th_mul(Big<L> &r, const u32 *th, const Big<L> &U) {
+#ifndef TP_EMU
+    if constexpr (L >= 24) { th_mul_ni<L>(r, th, U); return; }
+#endif
+    th_mul_body<L>(r, th, U);
+}
+/* a = floor(a / D), D < 2^32 a compile-time constant */
+template <u32 D, int L> DF void bdivc(Big<L> &a) {
+    u64 r = 0;
+#pragma unroll
+    for (int i = L - 1; i >= 0; i--) { const u64 cur = (r << 32) | a.w[i]; const u64 q = cur / D; a.w[i] = (u32)q; r = cur - q * D; }
+}
+/* f +/- the low 3 limbs of t, mod 2^96 */
+template <int L> DF void add96(u32 f[3], const Big<L> &t) {
+    u64 c = (u64)f[0] + t.w[0]; f[0] = (u32)c; c >>= 32; c += (u64)f[1] + t.w[1]; f[1] = (u32)c; c >>= 32; f[2] += t.w[2] + (u32)c;
+}
+template <int L> DF void sub96(u32 f[3], const Big<L> &t) {
+    u64 d = (u64)f[0] - t.w[0]; f[0] = (u32)d; u32 br = (u32)(d >> 32) & 1u;
+    d = (u64)f[1] - t.w[1] - br; f[1] = (u32)d; br = (u32)(d >> 32) & 1u; f[2] = f[2] - t.w[2] - br;
+}
+
+/* level 1 from psi1: 0 certainly killed; 2 the host decides (within the margins of rho); 3 certain pass (level 2 next) */
+DF int level1(u64 psi1, const tp_params &P) {
     const u64 d1 = psi1 < (1ULL << 63) ? psi1 : (u64)0 - psi1;
-    if (d1 > P.rho_hi) return 0;
-    if (d1 >= P.rho_lo) return 2;                        /* within the margins of rho */
-    const u64 psi2 = frac_theta<L>(lam, C.T + P.o_th2);
+    return d1 > P.rho_hi ? 0 : (d1 >= P.rho_lo ? 2 : 3);
+}
+/* level 2 after a certain level-1 pass: 1 certainly killed (counted in f1); 2 the host decides */
+DF int level2(u64 psi1, u64 psi2, const tp_params &P) {
     const long long s = (long long)psi1;                 /* signed distance of psi1 to Z (|s| < rho < 2^62), units 2^-64 */
 #ifdef TP_EMU
     const long long ms = (long long)(((__int128)P.mu63 * s) >> 63);
@@ -120,6 +172,13 @@ DF void putr(tp_out *out, long long outcap, unsigned long long *nout, unsigned p
     const unsigned long long k = bump(nout);
     if ((long long)k < outcap) { out[k].prefix = prefix; out[k].gl = gl; out[k].kind = kind; out[k].pad = 0; out[k].psi1 = out[k].psi2 = 0; }
 }
+/* lambda of the case with last digit c (index cl) at height e >= Smin: lambda_A + log1p(c 10^-e / A) */
+template <int L> DF void case_lambda(Big<L> &la, const Big<L> &lam, const Big<L> &ia, int cl, int e, const TCtx &C) {
+    const tp_params &P = *C.P;
+    Big<L> cw, u, lu; ldb(cw, C.T + P.o_c10 + ((size_t)cl * (P.smax + 1) + e) * L);
+    fmul(u, cw, ia);                                     /* u = c 10^-e / A */
+    flog1p(lu, u, P.nterm[e], C.T + P.o_inv); badd(la, lam, lu);
+}
 
 template <int L>
 DF void do_prefix(const TCtx &C, const tp_prefix &pf, unsigned idx, tp_out *out, long long outcap, unsigned long long *nout,
@@ -128,44 +187,82 @@ DF void do_prefix(const TCtx &C, const tp_prefix &pf, unsigned idx, tp_out *out,
     const int j = P.j, SS = P.smax + 1;
     const u32 *csw = T + P.o_cs + (size_t)pf.o * ((j + 3) / 4);
     Big<L> lam, ia;                                      /* lambda_A = log A, 1/A */
-    int acc = 0;
+    int acc = 0, i = 0;
+    unsigned sidx = 0;                                   /* the digits at heights below Smin: one entry of the small table */
     cnt[0] += (unsigned long long)(pf.ghi - pf.glo + 1);
-    if (j >= 2) {
+    for (; i < j - 1 && acc + pf.g[i] < P.Smin; i++) {
+        acc += pf.g[i];
+        sidx |= (((LDG(csw + (i >> 2)) >> (8 * (i & 3))) & 0xFFu) + 1u) << (3 * (acc - 1));
+    }
+    if (i == 0 && j >= 2) {                              /* first digit at height >= Smin: level-1 tables */
         acc = pf.g[0];
         const int c1 = (int)((LDG(csw) >> 0) & 0xFF);
         ldb(lam, T + P.o_lam1 + ((size_t)c1 * SS + acc) * L);
         ldb(ia, T + P.o_ia1 + ((size_t)c1 * SS + acc) * L);
-        for (int i = 1; i < j - 1; i++) {
-            acc += pf.g[i];
-            if (acc < P.Smin) { putr(out, outcap, nout, idx, 0, 2); return; }   /* the host does the whole prefix */
-            const int ci = (int)((LDG(csw + (i >> 2)) >> (8 * (i & 3))) & 0xFF);
-            Big<L> cw, w, lw, q, t; ldb(cw, T + P.o_c10 + ((size_t)ci * SS + acc) * L);
-            fmul(w, cw, ia);                             /* w = c_i 10^-S_i / A_{i-1} */
-            const int N = P.nterm[acc];
-            flog1p(lw, w, N, T + P.o_inv); badd(lam, lam, lw);
-            finv1p(q, w, N); fmul(t, ia, q); ia = t;
-        }
-    } else {
-        bzero_(lam); bzero_(ia); ia.w[L - 1] = 1u;
+        i = 1;
+    } else {                                             /* entry 0 (no digit, j = 1): lambda 0, 1/A = 1 */
+        ldb(lam, T + P.o_sl + (size_t)sidx * L);
+        ldb(ia, T + P.o_sia + (size_t)sidx * L);
+    }
+    for (; i < j - 1; i++) {                             /* heights >= Smin: |w| <= 72 10^-5 < 2^-10 */
+        acc += pf.g[i];
+        const int ci = (int)((LDG(csw + (i >> 2)) >> (8 * (i & 3))) & 0xFF);
+        Big<L> cw, w, lw, q, t; ldb(cw, T + P.o_c10 + ((size_t)ci * SS + acc) * L);
+        fmul(w, cw, ia);                                 /* w = c_i 10^-S_i / A_{i-1} */
+        const int N = P.nterm[acc];
+        flog1p(lw, w, N, T + P.o_inv); badd(lam, lam, lw);
+        finv1p(q, w, N); fmul(t, ia, q); ia = t;
     }
     const int cl = (int)((LDG(csw + ((j - 1) >> 2)) >> (8 * ((j - 1) & 3))) & 0xFF);
+    const u32 *th = T + P.o_th;
+    /* recurrence over the consecutive heights e with nrec[e] > 0 (all heights above the first such one): T_n = |Theta| u^n / n,
+     * u = c 10^-e / A, 96 fraction bits; T_n(e + 1) = T_n(e) / 10^n; frac(|Theta| lambda) = frac(phi_A + T_1 - T_2 + T_3) */
+    Big<L> T1, T2, T3; u32 phA[3] = {0u, 0u, 0u}; int nr = 0;
     for (int gl = pf.glo; gl <= pf.ghi; gl++) {
         const int e = acc + gl;
-        if (e < P.Smin) { putr(out, outcap, nout, idx, (unsigned)gl, 1); continue; }
-        Big<L> cw, u, lu, la; ldb(cw, T + P.o_c10 + ((size_t)cl * SS + e) * L);
-        fmul(u, cw, ia);                                 /* u = c 10^-e / A */
-        flog1p(lu, u, P.nterm[e], T + P.o_inv); badd(la, lam, lu);
-        if (P.dump) {                                    /* validation only: psi1, psi2 of every case */
+        Big<L> la; int have = 0, path; u64 psi1;
+        if (e < P.Smin) {                                /* every digit below Smin (then i = j - 1): the small table */
+            ldb(la, T + P.o_sl + (size_t)(sidx | ((unsigned)(cl + 1) << (3 * (e - 1)))) * L);
+            have = 1; path = 0; psi1 = frac_theta<L>(la, th);
+        } else if (nr == 0 && P.nrec[e] == 0) {          /* more series terms than the recurrence carries: direct */
+            case_lambda<L>(la, lam, ia, cl, e, C); have = 1; path = 1; psi1 = frac_theta<L>(la, th);
+        } else {
+            if (nr == 0) {                               /* start: u from the tables, the T_n by products */
+                nr = P.nrec[e]; path = 2;
+                frac_theta96<L>(phA, lam, th);
+                Big<L> cw, U; ldb(cw, T + P.o_c10 + ((size_t)cl * SS + e) * L);
+                fmul(U, cw, ia);                         /* U = u 2^FL */
+                th_mul<L>(T1, th, U);
+                if (nr >= 2) { fmul(T2, T1, U); bshr(T2, T2, 1); }
+                if (TP_NREC >= 3 && nr >= 3) { fmul(T3, T2, U); bmul_u32(T3, T3, 2u); bdivc<3u>(T3); }
+            } else {                                     /* step e - 1 -> e: u / 10 */
+                path = 3;
+                bdivc<10u>(T1);
+                if (nr >= 2) bdivc<100u>(T2);
+                if (TP_NREC >= 3 && nr >= 3) bdivc<1000u>(T3);
+            }
+            u32 F[3] = {phA[0], phA[1], phA[2]};
+            add96(F, T1);
+            if (nr >= 2) sub96(F, T2);
+            if (TP_NREC >= 3 && nr >= 3) add96(F, T3);
+            const u64 f = ((u64)F[2] << 32) | F[1];      /* top 64 bits of frac(|Theta| lambda) */
+            psi1 = LDG(th) ? f : (u64)0 - f;
+        }
+        if (P.dump) {                                    /* validation only: psi1 (and its path), psi2 of every case */
+            if (!have) case_lambda<L>(la, lam, ia, cl, e, C);
             const unsigned long long k = bump(nout);
             if ((long long)k < outcap) {
-                out[k].prefix = idx; out[k].gl = (unsigned)gl; out[k].kind = 3; out[k].pad = 0;
-                out[k].psi1 = frac_theta<L>(la, T + P.o_th); out[k].psi2 = frac_theta<L>(la, T + P.o_th2);
+                out[k].prefix = idx; out[k].gl = (unsigned)gl; out[k].kind = 3; out[k].pad = (unsigned)path;
+                out[k].psi1 = psi1; out[k].psi2 = frac_theta<L>(la, T + P.o_th2);
             }
             continue;
         }
-        const int k = classify<L>(la, C);
-        if (k == 1) cnt[1]++;
-        else if (k == 2) putr(out, outcap, nout, idx, (unsigned)gl, 1);
+        const int k1 = level1(psi1, P);
+        if (k1 == 0) continue;                           /* certainly killed at level 1 */
+        if (k1 == 2) { putr(out, outcap, nout, idx, (unsigned)gl, 1); continue; }
+        if (!have) case_lambda<L>(la, lam, ia, cl, e, C);   /* certain level-1 pass: level 2 needs psi2 */
+        if (level2(psi1, frac_theta<L>(la, T + P.o_th2), P) == 1) cnt[1]++;
+        else putr(out, outcap, nout, idx, (unsigned)gl, 1);
     }
 }
 

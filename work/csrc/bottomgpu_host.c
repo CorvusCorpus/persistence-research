@@ -12,8 +12,12 @@
 #include <unistd.h>
 #include "bottomgpu.h"
 
-/* size classes: must match BG_CLASSES in bottomgpu.cu (Gmax, L5, L2, LQ, LH) */
-static const int CLS[5][5] = {{60, 6, 5, 10, 7}, {90, 8, 6, 13, 9}, {125, 11, 7, 17, 11}, {165, 13, 9, 21, 13}, {200, 16, 10, 24, 14}};
+/* size classes: must match BG_CLASSES in bottomgpu.cu (Gmax, L5, L2, LQ, LH). L5: 5^(G + s) < 2^(32 L5) with >= 8 bits to
+ * spare; L2: 32 L2 >= G + s + 2 and tlmax = 32 L2 - G - 8 >= 40; LQ: Q = 2^(G-2) 5^(G-1) < 2^(32 LQ - 20); LH: the coordinates
+ * (checked per job by widths_ok); 2 LH <= BG_OUTW */
+#define NBCLS 9
+static const int CLS[NBCLS][5] = {{60, 6, 5, 10, 7}, {90, 8, 6, 13, 9}, {125, 11, 7, 17, 11}, {165, 13, 9, 21, 13}, {200, 16, 10, 24, 14},
+                                  {240, 19, 10, 26, 15}, {280, 22, 11, 30, 16}, {320, 25, 12, 34, 18}, {360, 28, 13, 38, 20}};
 static const int CVAL[BG_NC] = {9, 18, 27, 45, 54, 63, 72};
 
 static unsigned int *TB; static long long TW, TCAP;
@@ -70,7 +74,7 @@ static void run_flows(const bg_flow *fls, long n, long o) {
             while (i + 1 < no && B_out[i + 1].flow == e->flow && B_out[i + 1].p == e->p) i++;   /* the solve's other records */
             continue;
         }
-        mpz_import(vu, 32, -1, 4, 0, 0, e->up); mpz_import(vw, 32, -1, 4, 0, 0, e->w);
+        mpz_import(vu, BG_OUTW, -1, 4, 0, 0, e->up); mpz_import(vw, BG_OUTW, -1, 4, 0, 0, e->w);
         printf("CAND %ld pos", o); for (long s = 1; s < b; s++) printf(" %ld", pp[s]);
         printf(" p %u M %ld t %u up ", e->p, B_G, e->t); mpz_out_str(stdout, 10, vu); printf(" w "); mpz_out_str(stdout, 10, vw); printf("\n");
     }
@@ -132,6 +136,26 @@ static int mt_ok(long M, long t) {
 }
 static long ivp(long n, long p) { long e = 0; while (n % p == 0) { n /= p; e++; } return e; }
 
+/* the kernel's fixed widths cannot overflow for the lattice data of one t: the estimates K - off0 R (2 LQ limbs, off0 < Q),
+ * the coordinates ci, cj (LH limbs, signed) and up, ww (2 LH limbs, signed). With |K| the largest over w0:
+ * |ci| <= (|K_i| + Q |R_i|) / 2^F + 1 (cj alike), plus 1 for the neighbours; |up| <= Q + (|ci| + 1) |b1x| + (|cj| + 1) |b2x|,
+ * |ww| <= 4 + (|ci| + 1) |b1y| + (|cj| + 1) |b2y|. A failure sends the job to bottomc3. */
+static int widths_ok(const MT *r, const mpz_t Ri, const mpz_t Rj, const mpz_t Ki, const mpz_t Kj, int F, int LQ, int LH) {
+    mpz_t e, ci_, cj_, s, lim; mpz_inits(e, ci_, cj_, s, lim, NULL);
+    int ok = 1;
+    mpz_ui_pow_ui(lim, 2, 64 * LQ - 2);
+    mpz_abs(e, Ri); mpz_mul(e, e, r->Q); mpz_abs(s, Ki); mpz_add(e, e, s); ok &= mpz_cmp(e, lim) < 0;   /* |K_i| + Q |R_i| */
+    mpz_fdiv_q_2exp(ci_, e, F); mpz_add_ui(ci_, ci_, 2);
+    mpz_abs(e, Rj); mpz_mul(e, e, r->Q); mpz_abs(s, Kj); mpz_add(e, e, s); ok &= mpz_cmp(e, lim) < 0;
+    mpz_fdiv_q_2exp(cj_, e, F); mpz_add_ui(cj_, cj_, 2);
+    mpz_ui_pow_ui(lim, 2, 32 * LH - 2); ok &= mpz_cmp(ci_, lim) < 0 && mpz_cmp(cj_, lim) < 0;
+    mpz_ui_pow_ui(lim, 2, 64 * LH - 2);
+    mpz_abs(e, r->b1x); mpz_mul(s, ci_, e); mpz_abs(e, r->b2x); mpz_addmul(s, cj_, e); mpz_add(s, s, r->Q); ok &= mpz_cmp(s, lim) < 0;
+    mpz_abs(e, r->b1y); mpz_mul(s, ci_, e); mpz_abs(e, r->b2y); mpz_addmul(s, cj_, e); mpz_add_ui(s, s, 4); ok &= mpz_cmp(s, lim) < 0;
+    mpz_clears(e, ci_, cj_, s, lim, NULL);
+    return ok;
+}
+
 /* coefficient (-1)^(n+1) p^k / n' mod p^Mmod (k >= 0), as a residue; zero if k >= Mmod */
 static void series_coef(mpz_t out, long n, unsigned long p, long k, long Mmod) {
     mpz_t m, t; mpz_inits(m, t, NULL); mpz_ui_pow_ui(m, p, Mmod);
@@ -177,9 +201,9 @@ int main(int argc, char **argv) {
     fclose(f);
     long Mneed = heff[0] > G ? heff[0] : G;
     if (Mneed > Mmax) die("Mmax too small for this configuration space");
-    int cls = -1; for (int c = 0; c < 5; c++) if (G <= CLS[c][0]) { cls = c; break; }
-    /* kernel coverage: M = G for every solve (heff[0] <= G), a size class, n = G - t >= 8, positions < 256 */
-    if (heff[0] > G || cls < 0 || tm + 8 > G || G > 255) {
+    int cls = -1; for (int c = 0; c < NBCLS; c++) if (G <= CLS[c][0]) { cls = c; break; }
+    /* kernel coverage: M = G for every solve (heff[0] <= G), a size class (G <= 360: positions fit 16 bits), n = G - t >= 8 */
+    if (heff[0] > G || cls < 0 || tm + 8 > G) {
         if (ktest) die("ktest: G outside the kernel's size classes");
         execv(cpu, argv); perror("exec bottomc3"); return 2;
     }
@@ -253,10 +277,28 @@ int main(int argc, char **argv) {
     { MT *r0 = mt(G, 0); P.F = (int)mpz_sizeinbase(r0->Q, 2) + 64; }
     if (P.F + 64 > 64 * LQ) die("size class: F too large");
     mpz_t sc, num, den; mpz_inits(sc, num, den, NULL); mpz_ui_pow_ui(sc, 2, P.F);
+    mpz_t vRi, vRj, vK[8], Kim, Kjm; mpz_inits(vRi, vRj, Kim, Kjm, NULL); for (int i = 0; i < 8; i++) mpz_init(vK[i]);
     for (long t = 0; t <= tm; t++) {
         if (!mt_ok(G, t)) continue;                      /* o_tok[t] = 0: such solves go to bottom3.c */
         TB[P.o_tok + t] = 1;
         MT *r = mt(G, t);
+        /* R_i = b2y / det, R_j = -b1y / det; K_i = (U b2y - (W - 2 w0) b2x) / (2 det), K_j = (b1x (W - 2 w0) - b1y U) / (2 det),
+         * in fixed point with F fraction bits; first checked against the kernel's widths (else the job goes to bottomc3) */
+        mpz_mul(num, r->b2y, sc); round_div(vRi, num, r->det);
+        mpz_mul(num, r->b1y, sc); mpz_neg(num, num); round_div(vRj, num, r->det);
+        mpz_mul_2exp(den, r->det, 1); mpz_set_ui(Kim, 0); mpz_set_ui(Kjm, 0);
+        for (int w0 = 0; w0 < 4; w0++) {
+            mpz_sub_ui(w2, W, 2 * w0);
+            mpz_mul(num, U, r->b2y); mpz_submul(num, w2, r->b2x); mpz_mul(num, num, sc); round_div(vK[2 * w0], num, den);
+            mpz_mul(num, r->b1x, w2); mpz_submul(num, r->b1y, U); mpz_mul(num, num, sc); round_div(vK[2 * w0 + 1], num, den);
+            mpz_abs(y, vK[2 * w0]); if (mpz_cmp(y, Kim) > 0) mpz_set(Kim, y);
+            mpz_abs(y, vK[2 * w0 + 1]); if (mpz_cmp(y, Kjm) > 0) mpz_set(Kjm, y);
+        }
+        int wok = widths_ok(r, vRi, vRj, Kim, Kjm, P.F, LQ, LH);
+        const mpz_ptr bv[4] = {r->b1x, r->b1y, r->b2x, r->b2y};
+        for (int i = 0; i < 4; i++) wok &= mpz_sizeinbase(bv[i], 2) < (size_t)32 * LH - 1;         /* put_signed's ranges */
+        wok &= mpz_sizeinbase(vRi, 2) < (size_t)32 * LQ - 1 && mpz_sizeinbase(vRj, 2) < (size_t)32 * LQ - 1;
+        if (!wok) { execv(cpu, argv); perror("exec bottomc3"); return 2; }
         put_mpz(P.o_Ainv + t * L2, r->Ainv, L2);
         mpz_mul(y, r->A5inv, R); mpz_mod(y, y, r->q5); put_mpz(P.o_A5inv + t * L5, y, L5);
         mpz_invert(y, r->q2, r->q5); mpz_mul(y, y, R); mpz_mod(y, y, r->q5); put_mpz(P.o_q2inv5 + t * L5, y, L5);
@@ -266,14 +308,10 @@ int main(int argc, char **argv) {
         for (int w0 = 0; w0 < 4; w0++) { mpz_mul_ui(y, r->alpha, w0); mpz_mod(y, y, r->Q); put_mpz(P.o_alphaW + (t * 4 + w0) * LQ, y, LQ); }
         put_signed(P.o_b + (t * 4 + 0) * LH, r->b1x, LH); put_signed(P.o_b + (t * 4 + 1) * LH, r->b1y, LH);
         put_signed(P.o_b + (t * 4 + 2) * LH, r->b2x, LH); put_signed(P.o_b + (t * 4 + 3) * LH, r->b2y, LH);
-        /* R_i = b2y / det, R_j = -b1y / det; K_i = (U b2y - (W - 2 w0) b2x) / (2 det), K_j = (b1x (W - 2 w0) - b1y U) / (2 det) */
-        mpz_mul(num, r->b2y, sc); round_div(y, num, r->det); put_signed(P.o_Ri + t * LQ, y, LQ);
-        mpz_mul(num, r->b1y, sc); mpz_neg(num, num); round_div(y, num, r->det); put_signed(P.o_Rj + t * LQ, y, LQ);
-        mpz_mul_2exp(den, r->det, 1);
+        put_signed(P.o_Ri + t * LQ, vRi, LQ); put_signed(P.o_Rj + t * LQ, vRj, LQ);
         for (int w0 = 0; w0 < 4; w0++) {
-            mpz_sub_ui(w2, W, 2 * w0);
-            mpz_mul(num, U, r->b2y); mpz_submul(num, w2, r->b2x); mpz_mul(num, num, sc); round_div(y, num, den); put_signed(P.o_Ki + (t * 4 + w0) * 2LL * LQ, y, 2 * LQ);
-            mpz_mul(num, r->b1x, w2); mpz_submul(num, r->b1y, U); mpz_mul(num, num, sc); round_div(y, num, den); put_signed(P.o_Kj + (t * 4 + w0) * 2LL * LQ, y, 2 * LQ);
+            put_signed(P.o_Ki + (t * 4 + w0) * 2LL * LQ, vK[2 * w0], 2 * LQ);
+            put_signed(P.o_Kj + (t * 4 + w0) * 2LL * LQ, vK[2 * w0 + 1], 2 * LQ);
         }
     }
     P.words = TW;
@@ -311,7 +349,7 @@ int main(int argc, char **argv) {
                 while (i + 1 < no && o2[i + 1].flow == e->flow && o2[i + 1].p == e->p) i++;
                 continue;
             }
-            mpz_import(vu, 32, -1, 4, 0, 0, e->up); mpz_import(vw, 32, -1, 4, 0, 0, e->w);
+            mpz_import(vu, BG_OUTW, -1, 4, 0, 0, e->up); mpz_import(vw, BG_OUTW, -1, 4, 0, 0, e->w);
             printf("Q %u t %u up ", e->flow, e->t); mpz_out_str(stdout, 10, vu); printf(" w "); mpz_out_str(stdout, 10, vw); printf("\n");
         }
         printf("KDONE %llu %llu %llu device %s\n", cn[0], cn[1], cn[2], bg_device());
@@ -327,7 +365,7 @@ int main(int argc, char **argv) {
         /* iterative cum_rec: heights a[r] for r = b-1 (lowest digit) .. 1, each flow with its range of top heights p */
         if (b == 1) {
             long lo = 0, phi = heff[0]; if (lo < aklo) lo = aklo; if (phi > akhi + 1) phi = akhi + 1;
-            if (lo < phi) { bg_flow *q = &fl[nf++]; memset(q, 0, sizeof *q); q->o = (unsigned)o; q->lo = (unsigned char)lo; q->phi = (unsigned char)phi; }
+            if (lo < phi) { bg_flow *q = &fl[nf++]; memset(q, 0, sizeof *q); q->o = (unsigned)o; q->lo = (unsigned short)lo; q->phi = (unsigned short)phi; }
         } else {
             long r = b - 1, a[BG_MAXB + 1];
             long lo0 = 0, hi0 = heff[b - 1]; if (lo0 < aklo) lo0 = aklo; if (hi0 > akhi + 1) hi0 = akhi + 1;
@@ -340,8 +378,8 @@ int main(int argc, char **argv) {
                 const long lo = pos[1] + 1, phi = heff[0];
                 if (lo < phi) {
                     bg_flow *q = &fl[nf++]; memset(q, 0, sizeof *q); q->o = (unsigned)o;
-                    for (long s2 = 1; s2 < b; s2++) q->pos[s2] = (unsigned char)pos[s2];
-                    q->lo = (unsigned char)lo; q->phi = (unsigned char)phi;
+                    for (long s2 = 1; s2 < b; s2++) q->pos[s2] = (unsigned short)pos[s2];
+                    q->lo = (unsigned short)lo; q->phi = (unsigned short)phi;
                     if (nf == batch) { run_flows(fl, nf, o); nf = 0; }
                 }
             }

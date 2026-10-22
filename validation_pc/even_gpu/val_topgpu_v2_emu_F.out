@@ -1,0 +1,118 @@
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=346 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=308 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=271 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=2 G=271 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=234 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=197 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=3 G=197 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=160 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=123 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=4 G=123 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=87 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=1 G=51 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 2_2_2_2_2_2_2_3_3_3_7 j=5 G=51 slice-mid dim=4: 200 values, C and Python agree on 200 (non-empty 90)
+F1 3_3_7_7_9 j=1 G=123 slice-mid dim=3: 200 values, C and Python agree on 200 (non-empty 90)
+F1 3_3_7_7_9 j=1 G=87 slice-mid dim=3: 200 values, C and Python agree on 200 (non-empty 90)
+F1 3_3_7_7_9 j=1 G=51 slice-mid dim=3: 200 values, C and Python agree on 200 (non-empty 90)
+F1 3_3_7_7_9 j=2 G=51 slice-mid dim=3: 200 values, C and Python agree on 200 (non-empty 90)
+F1: 3400/3400 agree (1530 non-empty)
+F2 2_2_3 j=1 G=51 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_3_7_7 j=1 G=87 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_3_7_7 j=1 G=51 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=1 G=197 whole: 7 survivor runs, 3 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=1 G=160 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=1 G=123 whole: 8 survivor runs, 4 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=2 G=123 whole: 102 survivor runs, 88 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=1 G=87 whole: 5 survivor runs, 1 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=2 G=87 whole: 54 survivor runs, 39 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=1 G=51 whole: 6 survivor runs, 2 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=2 G=51 whole: 22 survivor runs, 8 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=3 G=51 slice-mid: 2 survivor runs, 2 resolved by topgpu -> CONSISTENT
+F2 2_3_4_6_7_8_9 j=3 G=51 slice-first: 2 survivor runs, 2 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=346 whole: 5 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=308 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=271 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=271 whole: 151 survivor runs, 145 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=234 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=234 whole: 124 survivor runs, 118 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=197 whole: 5 survivor runs, 1 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=197 whole: 89 survivor runs, 83 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=197 slice-mid: 95 survivor runs, 95 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=197 slice-first: 102 survivor runs, 102 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=160 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=160 whole: 67 survivor runs, 61 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=160 slice-mid: 140 survivor runs, 140 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=160 slice-first: 124 survivor runs, 124 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=123 whole: 5 survivor runs, 1 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=123 whole: 31 survivor runs, 25 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=123 slice-mid: 45 survivor runs, 45 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=123 slice-first: 90 survivor runs, 90 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=123 slice-mid: 77 survivor runs, 77 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=123 slice-first: 87 survivor runs, 87 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=87 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=87 whole: 18 survivor runs, 12 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=87 slice-mid: 24 survivor runs, 24 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=87 slice-first: 24 survivor runs, 24 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=87 slice-mid: 49 survivor runs, 49 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=87 slice-first: 70 survivor runs, 70 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=1 G=51 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=2 G=51 whole: 9 survivor runs, 3 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=3 G=51 whole: 102 survivor runs, 100 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=51 slice-mid: 8 survivor runs, 8 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=4 G=51 slice-first: 56 survivor runs, 56 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=5 G=51 slice-mid: 28 survivor runs, 28 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_2_2_2_3_3_3_7 j=5 G=51 slice-first: 34 survivor runs, 34 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=421 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=383 whole: 4 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=346 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=346 whole: 65 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=308 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=308 whole: 171 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=271 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=271 whole: 82 survivor runs, 80 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=271 slice-mid: 104 survivor runs, 104 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=271 slice-first: 114 survivor runs, 114 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=234 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=234 whole: 59 survivor runs, 57 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=234 slice-mid: 111 survivor runs, 111 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=234 slice-first: 121 survivor runs, 121 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=197 whole: 4 survivor runs, 1 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=197 whole: 39 survivor runs, 37 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=197 slice-mid: 105 survivor runs, 105 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=197 slice-first: 115 survivor runs, 115 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=197 slice-mid: 213 survivor runs, 213 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=197 slice-first: 552 survivor runs, 552 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=160 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=160 whole: 37 survivor runs, 35 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=160 slice-mid: 156 survivor runs, 156 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=160 slice-first: 144 survivor runs, 144 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=160 slice-mid: 192 survivor runs, 192 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=160 slice-first: 473 survivor runs, 473 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=123 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=123 whole: 16 survivor runs, 14 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=123 slice-mid: 39 survivor runs, 39 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=123 slice-first: 85 survivor runs, 85 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=123 slice-mid: 132 survivor runs, 132 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=123 slice-first: 140 survivor runs, 140 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=123 slice-mid: 496 survivor runs, 496 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=123 slice-first: 2564 survivor runs, 2558 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=87 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=87 whole: 11 survivor runs, 9 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=87 slice-mid: 27 survivor runs, 27 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=87 slice-first: 27 survivor runs, 27 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=87 slice-mid: 61 survivor runs, 61 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=87 slice-first: 82 survivor runs, 81 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=87 slice-mid: 165 survivor runs, 165 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=87 slice-first: 620 survivor runs, 620 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=1 G=51 whole: 3 survivor runs, 0 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=2 G=51 whole: 4 survivor runs, 2 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=3 G=51 whole: 42 survivor runs, 42 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=51 slice-mid: 6 survivor runs, 6 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=4 G=51 slice-first: 62 survivor runs, 62 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=51 slice-mid: 63 survivor runs, 63 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=5 G=51 slice-first: 42 survivor runs, 41 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=6 G=51 slice-mid: 66 survivor runs, 65 resolved by topgpu -> CONSISTENT
+F2 2_2_2_2_3_3_3_3_3_3_3_3_3 j=6 G=51 slice-first: 259 survivor runs, 259 resolved by topgpu -> CONSISTENT
+F2: 97 jobs, 9803 survivor runs, 9355 resolved
+P (fp) G=16: 150/150 planted genuine configurations kept, outputs consistent with topc3: True
+TOPGPU VALIDATION PASSED

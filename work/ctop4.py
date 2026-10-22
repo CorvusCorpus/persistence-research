@@ -1,6 +1,9 @@
 """Base-10 cumulative top test on the GPU (csrc/topgpu): one run per step, all orderings from `skip`, every first gap.
-Statement and survivor handling identical to ctop3.prove_top_c (topgpu prints the same SURV runs and counters as topc3:
-val_topgpu.py). Resumable at ordering boundaries: progress reports (ordering, 1), which ctop3 also accepts."""
+Statement and survivor handling identical to ctop3.prove_top_c (topgpu decides the same cases and counters as topc3:
+val_topgpu.py), except that the job carries the lattice basis ("fp" section) and topgpu resolves itself the survivor runs whose
+exact lattice enumeration is empty (ctop2.candidates would then be [] and the run needs nothing more): they come back as a
+count per ordering in PROG and are added to stats['enum'], so the statistics equal ctop3's. Resumable at ordering boundaries:
+progress reports (ordering, 1), which ctop3 also accepts."""
 import os, subprocess, tempfile
 from fractions import Fraction
 from ctop2 import lattice_job, config_N, candidates, could_be_solution
@@ -16,6 +19,8 @@ def run_top(top, j, ranges, orders, skip, g0lo=1):
     lines += [f"j {j}", "cum 1", "ranges " + " ".join(map(str, ranges)), f"nord {len(orders)}"]
     lines += [" ".join(str(9 * (x - 1)) for x in o) for o in orders]
     lines += [f"skip {skip}", "maxsurv 10000000", "debug 0", f"g0lo {g0lo}", f"g0hi {ranges[0] - 1}"]
+    lat = top.lat; R2 = Fraction(lat.R2)                     # topgpu resolves survivor runs with no lattice vector within R
+    lines += [f"fp {lat.dim}"] + [" ".join(map(str, row)) for row in lat.B] + [f"R2 {R2.numerator} {R2.denominator}"]
     fd, path = tempfile.mkstemp(suffix='.job'); os.write(fd, ("\n".join(lines) + "\n").encode()); os.close(fd)
     try:
         p = subprocess.Popen([BIN, path], stdout=subprocess.PIPE, text=True, bufsize=1, env=dict(os.environ, TP_CPU=CPU))
@@ -56,6 +61,7 @@ def _run(j, bag, top, ranges, sel, sk, glo, base, stats, cache, lat, progress):
                         else: stats['resolved'] = stats.get('resolved', 0) + 1
         elif f[0] == 'PROG':                                 # cases counted per finished ordering, as checkpoints record
             cur = int(f[2]); stats['top'] += cur - last; last = cur
+            if len(f) > 5: stats['enum'] += int(f[5])        # survivor runs topgpu resolved (empty lattice enumeration)
             progress((base + int(f[1]), 1))                  # (base: index of a single-ordering run's ordering)
         elif f[0] == 'DONE':
             stats['top'] += int(f[1]) - last; last = int(f[1])

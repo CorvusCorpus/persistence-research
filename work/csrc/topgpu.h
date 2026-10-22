@@ -8,6 +8,7 @@ extern "C" {
 
 #define TP_MAXJ 40
 #define TP_NC 7                    /* digit coefficients c = 9 (d - 1), d in 2 3 4 6 7 8 9 */
+#define TP_NREC 3                  /* most terms |Theta| u^n / n carried by the per-prefix recurrence (topgpu.cu) */
 
 typedef struct {                   /* one prefix (all digits but the last) and the range of the last gap */
     unsigned int o;                /* ordering index */
@@ -16,13 +17,14 @@ typedef struct {                   /* one prefix (all digits but the last) and t
 } tp_prefix;
 
 /* a case the host decides exactly (top3.c's code): kind 1 = not certainly killed (or uncertain), kind 2 = the whole prefix
- * (small heights: the series would converge too slowly) */
-typedef struct { unsigned int prefix, gl, kind, pad; unsigned long long psi1, psi2; } tp_out;   /* psi: dump mode (kind 3) */
+ * (not produced since heights below Smin come from the small-height table; the host still handles it) */
+typedef struct { unsigned int prefix, gl, kind, pad; unsigned long long psi1, psi2; } tp_out;   /* psi: dump mode (kind 3, pad =
+                                   the path of psi1: 0 small-height table, 1 direct series, 2 recurrence start, 3 recurrence step) */
 
 typedef struct {
     int j, cls, LW, LT;            /* digits; size class (kernel instantiation); limbs of the fixed-point values / of Theta */
     int FL, FT;                    /* fraction bits: lambda, 1/A, c 10^-S (FL); Theta (FT) */
-    int Smin;                      /* heights below Smin (levels >= 2 and the last digit) go to the host */
+    int Smin;                      /* = 5: digits at heights below Smin (at most four) take log A, 1/A from the small table */
     int smax;                      /* largest height in the tables */
     unsigned long long rho_hi, rho_lo;   /* level 1: certainly killed if dist > rho_hi, certainly passes if dist < rho_lo (2^-64) */
     unsigned long long dy, ds;     /* level 2 margins on dist(y) and |s| (2^-64) */
@@ -30,9 +32,12 @@ typedef struct {
     unsigned long long g2l, g3l;   /* lower bounds of g2/R2, g3/R2 with 32 fraction bits */
     int dump;                      /* validation: one kind-3 record with psi1, psi2 per case (no classification) */
     int nterm[600];                /* log1p / inverse series terms needed at height S (|w| <= 72 10^-S) */
+    int nrec[600];                 /* recurrence terms at height S (1 .. TP_NREC; 0: the direct series) */
     long long o_cs, o_lam1, o_ia1, o_c10, o_inv, o_th, o_th2;   /* table offsets (u32 words): c-index per (ordering, digit),
                                    packed 4 per word; level-1 log and inverse per (c, S); c 10^-S per (c, S); 1/n; Theta, Theta2
                                    (word 0: 1 if negative, then the low L + 1 limbs of round(|Theta| 2^64)) */
+    long long o_sl, o_sia;         /* small-height table: log A, 1/A for A = 1 + sum c_h 10^-h over heights h = 1 .. 4, entry
+                                   sum_h (cidx_h + 1) 8^(h - 1) (0 = no digit at h) */
     long long words;
 } tp_params;
 

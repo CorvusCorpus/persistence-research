@@ -1,10 +1,11 @@
 """Validation of the GPU bottom solver (csrc/bottomgpu, or bottomgpu_emu: the same kernel compiled for the CPU).
-  K  kernel tests: queries (Flow, c, p) with arbitrary Flow at production scale (G = 14 .. 197, boxes U, W ~ 2 XL with
+  K  kernel tests: queries (Flow, c, p) with arbitrary Flow at production scale (G = 14 .. 360, boxes U, W ~ 2 XL with
      G = ceil(2 log10 XL) + 12). Planted: F = 2^t 3^u' 7^w mod 10^G with (t, u', w) in the box, split as c 10^p + Flow
      (all p, including p = 0 and small p, which take the direct 5-adic and 2-adic paths); random: arbitrary Flow.
      For every query the kernel's candidates must equal bottom_ref.py's exact list, and every planted point must be found.
-  C  configuration spaces: whole steps of the bootstrapping plan of small bags (and slices of large ones), byte-identical
-     output (CAND lines, PROG, DONE counters) to csrc/bottomc3.
+  C  configuration spaces: whole steps of the bootstrapping plan of small bags (and slices of large ones), and the steps with
+     G > 200 of the largest bag of node 221184 (size classes up to G = 360), byte-identical output (CAND lines, PROG, DONE
+     counters) to csrc/bottomc3.
   P  genuine numbers: jobs whose configuration space contains the digits of a genuine zero-free 7-smooth number (work/Z.json);
      byte-identical to bottomc3, and the genuine solution must be among the CAND lines.
 usage (from work/): python3 val_bottomgpu.py EXE [K|C|P ...] [--n NQ] [--seed S]"""
@@ -29,7 +30,7 @@ def run(exe, lines, env=None):
 
 def part_k(exe, nq, seed):
     rnd = random.Random(seed); ok = True
-    for G in (14, 25, 40, 51, 60, 87, 90, 123, 125, 160, 165, 197, 200):
+    for G in (14, 25, 40, 51, 60, 87, 90, 123, 125, 160, 165, 197, 200, 234, 240, 271, 280, 308, 320, 346, 360):
         XL = 10 ** ((G - 12) // 2) + rnd.randrange(10 ** max(1, (G - 12) // 2 - 1))
         U = int(2.0960 * XL + 3); W = int(1.1834 * XL + 2); tm = min(38, G - 8); Mmax = max(4 * G + 8, G)
         cs = consts(Mmax)
@@ -107,13 +108,16 @@ def plan_jobs(bag, maxsolves=3_000_000):
 
 def part_c(exe, cpu):
     ok = True; n = 0
-    for bag in [(2, 2, 3), (2, 3, 7, 7), (2, 2, 2, 3, 3, 7), (2, 3, 4, 6, 7, 8, 9), (2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 7)]:
+    bags = [((2, 2, 3), 0), ((2, 3, 7, 7), 0), ((2, 2, 2, 3, 3, 7), 0), ((2, 3, 4, 6, 7, 8, 9), 0), ((2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 7), 0),
+            ((2,) * 13 + (3, 3, 3), 200)]                 # the largest bag of node 221184: only its steps with G > 200
+    for bag, gmin in bags:
         for name, lines in plan_jobs(bag):
+            G = int(lines[1].split()[1]); h0 = int([l for l in lines if l.startswith('heff')][0].split()[1])
+            if G <= gmin: continue
             a = run(cpu, lines); b = run(exe, lines); n += 1
             same = a == b
             ok &= same
-            G = int(lines[1].split()[1]); h0 = int([l for l in lines if l.startswith('heff')][0].split()[1])
-            path = 'kernel' if (h0 <= G and G <= 200) else 'bottomc3 (exec)'
+            path = 'kernel' if (h0 <= G and G <= 360) else 'bottomc3 (exec)'
             print(f"C {name} [{path}]: {a.splitlines()[-1]} -> {'IDENTICAL' if same else 'DIFFERENT'}", flush=True)
             if not same:
                 print("   cpu:", a[-300:].replace("\n", " | ")); print("   gpu:", b[-300:].replace("\n", " | "))

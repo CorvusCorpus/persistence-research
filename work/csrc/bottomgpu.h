@@ -11,14 +11,14 @@ extern "C" {
 
 typedef struct {                   /* one lower configuration (Flow) and the range of heights p of the top digit */
     unsigned int o;                /* ordering index (the digits come from the ordering table) */
-    unsigned char pos[BG_MAXB];    /* pos[r], r = 1 .. b-1: heights of digits d_{j+1+r} (pos[0] unused) */
-    unsigned char lo, phi;         /* p in [lo, phi) */
-    unsigned char pad[2];
+    unsigned short pos[BG_MAXB];   /* pos[r], r = 1 .. b-1: heights of digits d_{j+1+r} (pos[0] unused); heights < G */
+    unsigned short lo, phi;        /* p in [lo, phi) */
 } bg_flow;
 
+#define BG_OUTW 40                 /* limbs of a candidate's coordinates in a record (>= 2 LH of every size class) */
 /* kind 1: a candidate (seq = 4 w0 + 2 di + dj, bottom3.c's print order within a solve); kind 2: the host must redo this
  * solve (counted on the device; drop its kind-1 records); kind 3: the host must redo and count this solve */
-typedef struct { unsigned int flow, p, t, kind, seq; unsigned int up[32], w[32]; } bg_out;
+typedef struct { unsigned int flow, p, t, kind, seq; unsigned int up[BG_OUTW], w[BG_OUTW]; } bg_out;
 
 /* table offsets (in u32 words) inside one table buffer, and the sizes; filled by the host (bottomgpu_host.c) */
 typedef struct {

@@ -233,7 +233,7 @@ DF void do_core(const Ctx &C, const Big<L5> &F5N, const Big<L5> &F5G, const Big<
                 if ((long long)k < outcap) {
                     out[k].flow = flow_idx; out[k].p = (unsigned)p; out[k].t = (unsigned)t; out[k].kind = 1; out[k].seq = (unsigned)(4 * w0 + 2 * di + dj);
 #pragma unroll
-                    for (int i = 0; i < 32; i++) { out[k].up[i] = i < 2 * LH ? u.w[i] : 0u; out[k].w[i] = i < 2 * LH ? w.w[i] : 0u; }
+                    for (int i = 0; i < BG_OUTW; i++) { out[k].up[i] = i < 2 * LH ? u.w[i] : 0u; out[k].w[i] = i < 2 * LH ? w.w[i] : 0u; }
                 }
             }
         }
@@ -272,8 +272,9 @@ DF void do_query(const Ctx &C, const bg_query &q, unsigned idx, bg_out *out, lon
     do_core<L5, L2, LQ, LH>(C, F5N, F5G, F2, q.f5, q.ci, q.p, q.p + 1, idx, out, outcap, nout, cnt);
 }
 
-/* ---------------- size classes ---------------- */
-#define BG_CLASSES(X) X(0, 6, 5, 10, 7) X(1, 8, 6, 13, 9) X(2, 11, 7, 17, 11) X(3, 13, 9, 21, 13) X(4, 16, 10, 24, 14)
+/* ---------------- size classes (k, L5, L2, LQ, LH); Gmax 60, 90, 125, 165, 200, 240, 280, 320, 360 (bottomgpu_host.c) ---------------- */
+#define BG_CLASSES(X) X(0, 6, 5, 10, 7) X(1, 8, 6, 13, 9) X(2, 11, 7, 17, 11) X(3, 13, 9, 21, 13) X(4, 16, 10, 24, 14) \
+                      X(5, 19, 10, 26, 15) X(6, 22, 11, 30, 16) X(7, 25, 12, 34, 18) X(8, 28, 13, 38, 20)
 
 #ifdef BG_EMU
 static bg_params HP; static const u32 *HT; static const unsigned char *HORD;
