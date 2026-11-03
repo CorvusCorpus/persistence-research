@@ -20,6 +20,7 @@ from twoadic import tmax
 INF = float('inf')
 CFP = float(os.environ.get('CFP', '1000'))
 CAP = float(os.environ.get('MITM_TABLE_CAP', 'inf'))       # largest partner table (entries) that fits in memory
+GPMAX = 79                                                  # largest window (prove_mitm: 27, the C programs' 64-bit limit)
 BC = prove_cum.BOTTOM_COST
 L5 = math.log10(5)
 
@@ -112,7 +113,7 @@ def round_top(bag, XL, top, bot, Gs, kind):
             nt = min(nt, deep_cost(prove_cum.deff_top(j, top), 1, h, Gs - h, len(set(bag))) * nord(bag, j))
         if j and kind == 'mitm':
             got = None
-            for Gp in range(1, 80):
+            for Gp in range(1, GPMAX + 1):
                 nb = NB_window(bag, bot, Gp, k - j)
                 if nb > CAP: break
                 if Gs + L5 * Gp >= need(XL, nt, BC * nb): got = (Gp, nb); break
@@ -135,7 +136,7 @@ def round_bot(bag, XL, top, bot, Gs, kind):
             nb = min(nb, deep_cost(list(reversed(cbottom2.heff_of(i, k, bot))), 0, h, Gs - h, len(set(bag))) * nord(bag, k - i))
         if kind == 'mitm':
             got = None
-            for Gt in range(1, 80):
+            for Gt in range(1, GPMAX + 1):
                 ntw = NT_window(bag, top, Gt, i)
                 if ntw > CAP: break
                 if L5 * Gs + Gt >= need(XL, BC * nb, ntw): got = (Gt, ntw); break

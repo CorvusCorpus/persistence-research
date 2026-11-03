@@ -1,6 +1,9 @@
-"""Fast MITM top step: job export for csrc/mitm_bottom (bottom-window table) and csrc/mitm_top (top probe), and the exact
-decision of the candidate pairs with mitm_ref (docs/MITM_STEPS.md section 2).
-usage (from work/): python3 mitm_fast.py test   (C bottom table against mitm_ref.bottom_entries)"""
+"""Fast MITM top step: job export for csrc/mitm_bottom (bottom-window table) and csrc/mitm_top (top probe; or csrc/mitmgpu,
+env MITM_TOP), and the exact decision of the candidate pairs with mitm_ref (docs/MITM_STEPS.md section 2).
+usage (from work/): python3 mitm_fast.py test             (C bottom table against mitm_ref.bottom_entries)
+                    python3 mitm_fast.py test_top         (mitm_top's pairs against brute force over all pairs)
+                    python3 mitm_fast.py test_gpu EXE     (csrc/mitmgpu or mitmgpu_emu against mitm_top and mpmath; MG_QUICK=1:
+                                                           the six small lattices only)"""
 import os, sys, subprocess, tempfile
 _here = sys.path.pop(0)           # work/struct.py would shadow the standard struct that numpy needs (as in prove_cum_gpu.py)
 import struct
@@ -11,7 +14,7 @@ import prove_cum, mitm_ref
 
 W = os.path.dirname(os.path.abspath(__file__))
 BOTTOM = os.path.join(W, 'csrc', 'mitm_bottom')
-TOP = os.path.join(W, 'csrc', 'mitm_top')
+TOP = os.environ.get('MITM_TOP', os.path.join(W, 'csrc', 'mitm_top'))     # or csrc/mitmgpu (same job, same output)
 VALS = (2, 3, 4, 6, 7, 8, 9)
 ENTRY = np.dtype([('key', '<u8'), ('q', '<u8', 3), ('hcode', '<u8'), ('dcode', '<u8'), ('t', '<u4'), ('b', '<u4'), ('sig', '<u8')])
 
@@ -48,8 +51,7 @@ def run_bottom(lat, bag, bot, bmax, workdir):
     if r.returncode: raise RuntimeError(f"mitm_bottom failed: {r.stderr[-300:]}")
     with open(out, 'rb') as fh:
         n = struct.unpack('<Q', fh.read(8))[0]
-        tab = np.frombuffer(fh.read(), dtype=ENTRY, count=n)
-    return tab
+    return np.memmap(out, dtype=ENTRY, mode='r', offset=8, shape=(n,)) if n else np.zeros(0, dtype=ENTRY)
 
 def decode(e):
     b = int(e['b']); hs = [(int(e['hcode']) >> (6 * r)) & 63 for r in range(b)]; ds = tuple((int(e['dcode']) >> (4 * r)) & 15 for r in range(b))
@@ -65,11 +67,11 @@ def write_top_job(lat, bag, j, ranges, table, path):
     lines += ["hw " + " ".join(map(str, hw)), "ncell " + " ".join(map(str, lat.ncell)), f"table {table}"]
     open(path, 'w').write("\n".join(lines) + "\n")
 
-def run_top(lat, bag, j, ranges, workdir, threads=None):
+def run_top(lat, bag, j, ranges, workdir, threads=None, exe=None):
     job = os.path.join(workdir, 'top.job')
     write_top_job(lat, bag, j, ranges, os.path.join(workdir, 'bottom.bin'), job)
-    r = subprocess.run([TOP, job] + ([str(threads)] if threads else []), capture_output=True, text=True)
-    if r.returncode: raise RuntimeError(f"mitm_top failed: {r.stderr[-300:]}")
+    r = subprocess.run([exe or TOP, job] + ([str(threads)] if threads else []), capture_output=True, text=True)
+    if r.returncode: raise RuntimeError(f"{exe or TOP} failed: {r.stderr[-300:]}")
     cands = []; done = None
     for line in r.stdout.splitlines():
         f = line.split()
@@ -117,6 +119,48 @@ def test_top():
     print("MITM_TOP TEST", "PASSED" if ok else "FAILED")
     return ok
 
+def test_gpu(exe):
+    """csrc/mitmgpu (or mitmgpu_emu) against csrc/mitm_top: the same cases, a superset of the candidates (extras only within
+    the extra margin of 64 units); and its dumped P_i (MG_DUMP=1) against mpmath at 60 digits beyond |Theta_i|, every case"""
+    import random
+    bag = (2, 2, 3, 3, 7, 7); k = len(bag); ok = True
+    cases = [(3000, 12, 9, 7, 2, [6, 7]), (3000, 12, 8, 6, 3, [7, 8, 9]), (10 ** 9, 20, 16, 9, 2, [8, 9]),
+             (10 ** 9, 20, 13, 9, 3, [12, 13, 14]), (10 ** 12, 30, 22, 12, 3, [20, 21, 22]), (10 ** 20, 40, 34, 14, 2, [33, 34]),
+             (10 ** 60, 55, 118, 12, 2, [117, 118]), (10 ** 100, 55, 212, 10, 2, [211, 212]), (10 ** 130, 55, 272, 8, 1, [272]),
+             (10 ** 180, 55, 372, 8, 1, [372])]                     # the last: beyond the size classes (mitm_top fallback)
+    if os.environ.get('MG_QUICK'): cases = cases[:6]
+    for XL, tm, Gs, Gp, j, ranges in cases:
+        lat = mitm_ref.MitmLattice(XL, tm, Gs, Gp)
+        with tempfile.TemporaryDirectory() as d:
+            run_bottom(lat, bag, {k: 2}, k - j, d)
+            cpu, dc = run_top(lat, bag, j, ranges, d, exe=os.path.join(W, 'csrc', 'mitm_top'))
+            gpu, dg = run_top(lat, bag, j, ranges, d, exe=exe)
+            env = dict(os.environ, MG_DUMP='1')
+            r = subprocess.run([exe, os.path.join(d, 'top.job')], capture_output=True, text=True, env=env)
+        sc = {(o, tuple(ds), i) for o, ds, i in cpu}; sg = {(o, tuple(ds), i) for o, ds, i in gpu}
+        same = dc[0] == dg[0] and sc <= sg
+        # dump: every case's P_i against mpmath
+        th = [lat.Minv[2, i] / lat.eps for i in range(3)]
+        orders = prove_cum.ordered(bag, j); worst = 0; npt = 0
+        lines = [l.split() for l in r.stdout.splitlines() if l.startswith('PT ')]
+        rnd = random.Random(1); sample = lines if len(lines) <= 3000 else rnd.sample(lines, 3000)
+        with mp.workdps(int(max(mp.log10(abs(t)) for t in th)) + 60):
+            for f in sample:
+                o = int(f[1]); ds = [int(x) for x in f[2:2 + j]]; P = [int(x) for x in f[2 + j:5 + j]]
+                lam = mp.log1p(sum(9 * (dd - 1) * mp.mpf(10) ** (-D) for dd, D in zip(orders[o], ds)))
+                for i in range(3):
+                    x = th[i] * lam; want = int(mp.floor((x - mp.floor(x)) * mp.mpf(2) ** 64))
+                    dd = (P[i] - want) % (1 << 64); worst = max(worst, min(dd, (1 << 64) - dd))
+                npt += 1
+        fallback = not r.stdout.startswith('MGDUMP')    # the job went to mitm_top (no dump)
+        good = same and r.returncode == 0 and (fallback or (len(lines) == dg[0] and worst <= 4))
+        ok &= good
+        print(f"Gs {Gs} Gp {Gp} j {j}: cases cpu {dc[0]} gpu {dg[0]}; candidates cpu {len(sc)} gpu {len(sg)} "
+              f"(extra {len(sg - sc)}, missing {len(sc - sg)}); " + ("CPU fallback (beyond the size classes)" if fallback else
+              f"dump {len(lines)} cases, {npt} checked, worst |dP| {worst} units of 2^-64") + f" -> {'OK' if good else 'FAIL'}", flush=True)
+    print("MITM_GPU TEST", "PASSED" if ok else "FAILED")
+    return ok
+
 def test():
     bag = (2, 2, 3, 3, 7, 7); k = len(bag)
     ok = True
@@ -151,3 +195,4 @@ def test():
 if __name__ == '__main__':
     if sys.argv[1:] == ['test']: sys.exit(0 if test() else 1)
     if sys.argv[1:] == ['test_top']: sys.exit(0 if test_top() else 1)
+    if sys.argv[1:2] == ['test_gpu']: sys.exit(0 if test_gpu(os.path.abspath(sys.argv[2])) else 1)

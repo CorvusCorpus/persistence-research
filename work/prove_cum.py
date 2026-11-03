@@ -151,7 +151,12 @@ def _save(path, obj):
     with open(tmp, 'w') as fh: json.dump(obj, fh)
     os.replace(tmp, path)
 
+MITM = os.environ.get('PC_MITM', '0') == '1'          # MITM top steps (prove_mitm.py, docs/MITM_STEPS.md); needs twochain
+
 def prove_bag(bag, log=print, limit=LIMIT, dry=False):
+    if MITM:
+        import prove_mitm
+        return prove_mitm.prove_bag(bag, log, limit, dry)
     bag = tuple(sorted(bag)); k = len(bag); tm = tmax(bag)
     key = '_'.join(map(str, bag))
     rpath = os.path.join(RES, key + '.json'); cpath = os.path.join(CK, key + '.json')
@@ -238,7 +243,8 @@ if __name__ == "__main__":
         Lb = 0; recs = []
         for b in sorted(bs, key=len):
             Lmax, res = prove_bag(b, log=lambda x: print(x, flush=True))
-            Lb = max(Lb, Lmax); recs.append([list(b), Lmax, res['top'], res['bot']] + ([res['bootstrap']] if res.get('bootstrap') else []))
+            Lb = max(Lb, Lmax); recs.append([list(b), Lmax, res['top'], res['bot']] + ([res['bootstrap']] if res.get('bootstrap') else [])
+                                            + ([{'mitm': 1, 'lmin': res['lmin']}] if res.get('mitm') else []))
         assert Lb <= 5000
         bset = {tuple(sorted(b)) for b in bs}
         pre = sorted(y for y in Z if y >= 10 and '0' not in str(y)

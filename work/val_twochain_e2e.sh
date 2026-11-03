@@ -5,6 +5,8 @@
 #   - the preimage set equals that of the committed proofC_NODE.json;
 #   - every genuine solution of every bag (Z.json) satisfies every proved fact D_j < top[j], a_i < bot[i];
 #   - the committed records' cost (units of the cost model) next to the new run's, for the record.
+# With PC_MITM=1 exported (MITM top steps, prove_mitm.py) every record must also carry the MITM tag and its lmin, and the
+# facts are checked for the genuine solutions with L >= lmin (the MITM facts are conditional on it).
 # usage (from work/): ./val_twochain_e2e.sh NODE [JOBS] [SCRATCH]
 set -u
 cd "$(dirname "$0")" || exit 1
@@ -16,6 +18,7 @@ tail -1 "$S/run.log"; cat "$S/time.log"
 python3 - "$S" "$NODE" "$W" <<'EOF'
 import json, sys, os, glob
 S, node, W = sys.argv[1], sys.argv[2], sys.argv[3]
+MITM = os.environ.get('PC_MITM', '0') == '1'
 bad = 0
 def fail(m):
     global bad; bad += 1; print("FAIL", m)
@@ -23,12 +26,16 @@ new = json.load(open(f"{S}/proofC_{node}.json"))[node]; old = json.load(open(f"{
 if new['preimages'] != old['preimages']: fail(f"preimages {new['preimages']} != committed {old['preimages']}")
 if not new['Lbound'] <= 5000: fail(f"Lbound {new['Lbound']}")
 for rec in new['bags']:
-    if len(rec) != 5 or rec[4] != 'twochain': fail(f"proofC bag entry {rec[0]} without bootstrap tag")
+    if len(rec) != 5 + MITM or rec[4] != 'twochain': fail(f"proofC bag entry {rec[0]} without bootstrap tag")
+    if MITM and not (isinstance(rec[5], dict) and rec[5].get('mitm') == 1 and rec[5]['lmin'] <= rec[1] + 1):
+        fail(f"proofC bag entry {rec[0]} without MITM tag")
 Z = json.load(open(f"{W}/Z.json"))
 cost_new = cost_old = 0.0; nb = nviol = nsol = 0; missing = 0
 for f in sorted(glob.glob(f"{S}/bagresC/*.json")):
     r = json.load(open(f)); nb += 1
     if r.get('bootstrap') != 'twochain' or not r['Lmax'] <= 5000: fail(f"{os.path.basename(f)}: {r.get('bootstrap')} {r['Lmax']}")
+    if MITM and r.get('mitm') != 1: fail(f"{os.path.basename(f)}: no MITM tag")
+    lmin = r.get('lmin', 0)
     bag = tuple(r['bag']); cost_new += r['stats']['cost']
     o = os.path.join(W, 'bagresC', os.path.basename(f))
     if os.path.exists(o): cost_old += json.load(open(o))['stats']['cost']
@@ -37,6 +44,7 @@ for f in sorted(glob.glob(f"{S}/bagresC/*.json")):
         s = str(y)
         if y < 10 or '0' in s or tuple(sorted(int(c) for c in s if c != '1')) != bag: continue
         nsol += 1; L = len(s); pos = [L - 1 - i for i, ch in enumerate(s) if ch != '1']; a = [L] + pos
+        if L < lmin: continue
         for j, T in r['top'].items():
             if not L - pos[int(j)] < T: nviol += 1
         for i, H in r['bot'].items():

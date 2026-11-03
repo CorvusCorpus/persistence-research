@@ -64,4 +64,6 @@ work/csrc/mitm_top
 work/csrc/bottomgpu_emu
 work/csrc/topgpu
 work/csrc/topgpu_emu
+work/csrc/mitmgpu
+work/csrc/mitmgpu_emu
 work/csrc/*.o

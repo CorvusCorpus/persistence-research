@@ -43,13 +43,20 @@ csrc/topgpu_cuda.o: $(TPDEPS) ; $(NVCC) -O3 -arch=$(CUDA_ARCH) -c -o $@ csrc/top
 csrc/topgpu_emu.o: $(TPDEPS) ; g++ -O2 -march=native -DTP_EMU -x c++ -c -o $@ csrc/topgpu.cu
 csrc/topgpu: csrc/topgpu_host.o csrc/topgpu_cuda.o ; $(NVCC) -o $@ $^ $(LIBS)
 csrc/topgpu_emu: csrc/topgpu_host.o csrc/topgpu_emu.o ; g++ -o $@ $^ $(LIBS)
-cuda: csrc/bottomgpu csrc/bottomgpu_emu csrc/topgpu csrc/topgpu_emu
+# GPU MITM top probe (drop-in for csrc/mitm_top; see csrc/mitmgpu.cu)
+MGDEPS = csrc/mitmgpu_host.c csrc/mitmgpu.cu csrc/mitmgpu.h csrc/bigfix.h
+csrc/mitmgpu_host.o: $(MGDEPS) ; $(CC) $(CFLAGS) -c -o $@ csrc/mitmgpu_host.c
+csrc/mitmgpu_cuda.o: $(MGDEPS) ; $(NVCC) -O3 -arch=$(CUDA_ARCH) -c -o $@ csrc/mitmgpu.cu
+csrc/mitmgpu_emu.o: $(MGDEPS) ; g++ -O2 -march=native -DMG_EMU -x c++ -c -o $@ csrc/mitmgpu.cu
+csrc/mitmgpu: csrc/mitmgpu_host.o csrc/mitmgpu_cuda.o ; $(NVCC) -o $@ $^ $(LIBS)
+csrc/mitmgpu_emu: csrc/mitmgpu_host.o csrc/mitmgpu_emu.o ; g++ -o $@ $^ $(LIBS)
+cuda: csrc/bottomgpu csrc/bottomgpu_emu csrc/topgpu csrc/topgpu_emu csrc/mitmgpu csrc/mitmgpu_emu
 
 gsieve:
 	$(MAKE) -C gsieve
 
 clean:
-	rm -f $(HELPERS) zf7 csrc/bottomgpu csrc/bottomgpu_emu csrc/topgpu csrc/topgpu_emu csrc/*.o
+	rm -f $(HELPERS) zf7 csrc/bottomgpu csrc/bottomgpu_emu csrc/topgpu csrc/topgpu_emu csrc/mitmgpu csrc/mitmgpu_emu csrc/*.o
 	$(MAKE) -C gsieve clean
 
 .PHONY: all helpers gsieve clean cuda

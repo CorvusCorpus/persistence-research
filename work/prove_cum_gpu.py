@@ -6,6 +6,8 @@ cbottom5 / ctop4 (the same decisions and counters as bottomc3 / topc3: val_botto
 cbottom4 / ctop3, and the bags of all the given nodes are proved by one pool of worker processes, the costliest first
 (estimates from logs/node_costs.json; each bag writes its own bagresC/ckptC file, as runner4/prove_cum do, so a stopped
 run resumes). A node's proofC_<node>.json is written exactly as prove_cum.py writes it, once every bag of it is proved.
+With PC_MITM=1 (prove_mitm.py) the MITM top steps probe on the GPU too (csrc/mitmgpu, the same output as csrc/mitm_top:
+mitm_fast.py test_gpu), unless --cpu-top or MITM_TOP is given.
 usage (from work/): python3 prove_cum_gpu.py [--jobs J] [--cpu-bottom] [--cpu-top] NODE ...
   --cpu-bottom / --cpu-top keep cbottom4 / ctop3 (the CPU paths), for comparisons."""
 import sys
@@ -33,6 +35,9 @@ def _prove(args):
     prove_cum._save = _save_retry
     if not cpu_b: prove_cum.cbottom4 = cbottom5
     if not cpu_t: prove_cum.ctop3 = ctop4
+    if prove_cum.MITM and not cpu_t and 'MITM_TOP' not in os.environ:   # MITM top steps: the GPU probe (csrc/mitmgpu)
+        import mitm_fast
+        mitm_fast.TOP = os.path.join(mitm_fast.W, 'csrc', 'mitmgpu')
     out = []
     Lmax, res = prove_cum.prove_bag(bag, log=lambda x: out.append(x))
     return bag, Lmax, res, out
@@ -71,7 +76,8 @@ if __name__ == "__main__":
             Lb = 0; recs = []
             for b in bags[s]:                             # prove_cum.py's order and record format
                 Lmax, res = results[tuple(sorted(b))]
-                Lb = max(Lb, Lmax); recs.append([list(b), Lmax, res['top'], res['bot']] + ([res['bootstrap']] if res.get('bootstrap') else []))
+                Lb = max(Lb, Lmax); recs.append([list(b), Lmax, res['top'], res['bot']] + ([res['bootstrap']] if res.get('bootstrap') else [])
+                                                + ([{'mitm': 1, 'lmin': res['lmin']}] if res.get('mitm') else []))
             assert Lb <= 5000
             bset = {tuple(sorted(b)) for b in bags[s]}
             pre = sorted(y for y in Z if y >= 10 and '0' not in str(y)
