@@ -1456,3 +1456,51 @@ Design notes: `docs/GPU_EVEN_TARGETS.md`. No result in `docs/RESULTS.md` changes
   - a closing step with every digit in one of two windows: never competitive;
   - dropping the bottom threshold's tm + 8 floor: 1.7× on 2¹³·3³ (tmax = 55);
   - a smaller margin than +12: about 1.3–1.5× at tm = 55.
+
+### E.10 221184 proved with two chains (22 Oct – 3 Nov 2026)
+- **Run 1.** At commit `fb7cf6b`: `PC_BOOTSTRAP=twochain python3 prove_cum_gpu.py --jobs 10 221184`.
+  - Binaries: topgpu v3 `f0afed4f…`, bottomgpu `6d277763…`, topc3 `af706775…`, bottomc3 `f47187db…`.
+  - Log `work/logs/prove_gpu_221184.log`; times in `work/logs/prove_gpu_221184.time`.
+  - Started 22 Oct 22:21:48 UTC. 109 of the 110 bags were done by 23 Oct 00:54:36 UTC (2 h 33 min). The largest bags went first;
+    after 71 min 81% of the plan's units were done.
+- **Interruption.** The run was still on the last bag, 2¹⁰·3²·4·6 (bottom level 8 at G = 60, ordering 256 of 544), when WSL stopped.
+  The PC went idle while the user was away; `wsl.exe` returned exit status 4 and the wrapper never wrote its end time. The
+  checkpoint was intact.
+- **Slow tail.** Several bottom steps ran on bottomc3 instead of the GPU, because bottomgpu hands any job with heff[0] > G to
+  bottomc3 (the modulus would vary). This happens when G falls by one between rounds. In the dry run of the two-chain plan it is
+  94 bottom steps and 6.4·10¹⁰ units; the k = 11–14 bags took 1,600–9,200 s each.
+  - Fix, commit `2bfe9b4`: the opt-in floor `PC_GB_FLOOR=1`. Such a step runs at G′ = heff[0], with the same configurations and a
+    fixed modulus, proving a_j < G′. The planner applies it only when it still lowers the fact, so it can't loop.
+  - Dry run with the floor: 0 such steps; plan cost +0.3%.
+  - `val_twochain_e2e.sh 1229312` with the floor: E2E OK in 45.5 s, against 1,859 s before
+    (`validation_pc/twochain/e2e_floor_1229312.out`).
+- **Resume.** 3 Nov 18:33:28–18:41:03 UTC at `fb7cf6b`, stopped by hand (log `prove_gpu_221184_resume.log`). Then 18:41:14–18:45:36 UTC
+  at `2bfe9b4` with `PC_GB_FLOOR=1` (log `prove_gpu_221184_floor.log`): the last bag finished in 261 s.
+  - Its level-8 step was resumed mid-ordering: orderings 0–269 ran at G = 60, the rest at G′ = 61. Both parts imply a_8 < 61,
+    which is the recorded fact.
+  - The bag's record carries `"gb_floor": 1`. Its stats['cost'] counts the resumed step twice: prove_bag adds a step's cost again
+    when it resumes a partial step. That is bookkeeping only, not part of the proof.
+- **Result.** `work/proofC_221184.json`: all 110 bags with two chains, bounds L ≤ 103. 221184 has **no 7-smooth preimage**: the
+  exhaustive list below 10^5000 contains none.
+- **Checks.**
+  - Every bag of `bags_of(221184)` is recorded, and `twochain_cum` recomputed from each record's facts gives its recorded bound.
+  - Four bags were re-proved from scratch on the CPU path with `recheck_bag_cpu.py` (topc3/bottomc3, same plan). Facts, bound and
+    every counter are IDENTICAL; logs in `validation_pc/twochain/recheck221184_*.log`:
+
+    | bag | k | CPU time |
+    |---|---|---|
+    | 2³·3³·4²·8² | 10 | 638 s |
+    | 2⁶·4²·6³ | 11 | 826 s |
+    | 2⁸·4·6³ | 12 | 1,553 s |
+    | 2¹⁰·6³ | 13 | 2,393 s |
+- **Consequences.**
+  - RESULTS 2.1 counts 100 nodes; 2.2 has target 6 determined to depth 4; 2.3 is updated.
+  - Target 6's next level is blocked by 27 depth-4 nodes; the largest bag is 913217421312's, with 35 digits.
+  - `work/certificate.json`, `work/results.md` (= `docs/results_base10.md`) and `MANIFEST.sha256` were regenerated.
+- **Open-node census** (cost model, two chains, node_costs per node with a 2.5 GB cap):
+  - 78 open nodes before this run, 77 now; 56 of them have estimates.
+  - 34 small ones take under an hour each, about 4 h in all. 15 medium ones take 1.3–40 h. The large ones are 914838624 (2.3 days),
+    3281116734 (3.9), 9633792 (11.6) and 33718272 (20).
+  - 21 nodes have bags of 20–44 digits. 13716864's bags exhaust `twoadic.tmax`'s memory, which needs a leaner algorithm before
+    that node can start.
+  - Only the four blockers extend any tree; after them every tree is blocked by a node whose bags have 22–42 digits.

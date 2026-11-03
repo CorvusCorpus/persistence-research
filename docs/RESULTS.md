@@ -28,9 +28,9 @@ both a 5 and an even digit (set G).
 
 | # | Claim | Status | Evidence |
 |---|---|---|---|
-| 2.1 | For 99 nodes of the even-final-digit trees, the complete set of 7-smooth preimages (all sizes) is determined. | THEOREM (computer-assisted: Matveev + lattice/p-adic reduction + exhaustive list) | `work/certificate.json`, `work/proofC_*.json`, `work/proofJ_*.json`, table `docs/results_base10.md`. Seven nodes (131712, 122472, 24192, 1229312, 314928, 41472, 93312; 22 Oct 2026) were proved with the GPU case loops (`work/prove_cum_gpu.py`, validated against the CPU programs, `docs/GPU_EVEN_TARGETS.md`); one bag of each of six of them was re-proved from scratch on the CPU path with identical facts, bounds and counters (NOTEBOOK E.6–E.8) |
-| 2.2 | Tree levels determined exactly: target 2 to depth 3; target 4 to depth 3; target 6 to depth 3; target 8 to depth 2. | THEOREM (from 2.1) | `docs/results_base10.md` |
-| 2.3 | Open (blocking) nodes, one per target: target 2: 11239424 (1.3·10^14 work units, plus two bags with k ≥ 17 whose a-priori bound overflows the current code); target 4: 1161216 (1.4·10^14); target 6: 221184 (2.2·10^13); target 8: 33718272 (1.6·10^15, plus six bags with k ≥ 17). | OPEN | costs `work/logs/node_costs.out`; checkpoints `work/ckptC/`, `work/bagresC/` |
+| 2.1 | For 100 nodes of the even-final-digit trees, the complete set of 7-smooth preimages (all sizes) is determined. | THEOREM (computer-assisted: Matveev, and for 221184 also Yu's 5-adic bound + lattice/p-adic reduction + exhaustive list) | `work/certificate.json`, `work/proofC_*.json`, `work/proofJ_*.json`, table `docs/results_base10.md`. Seven nodes (131712, 122472, 24192, 1229312, 314928, 41472, 93312; 22 Oct 2026) were proved with the GPU case loops (`work/prove_cum_gpu.py`, validated against the CPU programs, `docs/GPU_EVEN_TARGETS.md`); one bag of each of six of them was re-proved from scratch on the CPU path with identical facts, bounds and counters (NOTEBOOK E.6–E.8). **221184** (target 6; 22 Oct – 3 Nov 2026): no 7-smooth preimage, every bag L ≤ 103, proved with the two-chain bootstrapping (`PC_BOOTSTRAP=twochain`, `docs/BOOTSTRAP_TWO_CHAINS.md`) and topgpu v3, its last bag also with `PC_GB_FLOOR=1`; four bags (k = 10–13) re-proved from scratch on the CPU path with identical facts, bounds and counters (NOTEBOOK E.10) |
+| 2.2 | Tree levels determined exactly: target 2 to depth 3; target 4 to depth 3; target 6 to depth 4; target 8 to depth 2. | THEOREM (from 2.1) | `docs/results_base10.md` |
+| 2.3 | Open (blocking) nodes. Target 2: 11239424; target 4: 1161216; target 8: 33718272; target 6: the 27 unproved nodes at depth 4, whose largest bags have up to 35 non-1 digits (913217421312: 35; 2113929216: 28; 226492416: 26; 9437184: 22). Costs with two chains: 11239424 7.1·10¹², 1161216 6.3·10¹², 33718272 1.6·10¹⁴ work units; nodes with bags of 20 or more digits are beyond the current method. In all, 77 nodes of the known trees (`work/even_nodes.json`) are open. | OPEN | costs `work/logs/node_costs_twochain.out` (and `node_costs.out` for Matveev's chain alone); checkpoints `work/ckptC/`, `work/bagresC/` |
 | 2.4 | Odd final digits in base 10 are settled in the literature (Brier–Clavier–Gutsche–Naccache 2021). | KNOWN | `docs/LITERATURE.md` |
 
 ## 3. Small bases (nonzero final digits)
@@ -52,7 +52,8 @@ both a 5 and an even digit (set G).
 | `work/gsieve/G_small.json` | the 1,117 chain numbers (all < 10^131 exhaustively) | COMPUTATIONAL |
 
 ## Trust base
-Matveev's lower bound for linear forms in logarithms (base-10 and small-base trees); correctness of the
+Matveev's lower bound for linear forms in logarithms (base-10 and small-base trees); Yu's 5-adic lower bound (Acta Math.
+211 (2013), Theorem 2) for the nodes proved with the two-chain bootstrapping (221184); correctness of the
 exhaustive lists; correctness of the C/Python code (validated by planted tests, brute-force comparisons and
 independent re-derivations as documented); GMP/MPFR. Nothing here has been peer reviewed. Independent
 re-running (ideally re-implementation) is the main missing step before publication.

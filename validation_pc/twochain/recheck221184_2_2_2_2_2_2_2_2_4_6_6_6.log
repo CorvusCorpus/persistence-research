@@ -1,0 +1,5 @@
+  bag (2, 2, 2, 2, 2, 2, 2, 2, 4, 6, 6, 6): k=12 tmax=47 top {0: 38, 1: 38, 2: 38, 3: 38, 4: 38, 5: 38, 6: 38} bot {7: 55, 8: 55, 9: 55, 10: 55, 11: 55, 12: 2} -> every solution has L <= 92 (top cases 752116859, bottom solves 178486587, survivor runs 381775, proofs 72, 1553s)
+CPU re-proof: 1553 s
+record: {'top': 752116859, 'bottom': 178486587, 'enum': 381775, 'proofs': 72, 'cost': 1466063218.0}
+CPU:    {'top': 752116859, 'bottom': 178486587, 'enum': 381775, 'proofs': 72, 'cost': 1466063218.0}
+IDENTICAL

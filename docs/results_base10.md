@@ -63,6 +63,7 @@ Each row: every integer y = 2^a 3^b 7^c whose digit product equals the node, ove
 | 6 | 3 | 41472 | 13 | 84 | 138 | 1843968, 9483264, 46294416, 69441624, 226492416 |
 | 6 | 3 | 71442 | 9 | 7 | 101 | none |
 | 6 | 3 | 122472 | 11 | 26 | 105 | none |
+| 6 | 3 | 221184 | 16 | 110 | 103 | none |
 | 6 | 4 | 378 | 5 | 4 | 252 | none |
 | 6 | 4 | 686 | 4 | 1 | 202 | none |
 | 6 | 4 | 1764 | 6 | 6 | 307 | none |
@@ -107,5 +108,5 @@ Each row: every integer y = 2^a 3^b 7^c whose digit product equals the node, ove
 ## Tree levels determined exactly
 - target 2: every node at depth <= 3 is known; open nodes at depth 3: [11239424]
 - target 4: every node at depth <= 3 is known; open nodes at depth 3: [1161216]
-- target 6: every node at depth <= 3 is known; open nodes at depth 3: [221184]
+- target 6: every node at depth <= 4 is known; open nodes at depth 4: [23328, 27216, 28672, 34992, 96768, 139968, 148176, 163296, 214326, 236196, 642978, 1382976, 1492992, 1778112, 1843968, 2667168, 3211264, 9437184, 9483264, 13716864, 46294416, 69441624, 226492416, 1162261467, 2113929216, 3281116734, 913217421312]
 - target 8: every node at depth <= 2 is known; open nodes at depth 2: [33718272]

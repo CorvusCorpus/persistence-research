@@ -42,3 +42,6 @@ example, `python3 work/gsieve/aggregate.py 36000 -1 validation_pc/task3_cuda/rer
 `even_gpu/val_topgpu_v3_twochain.out` and `even_gpu/val_topgpu_v3_default_C.out`: `work/val_topgpu.py` on topgpu v3
 (`f0afed4f…`, coverage up to |θ| < 2⁻⁴⁰). The first uses the two-chain plans (parts K, C, P, F), the second today's plans
 (part C).
+
+`twochain/` also holds `e2e_floor_1229312.out` and `e2e_floor_1229312_run.log` (the same re-proof with `PC_GB_FLOOR=1`), and
+`recheck221184_<bag>.log`, the CPU re-proofs of four bags of 221184 with `work/recheck_bag_cpu.py` (NOTEBOOK E.10).

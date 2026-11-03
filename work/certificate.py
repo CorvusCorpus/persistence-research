@@ -19,8 +19,10 @@ if __name__ == "__main__":
     res = load()
     nodes = json.load(open('even_nodes.json'))
     out = {'method': 'gap chain: case split on runs of >=G ones; cumulative: bounds on depths D_j = L - a_(j+1) (top, '
-                     'LLL lattice tests) and heights a_i (bottom, exact 10-adic logarithms); Matveev bound; 2-adic bound via '
-                     'digit-placement recursion; exhaustive list of zero-free 7-smooth numbers below 10^5000',
+                     'LLL lattice tests) and heights a_i (bottom, exact 10-adic logarithms); Matveev bound (bags whose record '
+                     'carries "twochain": Matveev with four logarithms for the depths and Yu (Acta Math. 211, 2013, Theorem 2) '
+                     '5-adic bound for the heights, docs/BOOTSTRAP_TWO_CHAINS.md); 2-adic bound via digit-placement recursion; '
+                     'exhaustive list of zero-free 7-smooth numbers below 10^5000',
            'nodes': {}}
     for d in ('2', '4', '6', '8'):
         for s in nodes[d]:

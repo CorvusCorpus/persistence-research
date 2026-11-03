@@ -95,11 +95,16 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
     | 1161216 | 6.3·10¹² | 22× | ≈ 18 h |
     | 11239424 | 7.1·10¹² | — | ≈ 21 h |
     | 33718272 | 1.6·10¹⁴ | — | ≈ 20 days |
-- **Next: 221184 with two chains** (`PC_BOOTSTRAP=twochain python3 prove_cum_gpu.py --jobs 10 221184`, about 2–3 h; the user
-  decides), then CPU re-proofs of some bags (as in E.8) before any claim. Then 1161216 and 11239424 (about a day each, so they
-  need approval under the 12 h rule).
+- **221184: DONE** (22 Oct – 3 Nov 2026, NOTEBOOK E.10). It has no 7-smooth preimage; target 6 is determined to depth 4. 109 bags
+  took 2 h 33 min, and four CPU re-proofs were identical.
+- **Next: 1161216 and 11239424** with `PC_BOOTSTRAP=twochain PC_GB_FLOOR=1`. At the rate 221184 reached (≈ 1.5·10⁸ units/s) they
+  take about 12 h and 13 h, so they need the user's approval under the 12 h rule. Keep the PC from sleeping (an idle PC stopped
+  WSL in E.10).
 - **Meet-in-the-middle steps** (`docs/MITM_STEPS.md`, cost model `work/plan_mitm.py`): another 7.8–9.1× on the largest bags.
-  33718272 needs them to be practical. Design and implementation order in that document; nothing built yet.
+  33718272 (≈ 13–20 days with two chains) needs them to be practical. A Python prototype of the hash join (synthetic data,
+  against brute force) found every compatible pair. Implementation order in that document.
+- **`twoadic.tmax`** memoizes every partial placement keyed by the full partial sum and exhausts memory on some bags (13716864).
+  A leaner exact algorithm is needed before that node can start.
 
 ## P5 — research directions (speculative)
 - **Zero-free-mode sieve** to extend Chaffin's "no zero-free 7-smooth in (10^140, 10^20000)" (OEIS A238985 has no
