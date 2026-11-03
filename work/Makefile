@@ -3,7 +3,7 @@ CC      ?= gcc
 CFLAGS  ?= -O2 -march=native
 LIBS     = -lmpfr -lgmp -lm
 
-HELPERS = csrc/topc csrc/topc3 csrc/bottomc csrc/bottomc2 csrc/bottomc3 csrc/topb csrc/bottomb csrc/top csrc/bottom
+HELPERS = csrc/topc csrc/topc3 csrc/bottomc csrc/bottomc2 csrc/bottomc3 csrc/topb csrc/bottomb csrc/top csrc/bottom           csrc/mitm_bottom csrc/mitm_top
 
 all: $(HELPERS) zf7 gsieve
 
@@ -20,6 +20,10 @@ csrc/bottomb:  csrc/bottomb.c ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
 # legacy gap-chain helpers (prove_iter3.py); the original binaries were built from these sources
 csrc/top:      csrc/top_v1.c    ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
 csrc/bottom:   csrc/bottom_v1.c ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
+
+# MITM top step, CPU programs (docs/MITM_STEPS.md; validated by mitm_fast.py test / test_top against mitm_ref.py)
+csrc/mitm_bottom: csrc/mitm_bottom.c ; $(CC) $(CFLAGS) -o $@ $<
+csrc/mitm_top:    csrc/mitm_top.c    ; $(CC) $(CFLAGS) -fopenmp -o $@ $< $(LIBS)
 
 zf7: zf7.c ; $(CC) -O3 -march=native -fopenmp -o $@ $< -lm
 

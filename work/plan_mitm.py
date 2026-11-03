@@ -11,13 +11,15 @@ round re-proves one side's levels up to its frontier at one threshold, with one 
             two halves per configuration of the others (deep_cost).
 Each round takes the side and kind with the smallest cost per digit of log10 XL gained.
 usage (from work/): python3 plan_mitm.py BAG ...   (BAG as 2_2_3_7)   env MODES (default 0,1,2,3 = standard, MITM, deep,
-MITM or deep per round), CFP (1000), SHOW=1 (print the rounds)"""
+MITM or deep per round), CFP (1000), MITM_TABLE_CAP (largest partner table in entries; default unlimited),
+SHOW=1 (print the rounds)"""
 import sys, os, math
 import prove_cum, cbottom2
 from twoadic import tmax
 
 INF = float('inf')
 CFP = float(os.environ.get('CFP', '1000'))
+CAP = float(os.environ.get('MITM_TABLE_CAP', 'inf'))       # largest partner table (entries) that fits in memory
 BC = prove_cum.BOTTOM_COST
 L5 = math.log10(5)
 
@@ -112,8 +114,8 @@ def round_top(bag, XL, top, bot, Gs, kind):
             got = None
             for Gp in range(1, 80):
                 nb = NB_window(bag, bot, Gp, k - j)
+                if nb > CAP: break
                 if Gs + L5 * Gp >= need(XL, nt, BC * nb): got = (Gp, nb); break
-                if nb > 1e14: break
             if got is None: return None
             Gp, nb = got
             if tables.get(Gp, 0) < nb: cost += BC * (nb - tables.get(Gp, 0)); tables[Gp] = nb
@@ -135,8 +137,8 @@ def round_bot(bag, XL, top, bot, Gs, kind):
             got = None
             for Gt in range(1, 80):
                 ntw = NT_window(bag, top, Gt, i)
+                if ntw > CAP: break
                 if L5 * Gs + Gt >= need(XL, BC * nb, ntw): got = (Gt, ntw); break
-                if ntw > 1e14: break
             if got is None: return None
             Gt, ntw = got
             if tables.get(Gt, 0) < ntw: cost += ntw - tables.get(Gt, 0); tables[Gt] = ntw

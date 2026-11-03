@@ -1,7 +1,29 @@
 # Meet-in-the-middle steps for the even-target prover (design and cost model)
 
-Research note (session 5, 22 Oct 2026). Status: **cost model only; nothing implemented, nothing in `docs/RESULTS.md` depends
-on it.** It builds on the two-chain bootstrapping (`docs/BOOTSTRAP_TWO_CHAINS.md`), which is implemented.
+Research note (session 5, 22 Oct 2026; implementation started 3 Nov 2026). Status: **the MITM top step exists as an exact
+reference (`work/mitm_ref.py`) and as validated CPU programs (`csrc/mitm_bottom`, `csrc/mitm_top`, driver `work/mitm_fast.py`);
+no GPU version and no use in any proof yet.** Nothing in `docs/RESULTS.md` depends on it. It builds on the two-chain
+bootstrapping (`docs/BOOTSTRAP_TWO_CHAINS.md`), which is implemented.
+
+**Validation so far (3 Nov 2026):**
+- `mitm_ref.py` self-test:
+  - The hash join against brute force over all pairs, on three lattices: 0/0, 7,568/7,568 and 12/12 compatible pairs found.
+  - 40/40 planted genuine numbers found with their own (t, u′, w, L).
+- `mitm_boot.py`: four bags of 24192 (k = 6) proved with MITM top steps mixed into the two-chain bootstrapping. Every bound
+  ≤ 89; every fact holds for the genuine solutions; the top facts end at 26 instead of 37.
+- `mitm_fast.py test`: mitm_bottom's table equals the reference entry for entry (same torus points to 2⁻⁶⁴, same cells).
+- `mitm_fast.py test_top`: mitm_top finds exactly the pairs that brute force finds (0/0, 12/12, 37/37).
+
+**Memory.** A partner table must fit in memory. With at most 10⁸ entries (`MITM_TABLE_CAP=1e8` in `plan_mitm.py`), the gains
+fall by only 10–25%:
+
+| Largest bag of | MITM only | MITM or deep |
+|---|---|---|
+| 221184 | 2.30·10¹⁰ | 1.31·10¹⁰ |
+| 1161216 | 1.79·10¹¹ | 1.09·10¹¹ |
+| 33718272 | 1.25·10¹³ | 5.5·10¹² |
+
+Uncapped, the planner would pick tables of up to 4.5·10¹⁰ entries for 33718272.
 
 ## 1. Where the cost is after two chains
 `prove_cum` proves facts D_j < G (top) and a_i < G (bottom) at G = ⌈2 log10 XL⌉ + 12, where XL is the current bound on

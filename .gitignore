@@ -59,6 +59,8 @@ work/tsieve/tsieve_gpu_emu_nl7
 work/tsieve/tsieve_gpu_emu_q8
 work/tsieve/tsieve_gpu_q64
 work/csrc/bottomgpu
+work/csrc/mitm_bottom
+work/csrc/mitm_top
 work/csrc/bottomgpu_emu
 work/csrc/topgpu
 work/csrc/topgpu_emu
