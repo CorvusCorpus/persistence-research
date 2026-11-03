@@ -109,6 +109,17 @@ def matveev_cum(k, tm, top, bot):
     assert nb <= B
     return max(10, math.ceil(Lb * 1.01))
 
+# PC_GB_FLOOR=1: a bottom step whose highest configured digit may lie at or above Gb (heff[0] > Gb, after G fell between
+# rounds) runs at Gb' = heff[0]: the same configurations with a fixed modulus 10^Gb' (bottomgpu covers it; otherwise it hands
+# the whole job to bottomc3, as M would vary), and the fact a_j < Gb' instead of a_j < Gb. Off by default (records so far).
+GB_FLOOR = os.environ.get('PC_GB_FLOOR', '0') == '1'
+
+def gb_step(j, k, bot, Gb):
+    """threshold of a bottom step at level j; the floor applies only when it still lowers the fact (else the loop could repeat it)"""
+    if not GB_FLOOR: return Gb
+    g = max(Gb, cbottom2.heff_of(j, k, bot)[0])
+    return g if g < bot.get(j, 10**18) else Gb
+
 def deff_top(j, top):
     return [min(top[ip] - (ip - i) for ip in range(i, j)) for i in range(j)]
 
@@ -167,6 +178,7 @@ def prove_bag(bag, log=print, limit=LIMIT, dry=False):
         if XL <= limit:
             res = {'bag': list(bag), 'Lmax': XL, 'top': top, 'bot': bot, 'stats': stats}
             if BOOTSTRAP != 'matveev': res['bootstrap'] = BOOTSTRAP
+            if GB_FLOOR: res['gb_floor'] = 1
             if not dry: _save(rpath, res)
             log(f"  bag {bag}: k={k} tmax={tm} top {dict(sorted(top.items()))} bot {dict(sorted(bot.items()))} -> every solution has "
                 f"L <= {XL} (top cases {stats['top']}, bottom solves {stats['bottom']}, survivor runs {stats['enum']}, "
@@ -208,12 +220,12 @@ def prove_bag(bag, log=print, limit=LIMIT, dry=False):
                     ok = ctop3.prove_top_c(j, bag, G, topl, known, stats, ordered(bag, j), skip, progress)
             else:
                 U = int(2.0960 * XL + 3); W = int(1.1834 * XL + 2)
-                ok = cbottom4.prove_bottom_cum(j, bag, Gb, tm, U, W, bot, stats, ordered(bag, k - j), skip, progress)
+                ok = cbottom4.prove_bottom_cum(j, bag, gb_step(j, k, bot, Gb), tm, U, W, bot, stats, ordered(bag, k - j), skip, progress)
             if not ok:
                 raise RuntimeError(f"bag {bag}: level {j} ({side}) not provable at G={G}")
         stats['proofs'] += 1
         if side == 'top': top[j] = min(top.get(j, 10**18), G)
-        else: bot[j] = min(bot.get(j, 10**18), Gb)
+        else: bot[j] = min(bot.get(j, 10**18), gb_step(j, k, bot, Gb))
         if not dry: _save(cpath, {'top': top, 'bot': bot, 'stats': stats, 'partial': None})
 
 if __name__ == "__main__":

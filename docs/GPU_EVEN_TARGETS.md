@@ -83,6 +83,14 @@ a covered job) and mod 2^n (n = M − t), obtained without exact divisions:
 (exec): other modes, jobs with heff[0] > G (M would vary), G > 360 (for node 221184 about 10⁷ solves in all), and any job
 failing the width check.
 
+**Floor rule.** In the two-chain plans G often falls by one between rounds, for example from 61 to 60. The next bottom step
+then has heff[0] = 61 > G and would go to bottomc3: 94 steps and 6.4·10¹⁰ units of 221184's plan. With `PC_GB_FLOOR=1`,
+prove_cum runs such a step at G′ = heff[0] instead (`prove_cum.gb_step`), and only when that still lowers the fact.
+- It tests the same configurations, with the fixed modulus 10^G′, and proves a_j < G′ instead of a_j < G.
+- It stays on the GPU. The plan's cost changes by +0.3%.
+- Records proved this way carry `"gb_floor": 1`.
+- NOTEBOOK E.10: 1229312 re-proved in 45 s with it, against 1,859 s without.
+
 **Exactness argument.** Each step computes the same residue of the same exact expression as bottom3.c (the series and
 plog identities above, with all truncated terms ≡ 0 mod p^M), so β is identical; the class tests and the lattice step are
 the same integer computations (the floor via a certified estimate, or the host). `work/bottom_ref.py` holds a Python
