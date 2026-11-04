@@ -22,7 +22,7 @@ csrc/top:      csrc/top_v1.c    ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
 csrc/bottom:   csrc/bottom_v1.c ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
 
 # MITM top step, CPU programs (docs/MITM_STEPS.md; validated by mitm_fast.py test / test_top against mitm_ref.py)
-csrc/mitm_bottom: csrc/mitm_bottom.c csrc/dlog5.h ; $(CC) $(CFLAGS) -o $@ $<
+csrc/mitm_bottom: csrc/mitm_bottom.c csrc/dlog5.h ; $(CC) $(CFLAGS) -fopenmp -o $@ $<
 csrc/mitm_top:    csrc/mitm_top.c csrc/mitm_exact.h csrc/dlog5.h ; $(CC) $(CFLAGS) -fopenmp -o $@ $< $(LIBS)
 
 zf7: zf7.c ; $(CC) -O3 -march=native -fopenmp -o $@ $< -lm
