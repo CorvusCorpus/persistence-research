@@ -13,3 +13,4 @@ node 23328: 48 digit multisets
 node 236196: 22 digit multisets
 node 28672: 19 digit multisets
 190 bags, 4 workers, bottom on CPU, top on CPU
+  bag (2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3): k=11 tmax=35 top {0: 37, 1: 37, 2: 37, 3: 37, 4: 37, 5: 37} bot {6: 47, 7: 47, 8: 47, 9: 47, 10: 47, 11: 2} -> every solution has L <= 83 (top cases 24925960, bottom solves 13841172, survivor runs 17978, proofs 61, 232s)
