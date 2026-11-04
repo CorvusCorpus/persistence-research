@@ -1,0 +1,6 @@
+val_twochain_e2e.sh 1229312 8 with PC_MITM=1 PC_GB_FLOOR=1 (GPU probe), commit 8a156625f501de01cc369bd61bca1c8ae9f88118, 2026-11-04T01:23:14Z
+node 1229312: all 7-smooth y with digit product 1229312: []   (29s)
+wall 28.83 s
+12 bags: twochain cost 2.121e+09 units; committed records 6.704e+10 (31.6x); 0 genuine solutions checked against the facts; preimages none
+E2E OK
+MITM steps 177, failed 0

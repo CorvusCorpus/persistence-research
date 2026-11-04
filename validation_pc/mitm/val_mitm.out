@@ -1,0 +1,70 @@
+val_mitm.sh 24192 8  commit 8a156625f501de01cc369bd61bca1c8ae9f88118  2026-11-04T01:17:32Z
+8ec2fcf2966b89df973dc0ffac89ddb3a907088cd222c7128bbc84432afc1787  csrc/mitm_bottom
+28f3995a3f0c18999e52254d416878caf23c99c8360dc8e148b9bfb96ee6fc57  csrc/mitm_top
+0946c30e2cabc38d789624d782c66d602a2e0e13636a10a84211876d62ec3fc6  csrc/mitmgpu
+02daf6e65ffca1c658c11e44bef8c6595fdfd40228986136d5aeaff91b75f815  csrc/mitmgpu_emu
+NVIDIA GeForce RTX 3060 Ti, 610.88
+== python3 mitm_ref.py
+lattice Gs 9 Gp 7: U 6291 W 3552 phi 62500 b1 [-285, 67] b2 [20, -224] det3 80503.0 half-widths ['0.0435', '0.0128', '0.0104'] cells [11, 39, 48]
+1) 135 top configurations x 2385 bottom entries: 394 probes, 108 candidate pairs; pairs with an exact solution 0 (0 lattice points), missed by the join 0
+lattice Gs 6 Gp 4: U 6291 W 3552 phi 500 b1 [20, -24] b2 [15, 7] det3 0.64403 half-widths ['1.08', '1.06', '0.99'] cells [1, 1, 1]
+1) 135 top configurations x 281 bottom entries: 37935 probes, 16560 candidate pairs; pairs with an exact solution 7568 (11865 lattice points), missed by the join 0
+lattice Gs 8 Gp 6: U 6291 W 3552 phi 12500 b1 [-65, 103] b2 [110, 18] det3 1610.1 half-widths ['0.107', '0.0459', '0.0548'] cells [4, 10, 9]
+1) 1344 top configurations x 501 bottom entries: 50244 probes, 10233 candidate pairs; pairs with an exact solution 12 (12 lattice points), missed by the join 0
+2) planted genuine numbers: 40/40 found (torus condition and exact pair)
+3) planted genuine numbers ending in 1, window Gp = 1 (empty): 5/5 found
+4) planted synthetic points, XL up to 10^100 (lattice precision): 20/20 found
+MITM REFERENCE SELF-TEST PASSED
+== python3 mitm_fast.py test
+Gs 9 Gp 1: reference 15 entries, C 15; same set True; worst |dQ| 0 units of 2^-64; cell keys differing 0; sorted True -> OK
+Gs 9 Gp 7: reference 2385 entries, C 2385; same set True; worst |dQ| 0 units of 2^-64; cell keys differing 0; sorted True -> OK
+Gs 20 Gp 12: reference 18003 entries, C 18003; same set True; worst |dQ| 0 units of 2^-64; cell keys differing 0; sorted True -> OK
+Gs 34 Gp 18: reference 73407 entries, C 73407; same set True; worst |dQ| 0 units of 2^-64; cell keys differing 0; sorted True -> OK
+Gs 22 Gp 11: reference 10699 entries, C 10699; same set True; worst |dQ| 0 units of 2^-64; cell keys differing 0; sorted True -> OK
+Gp 14: MB_CHECK=1 DONE 31011 -> OK
+Gp 20: MB_CHECK=1 DONE 104505 -> OK
+Gp 27: MB_CHECK=1 DONE 280065 -> OK
+MITM_BOTTOM TEST PASSED
+== python3 mitm_fast.py test_top
+top Gs 9 Gp 7 j 2: {'entries': 2385, 'cases': 135, 'probes': 394, 'candidates': 4}; exactly solvable pairs: fast 0, all pairs (brute force) 0 -> IDENTICAL
+top Gs 8 Gp 6 j 3: {'entries': 501, 'cases': 1344, 'probes': 50244, 'candidates': 279}; exactly solvable pairs: fast 12, all pairs (brute force) 12 -> IDENTICAL
+top Gs 16 Gp 9 j 2: {'entries': 6286, 'cases': 252, 'probes': 1584072, 'candidates': 7711}; exactly solvable pairs: fast 37, all pairs (brute force) 37 -> IDENTICAL
+top Gs 10 Gp 1 j 2: {'entries': 15, 'cases': 324, 'probes': 4860, 'candidates': 264}; exactly solvable pairs: fast 84, all pairs (brute force) 84 -> IDENTICAL
+MITM_TOP TEST PASSED
+== python3 mitm_fast.py test_exact csrc/mitm_top
+XL 10^3 Gs 6 Gp 4 j 2: 16560 candidates; solutions: probe 11865, mitm_ref 11865 -> IDENTICAL
+XL 10^3 Gs 9 Gp 7 j 2: 4 candidates; solutions: probe 0, mitm_ref 0 -> IDENTICAL
+XL 10^3 Gs 8 Gp 6 j 3: 279 candidates; solutions: probe 12, mitm_ref 12 -> IDENTICAL
+XL 10^3 Gs 10 Gp 1 j 2: 264 candidates; solutions: probe 84, mitm_ref 84 -> IDENTICAL
+XL 10^9 Gs 16 Gp 9 j 2: 7711 candidates; solutions: probe 37, mitm_ref 37 -> IDENTICAL
+XL 10^12 Gs 22 Gp 12 j 3: 1326 candidates; solutions: probe 1, mitm_ref 1 -> IDENTICAL
+XL 10^60 Gs 118 Gp 12 j 2: 34612 candidates; solutions: probe 42, mitm_ref 42 -> IDENTICAL
+XL 10^90 Gs 185 Gp 2 j 2: 3610 candidates; solutions: probe 825, mitm_ref 825 -> IDENTICAL
+XL 10^12 Gs 18 Gp 11 j 1: 208488 candidates; solutions: probe 12186, mitm_ref 12186 -> IDENTICAL
+MITM_EXACT TEST PASSED
+== python3 mitm_fast.py test_exact csrc/mitmgpu
+XL 10^3 Gs 6 Gp 4 j 2: 16560 candidates; solutions: probe 11865, mitm_ref 11865 -> IDENTICAL
+XL 10^3 Gs 9 Gp 7 j 2: 4 candidates; solutions: probe 0, mitm_ref 0 -> IDENTICAL
+XL 10^3 Gs 8 Gp 6 j 3: 279 candidates; solutions: probe 12, mitm_ref 12 -> IDENTICAL
+XL 10^3 Gs 10 Gp 1 j 2: 264 candidates; solutions: probe 84, mitm_ref 84 -> IDENTICAL
+XL 10^9 Gs 16 Gp 9 j 2: 7711 candidates; solutions: probe 37, mitm_ref 37 -> IDENTICAL
+XL 10^12 Gs 22 Gp 12 j 3: 1326 candidates; solutions: probe 1, mitm_ref 1 -> IDENTICAL
+XL 10^60 Gs 118 Gp 12 j 2: 34612 candidates; solutions: probe 42, mitm_ref 42 -> IDENTICAL
+XL 10^90 Gs 185 Gp 2 j 2: 3610 candidates; solutions: probe 825, mitm_ref 825 -> IDENTICAL
+XL 10^12 Gs 18 Gp 11 j 1: 208488 candidates; solutions: probe 12186, mitm_ref 12186 -> IDENTICAL
+MITM_EXACT TEST PASSED
+== env MG_QUICK=1 python3 mitm_fast.py test_gpu csrc/mitmgpu
+Gs 9 Gp 7 j 2: cases cpu 135 gpu 135; candidates cpu 4 gpu 4 (extra 0, missing 0); dump 135 cases, 135 checked, worst |dP| 2 units of 2^-64 -> OK
+Gs 8 Gp 6 j 3: cases cpu 1344 gpu 1344; candidates cpu 279 gpu 279 (extra 0, missing 0); dump 1344 cases, 1344 checked, worst |dP| 1 units of 2^-64 -> OK
+Gs 16 Gp 9 j 2: cases cpu 252 gpu 252; candidates cpu 7711 gpu 7711 (extra 0, missing 0); dump 252 cases, 252 checked, worst |dP| 2 units of 2^-64 -> OK
+Gs 13 Gp 9 j 3: cases cpu 6864 gpu 6864; candidates cpu 1697124 gpu 1697124 (extra 0, missing 0); dump 6864 cases, 3000 checked, worst |dP| 1 units of 2^-64 -> OK
+Gs 22 Gp 12 j 3: cases cpu 31920 gpu 31920; candidates cpu 1326 gpu 1326 (extra 0, missing 0); dump 31920 cases, 3000 checked, worst |dP| 2 units of 2^-64 -> OK
+Gs 34 Gp 14 j 2: cases cpu 4752 gpu 4752; candidates cpu 1644935 gpu 1644935 (extra 0, missing 0); dump 4752 cases, 3000 checked, worst |dP| 1 units of 2^-64 -> OK
+MITM_GPU TEST PASSED
+== e2e 24192, gpu probe (/mnt/c/Users/xlati/Desktop/persistence/persistence-research/work/csrc/mitmgpu)
+node 24192: all 7-smooth y with digit product 24192: [642978, 2667168, 9437184, 13716864, 1162261467, 3281116734]   (31s)
+wall 30.95 s
+39 bags: twochain cost 6.577e+08 units; committed records 8.215e+09 (12.5x); 6 genuine solutions checked against the facts; preimages [642978, 2667168, 9437184, 13716864, 1162261467, 3281116734]
+E2E OK
+MITM steps 333, failed 0
+VAL_MITM PASSED

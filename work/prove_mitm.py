@@ -20,6 +20,21 @@ import mitm_ref, mitm_fast
 
 CAP = float(os.environ.get('MITM_TABLE_CAP', '2.5e7'))    # 64-byte entries; mitm_bottom's peak is about 2.5x the table
 PL.CAP = CAP; PL.GPMAX = 27                               # mitm_bottom's 64-bit arithmetic needs Gp <= 27
+# Steps with tables above MITM_BIG entries run one at a time across processes (an flock on MITM_LOCK): several workers
+# building 2e7-entry tables at once would exhaust the host's and the GPU's memory.
+BIG = float(os.environ.get('MITM_BIG', '2e6'))
+LOCK = os.environ.get('MITM_LOCK', os.path.join(tempfile.gettempdir(), 'mitm_big_table.lock'))
+
+class big_step:
+    def __init__(self, nb): self.on = nb > BIG
+    def __enter__(self):
+        if self.on:
+            import fcntl
+            self.fh = open(LOCK, 'a'); fcntl.flock(self.fh, fcntl.LOCK_EX)
+    def __exit__(self, *a):
+        if self.on:
+            import fcntl
+            fcntl.flock(self.fh, fcntl.LOCK_UN); self.fh.close()
 
 def choose_round(bag, XL, top, bot, tm):
     k = len(bag)
@@ -48,10 +63,10 @@ def window_for(bag, XL, top, bot, j, Gs):
         if Gs + PL.L5 * Gp >= PL.need(XL, nt, PL.BC * nb): return Gp, nb
     return None, 0
 
-def mitm_step(bag, j, top, bot, XL, tm, Gs, Gp, stats):
+def mitm_step(bag, j, top, bot, XL, tm, Gs, Gp, nb, stats):
     lat = mitm_ref.MitmLattice(XL, tm, Gs, Gp)
     ranges = prove_cum.deff_top(j, top)
-    with tempfile.TemporaryDirectory(prefix="mitm_") as workdir:            # the step's table and jobs
+    with big_step(nb), tempfile.TemporaryDirectory(prefix="mitm_") as workdir:   # the step's table and jobs
         pairs, st = mitm_fast.fast_pairs(lat, bag, j, ranges, bot, workdir)
     S = max(top.get(j - 1, 0), Gs) + Gp
     ok = True
@@ -114,7 +129,7 @@ def prove_bag(bag, log=print, limit=prove_cum.LIMIT, dry=False):
                             if ok: break
                 elif Gp is not None:                         # MITM top step
                     Gj = Gs; stats['cost'] += PL.BC * nb
-                    if not dry: ok, Sj = mitm_step(bag, j, top, bot, XL, tm, Gs, Gp, stats)
+                    if not dry: ok, Sj = mitm_step(bag, j, top, bot, XL, tm, Gs, Gp, nb, stats)
                     else: Sj = max(top.get(j - 1, 0), Gs) + Gp
                     S = max(S, Sj); stats['mitm_steps'] += 1
                     log(f"    bag {bag}: MITM top j={j} XL 10^{math.log10(XL):.1f} G {G} -> {Gs} (window {Gp}, table {nb:.3g}, "

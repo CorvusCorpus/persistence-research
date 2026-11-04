@@ -1504,3 +1504,47 @@ Design notes: `docs/GPU_EVEN_TARGETS.md`. No result in `docs/RESULTS.md` changes
   - 21 nodes have bags of 20–44 digits. 13716864's bags exhaust `twoadic.tmax`'s memory, which needs a leaner algorithm before
     that node can start.
   - Only the four blockers extend any tree; after them every tree is blocked by a node whose bags have 22–42 digits.
+
+### E.11 MITM top steps in the prover, their GPU probe, and four bugs found by validation (3–4 Nov 2026)
+Design and cost model: `docs/MITM_STEPS.md`. No proof uses MITM steps yet; nothing in RESULTS depends on this entry.
+- **Implementation** (commits `67cc4f7`, `f76f2ea`, `8a15662`, `a3963d3`).
+  - `work/prove_mitm.py` (`PC_MITM=1`, two chains required): rounds from `plan_mitm.py`'s cost model; MITM top steps prove
+    D_j < Gs for L ≥ S_j; the bag's bound is max(XL, S − 1); every step's box uses max(XL, S − 1); tables capped at
+    `MITM_TABLE_CAP` (default 2.5·10⁷ entries); records tagged `mitm`, `lmin` (bagresC, proofC).
+  - `csrc/mitmgpu`: the probe on the GPU (topgpu's fixed-point λ on the direct path, three torus coordinates, a hash of the
+    table's cells); `prove_cum_gpu.py` uses it unless `--cpu-top`.
+  - `csrc/mitm_exact.h`: the exact decision of candidate pairs in C, inside both probes (before: Python, 0.28 ms per pair).
+  - `csrc/mitm_bottom`: the 5-adic discrete log digit by digit (`dlog5.h`), OpenMP enumeration, parallel sort.
+- **Bugs found while validating.** Only validation runs used the affected code.
+  1. *Level 0 in MITM rounds* ran the homogeneous test at Gs ≪ G and exhausted memory listing lattice points. Now at G.
+  2. *Lattice precision.* `MitmLattice` used Gs + Gp + 80 digits, but Mr = Tr·M cancels digits(Tr) + digits(M) digits. At
+     XL 10^35.8, Gs 72, Gp 18 the multipliers θ = Minv/ε were off by about 44, so the probe was meaningless and real pairs
+     were missed. Found because the C decisions reported 32 exactly solvable (false) pairs on a step where the old pipeline had
+     reported none. Precision now digits(Tr) + digits(M) + Gs + 60, and every lattice checks itself 40 digits higher.
+  3. *Empty window.* At Gp = 1 a solution ending in the digit 1 has an empty window (b = 0); it was never produced.
+  4. *Window codes.* Heights packed at 6 bits overflowed for windows of more than 10 digits; the decoded F was wrong
+     (found by the C decision's "dlog: 5 divides x" on 221184's largest bag).
+  - The comparisons between the C programs and the reference could not see bug 2: they share the lattice. The reference
+    self-test now plants synthetic points at production sizes (part 4; 0/6 found at the old precision, 20/20 now).
+  - The 3 Nov re-proofs of 24192 and 1229312 with MITM steps ran with bugs 2–4 and validate nothing about MITM; superseded.
+- **Validation** at `8a15662`: `work/val_mitm.sh` PASSED (`validation_pc/mitm/val_mitm.out`): reference self-test (four
+  parts), table, pairs, exact decisions (CPU and GPU), GPU probe, and 24192 re-proved with MITM steps: E2E OK in 31.0 s, 333
+  MITM steps. 1229312: E2E OK in 28.8 s, 177 MITM steps (`e2e_1229312.out`). `a3963d3` (parallel tables): `mitm_fast.py test`
+  passes, the 1.6·10⁷-entry table has the same entries as before, and two runs give identical files.
+- **Speed** (this machine):
+
+  | | before | now |
+  |---|---|---|
+  | node 24192, 8 workers | two chains + floor 44.7 s | MITM 31.0 s |
+  | node 1229312, 8 workers | 45.5 s | 28.8 s |
+  | largest step of 2¹³·3³ (6.0·10⁹ configurations, table 1.6·10⁷) | 152 s (Python decisions) | 53 s |
+  | 2¹³·3³, 221184's largest bag, one bag alone | 2,956 s in production (GPU shared by 10 workers) | 291 s |
+
+  - The 291 s (`validation_pc/mitm/bag_2e13_3e3_mitm_steps.log`): probe and exact decisions 133 s (1.58·10¹⁰ configurations,
+    1.0·10⁶ candidates, 1,131 exactly solvable pairs, all rejected by their last 40 digits), tables 100 s (1.5·10⁸ entries;
+    the parallel tables of `a3963d3` build them about 3 times faster), standard steps and planning 58 s. L ≤ 206.
+  - The production run's time for this bag was dominated by host work (5.3·10⁷ survivor runs at about 25 µs).
+  - The GPU probe runs at 1.4·10⁸ configurations/s (direct λ path); each start costs about 0.18 s.
+- **Left** (`docs/MITM_STEPS.md` §6): the GPU-side parallelepiped test (E fills 1/3.5–1/4.5 of its bounding box); topgpu's
+  recurrence for λ in the probe; one GPU process per round; the deep split; memory with several workers (a 2.5·10⁷-entry
+  table is a 1.6 GB file and needs about twice that while sorting).

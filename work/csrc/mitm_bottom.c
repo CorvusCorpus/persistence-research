@@ -180,7 +180,7 @@ int main(int argc, char **argv) {
             heights(s, d, d ? s->hts[d - 1] : Gp);
         }
     }
-    nE = 0; for (int i = 0; i < T; i++) nE += S[i].n;
+    nE = 0; for (int i = 0; i < T; i++) { nE += S[i].n; if (S[i].n) S[i].E = realloc(S[i].E, S[i].n * sizeof *S[i].E); }   /* peak 2x */
     E = malloc((nE ? nE : 1) * sizeof *E); if (!E) { fprintf(stderr, "oom\n"); return 2; }
     { size_t o = 0; for (int i = 0; i < T; i++) { if (S[i].n) memcpy(E + o, S[i].E, S[i].n * sizeof *E); o += S[i].n; free(S[i].E); } }
     free(S); free(task);

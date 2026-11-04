@@ -45,3 +45,11 @@ example, `python3 work/gsieve/aggregate.py 36000 -1 validation_pc/task3_cuda/rer
 
 `twochain/` also holds `e2e_floor_1229312.out` and `e2e_floor_1229312_run.log` (the same re-proof with `PC_GB_FLOOR=1`), and
 `recheck221184_<bag>.log`, the CPU re-proofs of four bags of 221184 with `work/recheck_bag_cpu.py` (NOTEBOOK E.10).
+
+`mitm/` (MITM top steps; `docs/MITM_STEPS.md`, `docs/NOTEBOOK.md` E.11):
+
+| file | run |
+|---|---|
+| `val_mitm.out`, `e2e_24192_gpu_run.log` | `work/val_mitm.sh` at `8a15662`: reference self-test, table, pairs, exact decisions (CPU and GPU), GPU probe, and 24192 re-proved with MITM steps on the GPU probe |
+| `e2e_1229312.out`, `e2e_1229312_gpu_run.log` | `val_twochain_e2e.sh 1229312` with `PC_MITM=1`, the same code |
+| `bag_2e13_3e3_mitm_steps.log` | 221184's largest bag proved alone with MITM steps on the GPU, every step timed (291 s) |
