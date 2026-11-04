@@ -1,18 +1,48 @@
 # Meet-in-the-middle steps for the even-target prover (design and cost model)
 
-Research note (session 5, 22 Oct 2026; implementation started 3 Nov 2026). Status: **the MITM top step exists as an exact
-reference (`work/mitm_ref.py`) and as validated CPU programs (`csrc/mitm_bottom`, `csrc/mitm_top`, driver `work/mitm_fast.py`);
-no GPU version and no use in any proof yet.** Nothing in `docs/RESULTS.md` depends on it. It builds on the two-chain
-bootstrapping (`docs/BOOTSTRAP_TWO_CHAINS.md`), which is implemented.
+Research note (session 5, 22 Oct 2026; implemented 3–4 Nov 2026). Status: **MITM top steps run inside the prover
+(`work/prove_mitm.py`, selected by `PC_MITM=1` with `PC_BOOTSTRAP=twochain`), with the probe and the exact decision of
+candidate pairs on the GPU host (`csrc/mitmgpu`, `csrc/mitm_exact.h`) or the CPU (`csrc/mitm_top`); not used in any proof yet.**
+Nothing in `docs/RESULTS.md` depends on it. It builds on the two-chain bootstrapping (`docs/BOOTSTRAP_TWO_CHAINS.md`).
 
-**Validation so far (3 Nov 2026):**
-- `mitm_ref.py` self-test:
-  - The hash join against brute force over all pairs, on three lattices: 0/0, 7,568/7,568 and 12/12 compatible pairs found.
-  - 40/40 planted genuine numbers found with their own (t, u′, w, L).
-- `mitm_boot.py`: four bags of 24192 (k = 6) proved with MITM top steps mixed into the two-chain bootstrapping. Every bound
-  ≤ 89; every fact holds for the genuine solutions; the top facts end at 26 instead of 37.
-- `mitm_fast.py test`: mitm_bottom's table equals the reference entry for entry (same torus points to 2⁻⁶⁴, same cells).
-- `mitm_fast.py test_top`: mitm_top finds exactly the pairs that brute force finds (0/0, 12/12, 37/37).
+**Components.**
+- `mitm_ref.py`: exact reference (slow). `mitm_bottom`: the bottom-window table. `mitm_top` / `mitmgpu`: the top probe (the
+  GPU kernel uses topgpu's fixed-point λ, three torus coordinates and a hash of the table's cells) and, with the job section
+  `exact 1`, the exact decision of every candidate pair (`mitm_exact.h`: GMP/MPFR, the reference's decisions).
+- `prove_mitm.py`: rounds chosen by `plan_mitm.py`'s cost model; level 0 at G; a MITM step at level j proves D_j < Gs for
+  L ≥ S_j = max(top[j−1], Gs) + Gp; the bag's bound is max(XL, S − 1), S the largest S_j; every step's box uses
+  max(XL, S − 1). Records carry `mitm: 1` and `lmin: S` (bagresC) and `{'mitm': 1, 'lmin': S}` (proofC bag entries).
+
+**Bugs found and fixed while validating (4 Nov 2026; only validation runs used the affected code).**
+- *Lattice precision.* `MitmLattice` worked at Gs + Gp + 80 digits, but Mr = Tr·M cancels about digits(Tr) + digits(M)
+  digits (Tr up to ~10⁴⁰, M up to ~10^(Gs+7)). At XL 10^35.8, Gs 72, Gp 18 the probe multipliers θ = Minv/ε were off by ~44,
+  so every P_T was meaningless and real pairs were missed. The precision is now digits(Tr) + digits(M) + Gs + 60, and every
+  lattice checks itself 40 digits higher (|Δθ| < 2⁻⁹⁰, |ΔMinv| < 10^−(Gs+40)). The comparisons between the C programs and
+  the reference could not see this (they share the lattice); the new self-test part 4 does (0/6 planted points at the old
+  precision, all at the new one).
+- *Empty window.* For Gp = 1 a solution may end in the digit 1: its window is empty (b = 0, F = −1, t = 0). Neither the
+  reference nor `mitm_bottom` produced it. Both do now (self-test part 3).
+- *Window codes.* `mitm_bottom` packed heights at 6 bits each, which overflows for windows of more than 10 digits; the
+  decoded F of such entries (Python path, then C) was wrong. Heights are now a bit mask and digits 3-bit indices (≤ 21 digits).
+- *Level 0 in MITM rounds* tried the homogeneous test at Gs ≪ G, where the lattice box holds astronomically many points
+  (memory exhausted). Level 0 now runs at G (at Gs only when Gs ≥ G − 8).
+- *Top test rounding.* `exact_pairs` rejects only when the value is outside (0, ε) by more than its rounding bound.
+
+The node re-proofs of 3 Nov with MITM steps (24192, 1229312) ran with these bugs and validate nothing about MITM; they are
+superseded by those of NOTEBOOK E.11.
+
+**Validation (4 Nov 2026; `work/val_mitm.sh`, logs in `validation_pc/mitm/`).**
+- `mitm_ref.py` self-test: (1) the hash join against brute force on three lattices (0/0, 7,568/7,568, 12/12 pairs);
+  (2) 40/40 planted genuine numbers; (3) 5/5 genuine numbers ending in 1 through the empty window at Gp = 1; (4) 20/20
+  planted synthetic points with XL from 10²⁰ to 10¹⁰⁰.
+- `mitm_fast.py test`: `mitm_bottom`'s table equals the reference entry for entry, including Gp = 1 and windows of up to
+  11 digits; every discrete log of Gp = 14, 20, 27 tables checked against Pohlig–Hellman (`MB_CHECK=1`).
+- `test_top`: the probe's pairs equal brute force over all pairs (four lattices, Gp = 1 included).
+- `test_exact`: the C decisions (`mitm_top` and `mitmgpu`) equal `mitm_ref.exact_pairs` on every candidate of nine lattices
+  (up to 208,488 candidates and 12,186 solutions; XL up to 10⁹⁰; windows of up to 11 digits).
+- `test_gpu`: `mitmgpu` has the same cases and candidates as `mitm_top`, and its P_i agree with mpmath within 2 units of
+  2⁻⁶⁴, up to |Θ| ~ 10²⁷⁰ (beyond the size classes the job goes to `mitm_top`).
+- `mitm_boot.py` (3 Nov): four bags of 24192 bootstrapped with reference MITM steps; every fact holds for the genuine numbers.
 
 **Memory.** A partner table must fit in memory. With at most 10⁸ entries (`MITM_TABLE_CAP=1e8` in `plan_mitm.py`), the gains
 fall by only 10–25%:
@@ -131,10 +161,12 @@ The two kinds of step help in different rounds:
   So four more digits cost about 150× more, even with both steps. Nodes deeper in the trees (up to 44 non-1 digits) need a
   different idea.
 
-## 6. Order of implementation (if pursued)
-1. The bottom-window table (C, 64-bit arithmetic for Gp ≤ 27: 5-adic discrete log, coset reduction, Q_B, cell index).
-2. A top kernel variant that outputs P_T (three coordinates) and probes the table on the GPU, with the existing prefix
-   machinery and error accounting.
-3. Exact decision of candidate pairs (Python or C Fincke–Pohst in 3 dimensions), then the existing could_be_solution check.
-4. A planner in prove_cum that chooses (Gs, Gp) per round; facts and records as now, plus the step type.
-5. Validation as in §2, then re-proofs of proved nodes and comparison of facts.
+## 6. Implementation status (4 Nov 2026)
+Done: the bottom-window table (`mitm_bottom`), the probe on the CPU (`mitm_top`) and the GPU (`mitmgpu`), the exact decision
+of candidate pairs in C (`mitm_exact.h`), the planner in the prover (`prove_mitm.py`), validation as above and re-proofs of
+proved nodes (NOTEBOOK E.11). Not done:
+- the deep-digit split (§3) and the bottom-side MITM step (only top steps exist);
+- an exact parallelepiped test on the GPU: the probe tests E's bounding box, 3.5–4.5 times E's volume, so 3–4 of every 4
+  candidates are rejected later by the exact decision;
+- building the table inside the probe process (today it goes through a file: about 0.6 µs per entry including the sort);
+- one GPU process per round instead of per step (each start costs about 0.2 s).

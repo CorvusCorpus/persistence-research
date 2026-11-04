@@ -117,10 +117,19 @@ static void mx_lam(mx_scr *s, int j, const int *digits, const int *D) {
     for (int i = 0; i < j; i++) { mpfr_ui_pow_ui(s->x, 10, (unsigned long)D[i], MPFR_RNDN); mpfr_ui_div(s->x, 9 * (digits[i] - 1), s->x, MPFR_RNDN); mpfr_add(s->lam, s->lam, s->x, MPFR_RNDN); }
     mpfr_log1p(s->lam, s->lam, MPFR_RNDN);
 }
-/* F = -1 + sum 9 (d_r - 1) 10^h_r from mitm_bottom's codes */
+/* F = -1 + sum 9 (d_r - 1) 10^h_r from mitm_bottom's codes (hcode: heights as a bit mask, from the top down; dcode: 3-bit
+ * indices of the digits 2 3 4 6 7 8 9 in that order) */
 static i128 mx_F(u64 hcode, u64 dcode, unsigned b) {
-    i128 F = -1, p;
-    for (unsigned r = 0; r < b; r++) { int h = (int)((hcode >> (6 * r)) & 63), d = (int)((dcode >> (4 * r)) & 15); p = 1; for (int q = 0; q < h; q++) p *= 10; F += (i128)(9 * (d - 1)) * p; }
+    static const int V[7] = {2, 3, 4, 6, 7, 8, 9};
+    i128 F = -1, p; unsigned r = 0;
+    for (int h = 63; h >= 0; h--) {
+        if (!((hcode >> h) & 1)) continue;
+        const unsigned ci = (unsigned)((dcode >> (3 * r)) & 7);
+        if (ci > 6 || h > 30) mx_die("window code");
+        p = 1; for (int q = 0; q < h; q++) p *= 10;
+        F += (i128)(9 * (V[ci] - 1)) * p; r++;
+    }
+    if (r != b) mx_die("window code: digit count");
     return F;
 }
 static void mx_set_i128(mpz_t z, i128 v) {

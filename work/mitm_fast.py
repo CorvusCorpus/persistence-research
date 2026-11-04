@@ -56,7 +56,11 @@ def run_bottom(lat, bag, bot, bmax, workdir):
     return np.memmap(out, dtype=ENTRY, mode='r', offset=8, shape=(n,)) if n else np.zeros(0, dtype=ENTRY)
 
 def decode(e):
-    b = int(e['b']); hs = [(int(e['hcode']) >> (6 * r)) & 63 for r in range(b)]; ds = tuple((int(e['dcode']) >> (4 * r)) & 15 for r in range(b))
+    """mitm_bottom's window codes: hcode the heights as a bit mask (from the top down), dcode 3-bit VALS indices in that order"""
+    b = int(e['b']); m = int(e['hcode'])
+    hs = [h for h in range(63, -1, -1) if m >> h & 1]
+    if len(hs) != b: raise ValueError("window code")
+    ds = tuple(VALS[(int(e['dcode']) >> (3 * r)) & 7] for r in range(b))
     return hs, ds, int(e['t'])
 
 def write_top_job(lat, bag, j, ranges, table, path, exact=False, cands=True):
@@ -116,11 +120,14 @@ def fast_pairs(lat, bag, j, ranges, bot, workdir, threads=None):
 
 def test_exact(exe):
     """the probe's own decisions (exact 1, PAIR lines) against mitm_ref.exact_pairs on every one of its candidates"""
-    bag = (2, 2, 3, 3, 7, 7); k = len(bag); ok = True
-    cases = [(3000, 12, 6, 4, 2, [6, 7]), (3000, 12, 9, 7, 2, [6, 7]), (3000, 12, 8, 6, 3, [7, 8, 9]), (3000, 12, 10, 1, 2, [9, 10]),
-             (10 ** 9, 20, 16, 9, 2, [8, 9]), (10 ** 12, 30, 22, 12, 3, [20, 21, 22]), (10 ** 60, 55, 118, 12, 2, [117, 118]),
-             (10 ** 90, 55, 185, 2, 2, [184, 185])]                  # the last: log10 XL > Gp + 70 (mitm_ref's precision fix)
-    for XL, tm, Gs, Gp, j, ranges in cases:
+    six = (2, 2, 3, 3, 7, 7); wide = (2,) * 12 + (3,); ok = True    # wide: windows of up to 11 digits
+    cases = [(six, 3000, 12, 6, 4, 2, [6, 7]), (six, 3000, 12, 9, 7, 2, [6, 7]), (six, 3000, 12, 8, 6, 3, [7, 8, 9]),
+             (six, 3000, 12, 10, 1, 2, [9, 10]), (six, 10 ** 9, 20, 16, 9, 2, [8, 9]), (six, 10 ** 12, 30, 22, 12, 3, [20, 21, 22]),
+             (six, 10 ** 60, 55, 118, 12, 2, [117, 118]),
+             (six, 10 ** 90, 55, 185, 2, 2, [184, 185]),               # log10 XL > Gp + 70 (mitm_ref's precision fix)
+             (wide, 10 ** 12, 40, 18, 11, 1, [18])]
+    for bag, XL, tm, Gs, Gp, j, ranges in cases:
+        k = len(bag)
         lat = mitm_ref.MitmLattice(XL, tm, Gs, Gp)
         with tempfile.TemporaryDirectory() as d:
             tab = run_bottom(lat, bag, {k: 2}, k - j, d)
@@ -204,14 +211,16 @@ def test_gpu(exe):
     return ok
 
 def test():
-    bag = (2, 2, 3, 3, 7, 7); k = len(bag)
     ok = True
-    for XL, tm, Gs, Gp in ((3000, 12, 9, 1), (3000, 12, 9, 7), (10 ** 12, 30, 20, 12), (10 ** 20, 40, 34, 18)):
+    six = (2, 2, 3, 3, 7, 7); wide = (2,) * 12 + (3,)                # wide: windows of up to 11 digits (codes, b > 10)
+    for bag, bmax, XL, tm, Gs, Gp in ((six, 4, 3000, 12, 9, 1), (six, 4, 3000, 12, 9, 7), (six, 4, 10 ** 12, 30, 20, 12),
+                                      (six, 4, 10 ** 20, 40, 34, 18), (wide, 12, 10 ** 12, 40, 22, 11)):
+        k = len(bag)
         lat = mitm_ref.MitmLattice(XL, tm, Gs, Gp)
         bot = {k: 2}
-        ref = mitm_ref.bottom_entries(lat, bag, bot, k - 2)
+        ref = mitm_ref.bottom_entries(lat, bag, bot, bmax)
         with tempfile.TemporaryDirectory() as d:
-            tab = run_bottom(lat, bag, bot, k - 2, d)
+            tab = run_bottom(lat, bag, bot, bmax, d)
         refd = {}
         for key, e in ref:
             refd[(tuple(e['heights']), tuple(e['digits']), e['t'])] = (key, [int(mp.floor((q - mp.floor(q)) * mp.mpf(2) ** 64)) for q in e['Q']])
@@ -235,7 +244,7 @@ def test():
     for XL, tm, Gs, Gp in ((10 ** 20, 40, 34, 14), (10 ** 30, 55, 50, 20), (10 ** 40, 55, 70, 27)):
         lat = mitm_ref.MitmLattice(XL, tm, Gs, Gp)
         with tempfile.TemporaryDirectory() as d:
-            job = os.path.join(d, 'bottom.job'); write_bottom_job(lat, bag, {k: 2}, k - 2, job)
+            job = os.path.join(d, 'bottom.job'); write_bottom_job(lat, six, {6: 2}, 4, job)
             r = subprocess.run([BOTTOM, job, os.path.join(d, 'bottom.bin')], capture_output=True, text=True,
                                env=dict(os.environ, MB_CHECK='1'))
         good = r.returncode == 0 and r.stdout.startswith('DONE')

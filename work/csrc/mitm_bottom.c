@@ -1,10 +1,11 @@
 /* mitm_bottom: the bottom-window table of the MITM top step (mitm_ref.bottom_entries in C; docs/MITM_STEPS.md section 2).
  * Every window: the lowest b <= bmax digits at heights < Gp (lowest digit at height <= 1, the bottom facts), with their
  * values, b = 0 included (no digit below Gp: only when bot[k] > Gp, i.e. Gp = 1); F = -1 + sum 9(d-1) 10^h; t = v2(F) if
- * v2(F) < Gp, else every t in [Gp, tm]; dl = dlog_3(F 2^-t mod 5^Gp) (digit by digit, dlog3 below; Pohlig-Hellman for its
+ * v2(F) < Gp, else every t in [Gp, tm]; dl = dlog_3(F 2^-t mod 5^Gp) (digit by digit, dlog5.h; Pohlig-Hellman for its
  * tables and for env MB_CHECK=1); v = (dl, 0) reduced by the basis (b1, b2) of {u + e7 w = 0 mod phi}; the torus point
  * Q = c0 + v_u Au + v_w Aw + t At (mod 1, 128-bit fixed point, constants from mitm_fast.py) and its cell.
- * Output: binary file of entries sorted by cell key (struct mb_entry below).
+ * Output: binary file of entries sorted by cell key (struct mb_entry below); the window as hcode (heights, bit mask) and
+ * dcode (3-bit digit indices, at most 21 digits). The earlier code (6 bits per height) overflowed for b > 10 (4 Nov 2026).
  * usage: mitm_bottom JOB OUT            build: see work/Makefile (needs Gp <= 27: 5^Gp < 2^63) */
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,7 +34,11 @@ static void emit(void) {
     int tlo = v < Gp ? v : Gp, thi = v < Gp ? v : tm;
     i128 Fr = F % (i128)M5; u64 Fm = (u64)(Fr < 0 ? Fr + (i128)M5 : Fr);   /* F = -1 for b = 0 */
     u64 sig = 0; for (int r = 0; r < b_; r++) for (int c = 0; c < 7; c++) if (VALS[c] == vals_[r]) sig += (u64)1 << (6 * c);
-    u64 hcode = 0, dcode = 0; for (int r = 0; r < b_; r++) { hcode |= (u64)hts_[r] << (6 * r); dcode |= (u64)vals_[r] << (4 * r); }
+    /* window codes: hcode = the set of heights as a bit mask (heights < Gp <= 27, read from the top down), dcode = the digits
+     * in that order as VALS indices, 3 bits each (at most 21 digits; a wider window stops the program) */
+    if (b_ > 21) { fprintf(stderr, "window of %d digits: dcode holds at most 21\n", b_); exit(2); }
+    u64 hcode = 0, dcode = 0;
+    for (int r = 0; r < b_; r++) { int ci = 0; for (int c = 0; c < 7; c++) if (VALS[c] == vals_[r]) ci = c; hcode |= (u64)1 << hts_[r]; dcode |= (u64)ci << (3 * r); }
     for (int t = tlo; t <= thi; t++) {
         if (t > tm) break;
         u64 x = mulmod(Fm, INV2T[t], M5);
