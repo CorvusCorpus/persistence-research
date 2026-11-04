@@ -97,6 +97,13 @@ Ordered by value per effort. Each item lists the acceptance test that must pass 
     | 33718272 | 1.6·10¹⁴ | — | ≈ 20 days |
 - **221184: DONE** (22 Oct – 3 Nov 2026, NOTEBOOK E.10). It has no 7-smooth preimage; target 6 is determined to depth 4. 109 bags
   took 2 h 33 min, and four CPU re-proofs were identical.
+- **Target 6, depth 4** (census of its 27 open nodes: `work/logs/node_costs_t6d4_twochain.out`, NOTEBOOK C.1).
+  - DONE (4 Nov 2026, cloud CPU, NOTEBOOK C.2–C.3): the eight cheapest, 214326, 27216, 148176, 34992, 642978, 23328, 236196,
+    28672 (4.4·10⁹ units in 41 min on 4 cores).
+  - Next tier: 1382976, 163296, 139968, 1843968, 96768, 1778112, 2667168 (3.2·10¹¹ units): about 1 h on the desktop's GPU pool,
+    about 51 h on a 4-core cloud container (1.8·10⁶ units/s). Then 1162261467 (4.5·10¹¹, about 1.3 h on the GPU).
+  - Depth 5 of target 6 needs all 19 remaining nodes, including 9437184 (1.5·10¹⁵) and the four whose bags exhaust
+    `twoadic.tmax` (13716864, 226492416, 2113929216, 913217421312): out of reach with the current method.
 - **Next: 1161216 and 11239424** with `PC_BOOTSTRAP=twochain PC_GB_FLOOR=1`. At the rate 221184 reached (≈ 1.5·10⁸ units/s) they
   take about 12 h and 13 h, so they need the user's approval under the 12 h rule. Keep the PC from sleeping (an idle PC stopped
   WSL in E.10).

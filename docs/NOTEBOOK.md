@@ -1572,3 +1572,64 @@ Design and cost model: `docs/MITM_STEPS.md`. No proof uses MITM steps yet; nothi
 - **Left** (`docs/MITM_STEPS.md` §6): the GPU-side parallelepiped test (E fills 1/3.5–1/4.5 of its bounding box); topgpu's
   recurrence for λ in the probe; one GPU process per round; the deep split; memory with several workers (a 2.5·10⁷-entry
   table is a 1.6 GB file and needs about twice that while sorting).
+
+---
+
+## 2026-11-04 · Session 6 (cloud container) · Cheap target-6 depth-4 nodes on the CPU path
+
+Machine: cloud container, 4 vCPUs (Intel Xeon @ 2.10 GHz), 15 GB RAM, no GPU. gcc 13.3.0, GMP 6.3.0, MPFR 4.2.1,
+python-flint 0.9.0, mpmath 1.4.1. Helpers built with `make helpers` (`-O3 -march=native`); topc3 `c0930227…`, bottomc3
+`e16d8538…`. Commit `86095a8` (the merge of the session-5 branch into `main`).
+
+### C.1 Cost census of the 27 open target-6 depth-4 nodes (`work/logs/node_costs_t6d4_twochain.{out,json}`)
+- E.10 quoted a census of all open nodes but did not save it; this recomputes it for target 6's frontier.
+- Per node, from `work/`: `ulimit -v 2621440; PC_BOOTSTRAP=twochain PC_GB_FLOOR=1 timeout 2400 python3 node_costs.py --json OUT NODE`
+  (dry runs; the 2.5 GB cap as in E.10), four nodes at a time.
+- Units (two chains, cheapest first):
+
+  | tier | nodes (units) | total |
+  |---|---|---|
+  | ≤ 1.3·10⁹ | 214326 1.1·10⁸, 27216 2.6·10⁸, 148176 3.3·10⁸, 34992 4.8·10⁸, 642978 5.1·10⁸, 23328 5.6·10⁸, 236196 8.5·10⁸, 28672 1.3·10⁹ | 4.4·10⁹ |
+  | 10¹⁰–10¹¹ | 1382976 9.4·10⁹, 163296 1.1·10¹⁰, 139968 1.9·10¹⁰, 1843968 2.7·10¹⁰, 96768 3.8·10¹⁰, 1778112 1.04·10¹¹, 2667168 1.12·10¹¹ | 3.2·10¹¹ |
+  | 4.5·10¹¹–3.2·10¹³ | 1162261467 4.5·10¹¹, 3211264 3.8·10¹², 69441624 7.0·10¹², 46294416 1.13·10¹³, 9483264 1.20·10¹³, 1492992 1.24·10¹³, 3281116734 3.2·10¹³ | 8.0·10¹³ |
+  | beyond | 9437184 1.5·10¹⁵ (k ≤ 22); no estimate (MemoryError in `twoadic.tmax` under the cap): 13716864 (k ≤ 16), 226492416 (26), 2113929216 (28), 913217421312 (35) | — |
+
+### C.2 The eight cheapest nodes proved (`work/logs/prove_cpu_t6d4_tier1.log`)
+- Command (from `work/`): `PC_BOOTSTRAP=twochain PC_GB_FLOOR=1 python3 -u prove_cum_gpu.py --jobs 4 --cpu-bottom --cpu-top
+  214326 27216 148176 34992 642978 23328 236196 28672`, i.e. the CPU case loops (ctop3/topc3, cbottom4/bottomc3) in a pool of
+  four workers, the two-chain bootstrap and the floor rule as in E.10, no MITM steps.
+- 190 bags, 2,474 s wall, 4.368·10⁹ units (equal to the plan): 1.77·10⁶ units/s on 4 cores, about 54 times slower than the
+  desktop's GPU pool (9.5·10⁷ units/s, E.9).
+- Results (every bag tagged `twochain`; all 7-smooth preimages over all lengths):
+
+  | node | parent (depth 3) | bags | k ≤ | proved length bound | 7-smooth preimages |
+  |---|---|---|---|---|---|
+  | 214326 | 288 | 8 | 10 | 83 | none |
+  | 27216 | 168 | 28 | 10 | 87 | 666792, 13226976, 71663616 |
+  | 148176 | 1344 | 17 | 10 | 84 | none |
+  | 34992 | 1944 | 39 | 11 | 89 | 133413966 |
+  | 642978 | 24192 | 9 | 11 | 83 | none |
+  | 23328 | 288 | 48 | 11 | 90 | 2939328, 19361664 |
+  | 236196 | 1944 | 22 | 12 | 91 | 11329339392 |
+  | 28672 | 1344 | 19 | 13 | 87 | none |
+
+### C.3 Checks
+- **Records** (scratch script, reading only the committed files): for each node, the proofC bag set equals `bags_of(node)`;
+  every entry carries `twochain` and L ≤ 5000 and equals its bagresC record (Lmax, top, bot); the preimages equal those
+  recomputed from `Z.json` by digit product, and each is 7-smooth with digit product = node; the 7 genuine solutions of these
+  bags satisfy every proved fact. ALL OK.
+- **Positive control on this machine** (`validation_pc/twochain/e2e_cpu_24192_cloud.out`): `val_twochain_e2e.sh` with its
+  run line switched to the same CPU command (`--cpu-bottom --cpu-top`, `PC_GB_FLOOR=1`, 4 jobs; diff in the file) re-proved
+  24192 from scratch in an empty directory: **E2E OK** in 596 s. Exactly the six committed preimages (642978, 2667168,
+  9437184, 13716864, 1162261467, 3281116734), every bag tagged and L ≤ 5000, the 6 genuine solutions satisfy every fact, and
+  1.180·10⁹ units, the same as the GPU validation run (`docs/BOOTSTRAP_TWO_CHAINS.md` §6).
+- **Record files:** `certificate.py` at `86095a8` reproduces the committed `certificate.json` exactly; after this run the only
+  change is the eight added nodes (every earlier entry identical). `results_table.py` regenerated `work/results.md` =
+  `docs/results_base10.md`. `make manifest`: eleven added files (eight proofC, the census pair, the run log) and the new hash of
+  the regenerated `certificate.json`; `make records-check` passes.
+
+### C.4 Consequences
+- RESULTS 2.1: 108 nodes. 2.2 is unchanged: target 6 stays determined to depth 4, because depth 5 needs all 19 remaining
+  depth-4 nodes, among them the five beyond the method (C.1). 2.3: 69 of the 177 known nodes are open (77 before).
+- The seven new preimages are depth-5 nodes of target 6 (already in `work/even_nodes.json`).
+- Next by cost: the seven nodes of the second tier, 3.2·10¹¹ units, about 1 h on the desktop's GPU pool or about 51 h here.

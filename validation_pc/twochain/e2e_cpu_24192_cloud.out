@@ -1,0 +1,19 @@
+# Positive control, 2026-11-04, cloud container (4 vCPUs), commit 86095a8: val_twochain_e2e.sh with its run line changed to the CPU path:
+#   ( cd "$S" && PC_BOOTSTRAP=twochain PC_GB_FLOOR=1 python3 "$W/prove_cum_gpu.py" --jobs 4 --cpu-bottom --cpu-top 24192 )
+# diff against work/val_twochain_e2e.sh:
+#   12c12
+#   < cd "$(dirname "$0")" || exit 1
+#   ---
+#   > cd /home/user/persistence-research/work || exit 1
+#   15c15
+#   < ( cd "$S" && PC_BOOTSTRAP=twochain /usr/bin/time -f "wall %e s" python3 "$W/prove_cum_gpu.py" --jobs "$J" "$NODE" > run.log 2> time.log ) \
+#   ---
+#   > ( cd "$S" && PC_BOOTSTRAP=twochain PC_GB_FLOOR=1 bash -c "time python3 $W/prove_cum_gpu.py --jobs $J --cpu-bottom --cpu-top $NODE" > run.log 2> time.log ) \
+node 24192: all 7-smooth y with digit product 24192: [642978, 2667168, 9437184, 13716864, 1162261467, 3281116734]   (596s)
+
+real	9m55.983s
+user	37m52.625s
+sys	0m17.985s
+39 bags: twochain cost 1.180e+09 units; committed records 8.215e+09 (7.0x); 6 genuine solutions checked against the facts; preimages [642978, 2667168, 9437184, 13716864, 1162261467, 3281116734]
+E2E OK
+exit 0
