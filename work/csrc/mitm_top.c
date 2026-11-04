@@ -4,7 +4,10 @@
  * 27 neighbouring cells of the bottom table (mitm_bottom's sorted output) are searched, and every entry that is
  * multiset-compatible and within the box |P_i - Q_i| <= hw_i (units of 2^-64, margins included by mitm_fast.py) is printed:
  *   CAND o D_0 .. D_(j-1) idx            (o: ordering index, idx: table index)
- * then DONE ncases nprobes ncand.        usage: mitm_top JOB [threads]       build: see work/Makefile (OpenMP, MPFR) */
+ * then DONE ncases nprobes ncand.        usage: mitm_top JOB [threads]       build: see work/Makefile (OpenMP, MPFR)
+ * With the job section "exact 1" (mitm_exact.h) every candidate is decided here and each solution printed as
+ *   PAIR o D_0 .. D_(j-1) idx t u w L
+ * (CAND lines only with "xcands 1"); DONE then carries a fourth field, the number of PAIR lines. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,8 +15,7 @@
 #include <gmp.h>
 #include <mpfr.h>
 #include <omp.h>
-
-typedef uint64_t u64; typedef unsigned __int128 u128;
+#include "mitm_exact.h"
 static const int VALS[7] = {2, 3, 4, 6, 7, 8, 9};
 static int prec, j, cnt[7], rng[64];
 static char *theta_s[3];
@@ -32,6 +34,20 @@ static void gen(int r) {
 
 static size_t lower(u64 key) { size_t lo = 0, hi = nT; while (lo < hi) { size_t m = (lo + hi) / 2; if (T[m].key < key) lo = m + 1; else hi = m; } return lo; }
 
+typedef struct { char *out; size_t *olen; int o, j; const int *D; size_t idx; } pair_ctx;
+static void flush_out(char *out, size_t *olen) {
+    #pragma omp critical
+    { fwrite(out, 1, *olen, stdout); }
+    *olen = 0;
+}
+static void emit_pair(void *c_, int t, const mpz_t u, const mpz_t w, const mpz_t L) {
+    pair_ctx *c = (pair_ctx *)c_;
+    if (*c->olen > (1 << 20) - 8192) flush_out(c->out, c->olen);
+    *c->olen += sprintf(c->out + *c->olen, "PAIR %d", c->o);
+    for (int i = 0; i < c->j; i++) *c->olen += sprintf(c->out + *c->olen, " %d", c->D[i]);
+    *c->olen += gmp_sprintf(c->out + *c->olen, " %zu %d %Zd %Zd %Zd\n", c->idx, t, u, w, L);
+}
+
 static u64 frac64(mpfr_t x, mpfr_t tmp) {                     /* top 64 bits of frac(x) in [0, 1) */
     mpfr_frac(tmp, x, MPFR_RNDN);
     if (mpfr_sgn(tmp) < 0) mpfr_add_ui(tmp, tmp, 1, MPFR_RNDN);
@@ -48,6 +64,7 @@ int main(int argc, char **argv) {
     FILE *f = fopen(argv[1], "r"); if (!f) { perror("job"); return 2; }
     char w[64], path[4096] = "";
     static char buf[3][100000];
+    mx_preinit();
     while (fscanf(f, "%63s", w) == 1) {
         if (!strcmp(w, "prec")) fscanf(f, "%d", &prec);
         else if (!strcmp(w, "j")) fscanf(f, "%d", &j);
@@ -57,23 +74,28 @@ int main(int argc, char **argv) {
         else if (!strcmp(w, "hw")) fscanf(f, "%lu %lu %lu", &hw[0], &hw[1], &hw[2]);
         else if (!strcmp(w, "ncell")) fscanf(f, "%lu %lu %lu", &ncell[0], &ncell[1], &ncell[2]);
         else if (!strcmp(w, "table")) fscanf(f, "%4095s", path);
-        else { fprintf(stderr, "unknown key %s\n", w); return 2; }
+        else {
+            int r = mx_key(f, w);
+            if (r <= 0) { fprintf(stderr, r < 0 ? "bad value of %s\n" : "unknown key %s\n", w); return 2; }
+        }
     }
     fclose(f);
+    if (MX.on) mx_init();
     FILE *tb = fopen(path, "rb"); if (!tb) { perror("table"); return 2; }
     if (fread(&nT, sizeof nT, 1, tb) != 1) return 2;
     T = malloc((nT ? nT : 1) * sizeof *T); if (nT && fread(T, sizeof *T, nT, tb) != nT) { fprintf(stderr, "short table\n"); return 2; }
     fclose(tb);
     for (int c = 0; c < 7; c++) rem_[c] = cnt[c];
     gen(0);
-    unsigned long long ncase = 0, nprobe = 0, ncand = 0;
-    #pragma omp parallel reduction(+:ncase, nprobe, ncand)
+    unsigned long long ncase = 0, nprobe = 0, ncand = 0, npair = 0;
+    #pragma omp parallel reduction(+:ncase, nprobe, ncand, npair)
     {
         mpfr_t th[3], z, lam, x, tmp, p10;
         for (int i = 0; i < 3; i++) { mpfr_init2(th[i], prec); mpfr_set_str(th[i], theta_s[i], 10, MPFR_RNDN); }
         mpfr_inits2(prec, z, lam, x, tmp, p10, (mpfr_ptr)0);
         char *out = malloc(1 << 20); size_t olen = 0;
         int D[64];
+        mx_scr sc; if (MX.on) mx_scr_init(&sc);
         #pragma omp for schedule(dynamic, 1)
         for (int o = 0; o < nord; o++) {
             u64 sigT = 0; for (int i = 0; i < j; i++) for (int c = 0; c < 7; c++) if (VALS[c] == ords[o][i]) sigT += (u64)1 << (6 * c);
@@ -93,7 +115,7 @@ int main(int argc, char **argv) {
                 mpfr_log1p(lam, z, MPFR_RNDN);
                 u64 P[3], cell[3];
                 for (int i = 0; i < 3; i++) { mpfr_mul(x, lam, th[i], MPFR_RNDN); P[i] = frac64(x, tmp); cell[i] = (u64)(((u128)P[i] * ncell[i]) >> 64); }
-                u64 seen[27]; int ns = 0;
+                u64 seen[27]; int ns = 0, lam_ok = 0;
                 for (int d0 = -1; d0 <= 1; d0++) for (int d1 = -1; d1 <= 1; d1++) for (int d2 = -1; d2 <= 1; d2++) {
                     u64 c0 = (cell[0] + ncell[0] + d0) % ncell[0], c1 = (cell[1] + ncell[1] + d1) % ncell[1], c2 = (cell[2] + ncell[2] + d2) % ncell[2];
                     u64 key = (c0 * ncell[1] + c1) * ncell[2] + c2; int dup = 0;
@@ -108,14 +130,17 @@ int main(int argc, char **argv) {
                         for (int i = 0; i < 3 && inbox; i++) { u64 dd = P[i] - T[idx].q[i]; u64 ad = (int64_t)dd < 0 ? (u64)0 - dd : dd; if (ad > hw[i]) inbox = 0; }
                         if (!inbox) continue;
                         ncand++;
-                        if (olen > (1 << 20) - 4096) {
-                            #pragma omp critical
-                            { fwrite(out, 1, olen, stdout); }
-                            olen = 0;
+                        if (olen > (1 << 20) - 8192) flush_out(out, &olen);
+                        if (!MX.on || MX.cands) {
+                            olen += sprintf(out + olen, "CAND %d", o);
+                            for (int i = 0; i < j; i++) olen += sprintf(out + olen, " %d", D[i]);
+                            olen += sprintf(out + olen, " %zu\n", idx);
                         }
-                        olen += sprintf(out + olen, "CAND %d", o);
-                        for (int i = 0; i < j; i++) olen += sprintf(out + olen, " %d", D[i]);
-                        olen += sprintf(out + olen, " %zu\n", idx);
+                        if (MX.on) {                         /* exact decision (mitm_exact.h) */
+                            if (!lam_ok) { mx_lam(&sc, j, ords[o], D); lam_ok = 1; }
+                            pair_ctx pc = {out, &olen, o, j, D, idx};
+                            npair += (unsigned long long)mx_check(&sc, mx_F(T[idx].hcode, T[idx].dcode, T[idx].b), (int)T[idx].t, emit_pair, &pc);
+                        }
                     }
                 }
             }
@@ -126,6 +151,7 @@ int main(int argc, char **argv) {
         for (int i = 0; i < 3; i++) mpfr_clear(th[i]);
         mpfr_clears(z, lam, x, tmp, p10, (mpfr_ptr)0);
     }
-    printf("DONE %llu %llu %llu\n", ncase, nprobe, ncand);
+    if (MX.on) printf("DONE %llu %llu %llu %llu\n", ncase, nprobe, ncand, npair);
+    else printf("DONE %llu %llu %llu\n", ncase, nprobe, ncand);
     return 0;
 }

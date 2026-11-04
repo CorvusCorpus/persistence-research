@@ -2,6 +2,8 @@
  *   CAND o D_0 .. D_(j-1) idx     every multiset-compatible table entry within the box (margins: the job's, plus 64 units of
  *                                 2^-64 for the kernel's fixed point), sorted;
  *   DONE ncases nprobes ncand     nprobes: table entries examined (the cells of each box, not mitm_top's 27 neighbours).
+ * With the job section "exact 1" every candidate is decided here (mitm_exact.h, as mitm_top): PAIR lines, CAND lines only
+ * with "xcands 1", and DONE ncases nprobes ncand npair.
  * Tables and the fixed-point lambda are topgpu_host.c's (class with FL >= bits(max |Theta_i|) + 80; beyond the largest class
  * the job goes to mitm_top: env MG_CPU, else mitm_top beside this binary); orderings and the enumeration of depths (D_0 >= 1, D_i < D_(i+1), D_i < ranges[i]) are mitm_top's, as prefixes plus a last gap.
  * usage: mitmgpu JOB      env MG_BATCH (prefixes per launch, default 2^18), MG_DUMP=1 (validation: "PT o D_0 .. P_0 P_1 P_2" for
@@ -15,6 +17,7 @@
 #include <gmp.h>
 #include <mpfr.h>
 #include "mitmgpu.h"
+#include "mitm_exact.h"
 
 static void die(const char *m) { fprintf(stderr, "%s\n", m); exit(3); }
 static double now_s(void) { struct timespec ts; clock_gettime(CLOCK_MONOTONIC, &ts); return ts.tv_sec + 1e-9 * ts.tv_nsec; }
@@ -44,7 +47,16 @@ static void gen(int r) {
 typedef struct { unsigned long long key, q[3], hcode, dcode; unsigned int t, b; unsigned long long sig; } mb_entry;   /* mitm_bottom */
 
 static mg_out *OUT; static long long OUTCAP = 1 << 16; static int DUMP;
-static unsigned long long NCASE, NPROBE, NCAND; static double T_GPU;
+static unsigned long long NCASE, NPROBE, NCAND, NPAIR; static double T_GPU;
+typedef struct { unsigned long long hcode, dcode; unsigned int t, b; } mg_win;   /* each entry's window, for the exact decision */
+static mg_win *WIN; static mx_scr SC;
+typedef struct { unsigned o; const long *D; unsigned long long idx; } pair_ctx;
+static void emit_pair(void *c_, int t, const mpz_t u, const mpz_t w, const mpz_t L) {
+    const pair_ctx *c = (const pair_ctx *)c_;
+    printf("PAIR %u", c->o);
+    for (int i = 0; i < j_; i++) printf(" %ld", c->D[i]);
+    gmp_printf(" %llu %d %Zd %Zd %Zd\n", c->idx, t, u, w, L);
+}
 static int cmp_out(const void *A_, const void *B_) {
     const mg_out *a = (const mg_out *)A_, *b = (const mg_out *)B_;
     if (a->prefix != b->prefix) return a->prefix < b->prefix ? -1 : 1;
@@ -59,14 +71,30 @@ static void run_batch(const mg_prefix *pf, long n) {
     T_GPU += now_s() - t0;
     NCASE += cn[0]; NPROBE += cn[1];
     qsort(OUT, (size_t)no, sizeof(mg_out), cmp_out);
+    long D[MG_MAXJ + 1]; int dig[MG_MAXJ + 1]; long long last_p = -1; unsigned last_gl = 0;
     for (long long r = 0; r < no; r++) {
         const mg_prefix *q = &pf[OUT[r].prefix];
-        printf(DUMP ? "PT %u" : "CAND %u", q->o);
         long acc = 0;
-        for (int s = 0; s < j_ - 1; s++) { acc += q->g[s]; printf(" %ld", acc); }
-        printf(" %ld", acc + (long)OUT[r].gl);
-        if (DUMP) printf(" %llu %llu %llu\n", OUT[r].p[0], OUT[r].p[1], OUT[r].p[2]);
-        else { printf(" %llu\n", OUT[r].idx); NCAND++; }
+        for (int s = 0; s < j_ - 1; s++) { acc += q->g[s]; D[s] = acc; }
+        D[j_ - 1] = acc + (long)OUT[r].gl;
+        if (DUMP || !MX.on || MX.cands) {
+            printf(DUMP ? "PT %u" : "CAND %u", q->o);
+            for (int s = 0; s < j_; s++) printf(" %ld", D[s]);
+            if (DUMP) printf(" %llu %llu %llu\n", OUT[r].p[0], OUT[r].p[1], OUT[r].p[2]);
+            else printf(" %llu\n", OUT[r].idx);
+        }
+        if (DUMP) continue;
+        NCAND++;
+        if (MX.on) {                                     /* exact decision (mitm_exact.h); lambda once per configuration */
+            if ((long long)OUT[r].prefix != last_p || OUT[r].gl != last_gl) {
+                int Di[MG_MAXJ + 1];
+                for (int s = 0; s < j_; s++) { dig[s] = VALS[ords[q->o][s]]; Di[s] = (int)D[s]; }
+                mx_lam(&SC, j_, dig, Di); last_p = OUT[r].prefix; last_gl = OUT[r].gl;
+            }
+            const mg_win *e = &WIN[OUT[r].idx];
+            pair_ctx pc = {q->o, D, OUT[r].idx};
+            NPAIR += (unsigned long long)mx_check(&SC, mx_F(e->hcode, e->dcode, e->b), (int)e->t, emit_pair, &pc);
+        }
     }
 }
 
@@ -76,6 +104,7 @@ int main(int argc, char **argv) {
     FILE *f = fopen(argv[1], "r"); if (!f) { perror("job"); return 2; }
     char w[64], path[4096] = ""; static char tbuf[3][100000];
     long prec = 0, rng[MG_MAXJ + 1]; unsigned long long hw[3] = {0, 0, 0}, ncell[3] = {0, 0, 0}; int have_th = 0;
+    mx_preinit();
     while (fscanf(f, "%63s", w) == 1) {
         if (!strcmp(w, "prec")) { if (fscanf(f, "%ld", &prec) != 1) die("bad prec"); }
         else if (!strcmp(w, "j")) { if (fscanf(f, "%d", &j_) != 1 || j_ < 1 || j_ > MG_MAXJ) die("bad j"); }
@@ -86,7 +115,10 @@ int main(int argc, char **argv) {
         else if (!strcmp(w, "hw")) { if (fscanf(f, "%llu %llu %llu", &hw[0], &hw[1], &hw[2]) != 3) die("bad hw"); }
         else if (!strcmp(w, "ncell")) { if (fscanf(f, "%llu %llu %llu", &ncell[0], &ncell[1], &ncell[2]) != 3) die("bad ncell"); }
         else if (!strcmp(w, "table")) { if (fscanf(f, "%4095s", path) != 1) die("bad table"); }
-        else { fprintf(stderr, "unknown key %s\n", w); return 2; }
+        else {
+            int r = mx_key(f, w);
+            if (r <= 0) { fprintf(stderr, r < 0 ? "bad value of %s\n" : "unknown key %s\n", w); return 2; }
+        }
     }
     fclose(f);
     if (have_th != 7 || prec < 64 || !path[0]) die("incomplete job");
@@ -99,6 +131,7 @@ int main(int argc, char **argv) {
     unsigned long long nT = 0; if (fread(&nT, sizeof nT, 1, tb) != 1) die("short table");
     if (nT >= (1ULL << 32)) die("table too large");
     mg_entry *E = malloc((nT ? nT : 1) * sizeof *E); unsigned long long *K = malloc((nT ? nT : 1) * sizeof *K);
+    WIN = malloc((nT ? nT : 1) * sizeof *WIN);
     unsigned long long ndist = 0;
     {
         const size_t CH = 1 << 16; mb_entry *buf = malloc(CH * sizeof *buf); unsigned long long done = 0;
@@ -113,6 +146,7 @@ int main(int argc, char **argv) {
                 K[x] = buf[r].key;
                 for (int a = 0; a < 3; a++) E[x].q[a] = buf[r].q[a];
                 E[x].sig = buf[r].sig;
+                WIN[x].hcode = buf[r].hcode; WIN[x].dcode = buf[r].dcode; WIN[x].t = buf[r].t; WIN[x].b = buf[r].b;
             }
             done += want;
         }
@@ -216,6 +250,8 @@ int main(int argc, char **argv) {
     Pp.words = TW;
     DUMP = Pp.dump = getenv("MG_DUMP") && atoi(getenv("MG_DUMP")) ? 1 : 0;
     if (DUMP) printf("MGDUMP FL %d L %d theta_bits %ld\n", FL, L, tb_bits);
+    if (DUMP) MX.on = 0;
+    if (MX.on) { mx_init(); mx_scr_init(&SC); }
     if (mg_init(&Pp, TB, E, (long long)nT, H)) die("mg_init");
     const double t_init = now_s();
 
@@ -251,7 +287,8 @@ int main(int argc, char **argv) {
         }
         if (np) { run_batch(pf, np); np = 0; }
     }
-    printf("DONE %llu %llu %llu\n", NCASE, NPROBE, NCAND);
+    if (MX.on) printf("DONE %llu %llu %llu %llu\n", NCASE, NPROBE, NCAND, NPAIR);
+    else printf("DONE %llu %llu %llu\n", NCASE, NPROBE, NCAND);
     if (getenv("MG_TIME"))
         fprintf(stderr, "MGTIME %s class L=%d table %llu entries (%llu cells, 2^%d slots) setup %.3f s, kernel+copies %.3f s, total %.3f s\n",
                 mg_device(), L, nT, ndist, hbits, t_init - t_start, T_GPU, now_s() - t_start);

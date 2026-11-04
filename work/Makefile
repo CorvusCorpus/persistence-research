@@ -22,8 +22,8 @@ csrc/top:      csrc/top_v1.c    ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
 csrc/bottom:   csrc/bottom_v1.c ; $(CC) $(CFLAGS) -o $@ $< $(LIBS)
 
 # MITM top step, CPU programs (docs/MITM_STEPS.md; validated by mitm_fast.py test / test_top against mitm_ref.py)
-csrc/mitm_bottom: csrc/mitm_bottom.c ; $(CC) $(CFLAGS) -o $@ $<
-csrc/mitm_top:    csrc/mitm_top.c    ; $(CC) $(CFLAGS) -fopenmp -o $@ $< $(LIBS)
+csrc/mitm_bottom: csrc/mitm_bottom.c csrc/dlog5.h ; $(CC) $(CFLAGS) -o $@ $<
+csrc/mitm_top:    csrc/mitm_top.c csrc/mitm_exact.h csrc/dlog5.h ; $(CC) $(CFLAGS) -fopenmp -o $@ $< $(LIBS)
 
 zf7: zf7.c ; $(CC) -O3 -march=native -fopenmp -o $@ $< -lm
 
@@ -44,8 +44,8 @@ csrc/topgpu_emu.o: $(TPDEPS) ; g++ -O2 -march=native -DTP_EMU -x c++ -c -o $@ cs
 csrc/topgpu: csrc/topgpu_host.o csrc/topgpu_cuda.o ; $(NVCC) -o $@ $^ $(LIBS)
 csrc/topgpu_emu: csrc/topgpu_host.o csrc/topgpu_emu.o ; g++ -o $@ $^ $(LIBS)
 # GPU MITM top probe (drop-in for csrc/mitm_top; see csrc/mitmgpu.cu)
-MGDEPS = csrc/mitmgpu_host.c csrc/mitmgpu.cu csrc/mitmgpu.h csrc/bigfix.h
-csrc/mitmgpu_host.o: $(MGDEPS) ; $(CC) $(CFLAGS) -c -o $@ csrc/mitmgpu_host.c
+MGDEPS = csrc/mitmgpu.cu csrc/mitmgpu.h csrc/bigfix.h
+csrc/mitmgpu_host.o: csrc/mitmgpu_host.c csrc/mitmgpu.h csrc/mitm_exact.h csrc/dlog5.h ; $(CC) $(CFLAGS) -c -o $@ csrc/mitmgpu_host.c
 csrc/mitmgpu_cuda.o: $(MGDEPS) ; $(NVCC) -O3 -arch=$(CUDA_ARCH) -c -o $@ csrc/mitmgpu.cu
 csrc/mitmgpu_emu.o: $(MGDEPS) ; g++ -O2 -march=native -DMG_EMU -x c++ -c -o $@ csrc/mitmgpu.cu
 csrc/mitmgpu: csrc/mitmgpu_host.o csrc/mitmgpu_cuda.o ; $(NVCC) -o $@ $^ $(LIBS)

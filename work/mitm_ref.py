@@ -3,7 +3,7 @@
 Step at top level j with thresholds (Gs, Gp).  Claim: every solution with D_j >= Gs and L >= max(top[j-1], Gs) + Gp is
 impossible; together with the trivial case this gives  D_j < Gs  or  L < max(top[j-1], Gs) + Gp.
 For such a solution, with T its top j digits (ranges from the top facts) and B the digits at heights < Gp (the lowest b
-digits, b >= 1 since a_k <= 1):
+digits; b >= 1 when Gp >= 2 since a_k <= 1, and b = 0 is possible for Gp = 1):
   top     0 < t log2 + u' log3 + w log7 - L log10 - log(1 + z_T) < eps = 80 10^-Gs          (prove_cum's (F3'))
   bottom  2^t 3^u' 7^w = F_B (mod 10^Gp), F_B = -1 + sum_B c 10^h; hence t = v2(F_B) when v2(F_B) < Gp (else t >= Gp),
           and 3^u' 7^w = F_B 2^-t (mod 5^Gp), i.e.  u' + e7 w = dl_B (mod phi), phi = 4 5^(Gp-1), e7 = dlog_3 7.
@@ -15,7 +15,8 @@ With Mr = Tr M LLL-reduced (Tr unimodular) this reads  P_T - Q_B in E = K Mr^-1 
   P_T = (log(1 + z_T)/eps) e3 Mr^-1  and  Q_B = -tau_B Mr^-1,  tau_B = tau with log(1 + z_T) removed.
 Bottom entries are hashed by cells at least as wide as E's bounding box (plus the numerical margin); each top configuration
 probes the 27 neighbouring cells; every pair found is decided exactly (all integer points m in the box, then the top
-inequality with interval arithmetic, the full congruence mod 10^Gp, the side condition and the candidate's digits).
+inequality, rejected only when outside (0, eps) by more than the rounding bound, the full congruence mod 10^Gp, the side
+condition and the candidate's digits).
 usage (from work/): python3 mitm_ref.py   (self-test: planted genuine numbers, and the join against all pairs)"""
 import math, itertools, json, random, sys
 import mpmath as mp
@@ -40,7 +41,7 @@ def dlog3(x, n):
     return e
 
 class MitmLattice:
-    def __init__(self, XL, tm, Gs, Gp):
+    def __init__(self, XL, tm, Gs, Gp, dps=None):
         self.XL, self.tm, self.Gs, self.Gp = XL, tm, Gs, Gp
         self.U = int(2.0960 * XL + 3); self.W = int(1.1834 * XL + 2)
         self.phi = 4 * 5 ** (Gp - 1); self.e7 = dlog3(7, Gp); self.M5 = 5 ** Gp
@@ -53,29 +54,60 @@ class MitmLattice:
         self.b1, self.b2 = a, b
         self.det2 = a[0] * b[1] - a[1] * b[0]
         assert abs(self.det2) == self.phi
-        mp.mp.dps = Gs + Gp + 80
-        self.eps = 80 * mp.mpf(10) ** (-Gs)
-        self.l3, self.l7, self.l10, self.l2 = mp.log(3), mp.log(7), mp.log(10), mp.log(2)
-        U, W, eps = self.U, self.W, self.eps
-        l = lambda v: v[0] * self.l3 + v[1] * self.l7
-        M = mp.matrix([[mp.mpf(a[0]) / U, mp.mpf(a[1]) / W, l(a) / eps],
-                       [mp.mpf(b[0]) / U, mp.mpf(b[1]) / W, l(b) / eps],
-                       [0, 0, -self.l10 / eps]])
-        scale = mp.mpf(2) ** 80 * U                                     # integer image for LLL (rounding is harmless: the
+        # Precision. exact_pairs' top test has terms u log 3 ~ XL against eps = 80 10^-Gs: at least log10 XL + Gs digits. And
+        # Mr = Tr M cancels: entries of Tr (up to ~10^40) times entries of M (up to ~10^(Gs + 7)) leave Mr ~ 10^3, while
+        # theta = Minv/eps, Q_B and exact_pairs' c need Minv to ~10^-(Gs + 40), i.e. Mr to ~10^-(Gs + 50) absolute. The
+        # precision is therefore raised after LLL to digits(Tr) + digits(M) + Gs + 60, and every lattice checks itself: theta
+        # and Minv recomputed 40 digits higher must agree (|d theta| < 2^-90, |d Minv| < 10^-(Gs + 40)). (Precision
+        # Gs + Gp + 80 alone left theta wrong by ~44 at XL 10^35.8, Gs 72, Gp 18: 4 Nov 2026.) dps forces a precision (tests).
+        mp.mp.dps = dps or Gs + Gp + 80 + len(str(self.U))
+        M = self._M()
+        scale = mp.mpf(2) ** 80 * self.U                                # integer image for LLL (rounding is harmless: the
         Mi = flint.fmpz_mat([[int(mp.nint(M[i, k] * scale)) for k in range(3)] for i in range(3)])   # unimodular Tr is exact)
         R = Mi.lll()
         Tq = flint.fmpq_mat(R) * flint.fmpq_mat(Mi).inv()
         self.Tr = [[int(Tq[i, k]) for k in range(3)] for i in range(3)]
         assert all(Tq[i, k] == self.Tr[i][k] for i in range(3) for k in range(3))
         assert abs(flint.fmpz_mat(self.Tr).det()) == 1
-        self.Mr = mp.matrix(3, 3)
+        dTr = len(str(max(abs(x) for row in self.Tr for x in row))); dM = len(str(int(max(abs(M[i, k]) for i in range(3) for k in range(3)))))
+        mp.mp.dps = self.dps = dps or max(mp.mp.dps, dTr + dM + Gs + 60)
+        self._finish(self._M())
+        if dps is None:                                                 # self-check 40 digits higher
+            th = [self.Minv[2, i] / self.eps for i in range(3)]; Mi0 = self.Minv
+            mp.mp.dps = self.dps + 40
+            Mr = self._Mr(self._M()); Minv = Mr ** -1
+            dth = max(abs(Minv[2, i] / self.eps - th[i]) for i in range(3))
+            dmi = max(abs(Minv[i, k] - Mi0[i, k]) for i in range(3) for k in range(3))
+            mp.mp.dps = self.dps; self._consts()
+            assert dth < mp.mpf(2) ** -90 and dmi < mp.mpf(10) ** (-(Gs + 40)), f"MitmLattice precision: theta {dth}, Minv {dmi}"
+
+    def _consts(self):
+        self.eps = 80 * mp.mpf(10) ** (-self.Gs)
+        self.l3, self.l7, self.l10, self.l2 = mp.log(3), mp.log(7), mp.log(10), mp.log(2)
+
+    def _M(self):
+        """M at the current precision (constants recomputed)"""
+        self._consts()
+        U, W, eps, a, b = self.U, self.W, self.eps, self.b1, self.b2
+        l = lambda v: v[0] * self.l3 + v[1] * self.l7
+        return mp.matrix([[mp.mpf(a[0]) / U, mp.mpf(a[1]) / W, l(a) / eps],
+                          [mp.mpf(b[0]) / U, mp.mpf(b[1]) / W, l(b) / eps],
+                          [0, 0, -self.l10 / eps]])
+
+    def _Mr(self, M):
+        Mr = mp.matrix(3, 3)
         for i in range(3):
             for k in range(3):
-                self.Mr[i, k] = sum(self.Tr[i][r] * M[r, k] for r in range(3))
+                Mr[i, k] = sum(self.Tr[i][r] * M[r, k] for r in range(3))
+        return Mr
+
+    def _finish(self, M):
+        U = self.U
+        self.Mr = self._Mr(M)
         self.Minv = self.Mr ** -1
         self.K = [mp.mpf(U - 2) / (2 * U), mp.mpf(1) / 2, mp.mpf(1) / 2]
         self.hw = [sum(self.K[r] * abs(self.Minv[r, i]) for r in range(3)) for i in range(3)]
-        self.margin = mp.mpf(10) ** (-30)                               # numerical error of P_T, Q_B (dps >> 30)
+        self.margin = mp.mpf(10) ** (-30)                               # numerical error of P_T, Q_B (checked above)
         self.ncell = [max(1, int(1 / (2 * (h + self.margin)))) for h in self.hw]
         self.det3 = abs(mp.det(self.Mr))
 
@@ -104,9 +136,10 @@ def Fraction_div(a, b):
 
 def bottom_entries(lat, bag, bot, bmax):
     """every bottom window: the lowest b <= bmax digits at heights < Gp (a_k <= 1, the bottom facts), with their values;
-    one entry per admissible t.  Returns list of (Q_B cell, entry)."""
+    one entry per admissible t.  b = 0 (no digit below Gp: units digit 1, F = -1, t = 0) occurs only when bot[k] > Gp,
+    i.e. Gp = 1.  Returns list of (Q_B cell, entry)."""
     k = len(bag); Gp = lat.Gp; out = []
-    for b in range(1, bmax + 1):
+    for b in range(0, bmax + 1):
         if b < k and bot.get(k - b, 10 ** 9) <= Gp: continue              # digit k-b must lie inside the window
         hi = []
         for i in range(k - b + 1, k + 1):                                   # bounds a_i < h for the window's digits
@@ -114,7 +147,7 @@ def bottom_entries(lat, bag, bot, bmax):
             for ip in range(k - b + 1, i + 1):
                 if ip in bot: h = min(h, bot[ip] - (i - ip))
             hi.append(h)
-        if min(hi) <= 0: continue
+        if hi and min(hi) <= 0: continue
         orders = prove_cum.ordered(bag, b)
         def heights(r, top):
             if r == b: yield []; return
@@ -150,6 +183,7 @@ def exact_pairs(lat, lam, e):
     """every (t, u', w, L) in the box with both relations for top value lam = log(1+z_T) and bottom entry e"""
     tau = lat.tau_B(e['vB'], e['t']); tau[2] += lam / lat.eps
     c = lat.coords(tau); out = []
+    slack = mp.mpf(10) ** (len(str(lat.U)) + 5 - mp.mp.dps)            # rounding bound of val (terms up to ~ U log 10)
     rngs = [range(int(mp.floor(c[i] - lat.hw[i] - lat.margin)), int(mp.ceil(c[i] + lat.hw[i] + lat.margin)) + 1) for i in range(3)]
     for mr in itertools.product(*rngs):
         m = [sum(mr[r] * lat.Tr[r][i] for r in range(3)) for i in range(3)]
@@ -157,7 +191,7 @@ def exact_pairs(lat, lam, e):
         t = e['t']
         if not (2 <= u <= lat.U and 0 <= w <= lat.W): continue
         val = t * lat.l2 + u * lat.l3 + w * lat.l7 - L * lat.l10 - lam
-        if not (0 < val < lat.eps): continue
+        if val <= -slack or val >= lat.eps + slack: continue
         if (pow(2, t, 10 ** lat.Gp) * pow(3, u, 10 ** lat.Gp) * pow(7, w, 10 ** lat.Gp) - e['F']) % 10 ** lat.Gp: continue
         out.append((t, u, w, L))
     return out
@@ -248,6 +282,55 @@ def selftest():
         if tested >= 40: break
     print(f"2) planted genuine numbers: {hit}/{tested} found (torus condition and exact pair)")
     ok &= hit == tested and tested > 0
+    # 3) planted genuine numbers ending in 1 at Gp = 1: their window is empty (b = 0, F = -1, t = 0), which bottom_entries
+    #    must hold and which must pair with their own top configuration
+    tested3 = hit3 = 0
+    for y in Z:
+        s = str(y)
+        if y < 10 or '0' in s or '5' in s or s[-1] != '1': continue
+        L = len(s); pos = [L - 1 - i for i, ch in enumerate(s) if ch != '1']; digs = [int(ch) for ch in s if ch != '1']
+        kk = len(pos)
+        if kk < 2 or L < 12: continue
+        jj = kk - 1                                                 # top: all digits but the lowest; that one is deep
+        Dj = L - pos[jj]
+        if Dj < 3 or L < L - pos[jj - 1] + 1: continue
+        t = v2(y); r = y >> t; u = 0
+        while r % 3 == 0: r //= 3; u += 1
+        w = 0
+        while r % 7 == 0: r //= 7; w += 1
+        lat2 = MitmLattice(max(200, L + 50), t + 2, min(Dj, 14), 1)
+        ents = [e for _, e in bottom_entries(lat2, tuple(sorted(digs)), {kk: 2}, kk - jj) if not e['digits']]
+        lam = lam_T(tuple(digs[:jj]), [L - p for p in pos[:jj]])
+        sols = exact_pairs(lat2, lam, ents[0]) if len(ents) == 1 else []
+        tested3 += 1; good = len(ents) == 1 and (t, u + 2, w, L) in sols
+        hit3 += good
+        if not good: print("   planted MISS (b = 0)", y, len(ents), sols[:3], (t, u + 2, w, L))
+        if tested3 >= 10: break
+    print(f"3) planted genuine numbers ending in 1, window Gp = 1 (empty): {hit3}/{tested3} found")
+    ok &= hit3 == tested3 and tested3 > 0
+    # 4) planted synthetic points at production sizes (the precision of theta, Q_B and c): random t, u', w in the box,
+    #    L = floor(log10(2^t 3^u' 7^w)), lam = t log2 + u' log3 + w log7 - L log10 - eps/2 (so the top value is inside the
+    #    window), F = 2^t 3^u' 7^w mod 10^Gp; the torus condition must hold and exact_pairs must return the point
+    rnd = random.Random(4); tested4 = hit4 = 0
+    for XL, Gs, Gp in ((10 ** 20, 46, 14), (int(10 ** 35.8), 72, 18), (10 ** 60, 118, 12), (10 ** 100, 200, 9), (10 ** 47, 96, 17)):
+        lat = MitmLattice(XL, 55, Gs, Gp)
+        for _ in range(4):
+            t = rnd.randrange(0, 56); u = rnd.randrange(2, lat.U + 1); w = rnd.randrange(0, lat.W + 1)
+            s = t * lat.l2 + u * lat.l3 + w * lat.l7; L = int(mp.floor(s / lat.l10))
+            lam = s - L * lat.l10 - lat.eps / 2
+            F = pow(2, t, 10 ** Gp) * pow(3, u, 10 ** Gp) * pow(7, w, 10 ** Gp) % 10 ** Gp
+            dl = dlog3(F * pow(2, -t, lat.M5) % lat.M5, Gp) if F % 5 else None
+            if dl is None: continue                                     # (F = 0 mod 5 cannot occur: 2, 3, 7 are units)
+            vB = lat.v_rep(dl); e = {'F': F, 't': t, 'vB': vB}
+            q = [-c for c in lat.coords(lat.tau_B(vB, t))]
+            p = [lam / lat.eps * lat.Minv[2, i] for i in range(3)]
+            d = [(p[i] - q[i]) - mp.nint(p[i] - q[i]) for i in range(3)]
+            inside = all(abs(d[i]) <= lat.hw[i] + lat.margin for i in range(3))
+            good = inside and (t, u, w, L) in exact_pairs(lat, lam, e)
+            tested4 += 1; hit4 += good
+            if not good: print("   planted MISS (synthetic)", XL, Gs, Gp, inside, (t, u, w, L))
+    print(f"4) planted synthetic points, XL up to 10^100 (lattice precision): {hit4}/{tested4} found")
+    ok &= hit4 == tested4 and tested4 > 0
     print("MITM REFERENCE SELF-TEST", "PASSED" if ok else "FAILED")
     return ok
 
