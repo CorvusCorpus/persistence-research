@@ -1539,6 +1539,30 @@ Design and cost model: `docs/MITM_STEPS.md`. No proof uses MITM steps yet; nothi
   | node 1229312, 8 workers | 45.5 s | 28.8 s |
   | largest step of 2¹³·3³ (6.0·10⁹ configurations, table 1.6·10⁷) | 152 s (Python decisions) | 53 s |
   | 2¹³·3³, 221184's largest bag, one bag alone | 2,956 s in production (GPU shared by 10 workers) | 291 s |
+  | node 221184 (110 bags) | about 2.6 h in production, 10 workers (E.10) | 2,037 s, 6 workers |
+
+  - 221184 at `31c51cf` (`validation_pc/mitm/e2e_221184.out`): E2E OK, no preimage (as the committed proof), 1,882 MITM steps,
+    none failed; 3.09·10¹¹ units against 8.48·10¹¹ in the committed records. That is 1.5·10⁸ units/s for the node, the GPU at
+    about 80% (the probe is the bottleneck), big-table steps one at a time (`MITM_BIG`).
+- **Projections for the blockers** (dry runs of every bag with `prove_mitm`, cap 2.5·10⁷; times at 221184's 1.5·10⁸ units/s;
+  two-chain standard plans from `logs/node_costs_twochain.json` at 9.5·10⁷ units/s):
+
+  | node | bags | MITM plan | two chains | MITM time | two chains |
+  |---|---|---|---|---|---|
+  | 1161216 | 118 | 2.46·10¹² | 6.27·10¹² | ≈ 4.5 h | ≈ 18 h |
+  | 11239424 | 27 | 2.82·10¹² | 7.05·10¹² | ≈ 5.2 h | ≈ 21 h |
+  | 33718272 | 51 | 7.95·10¹³ | 1.64·10¹⁴ | ≈ 6 days | ≈ 20 days |
+
+  - The largest bags set a floor: one bag alone ran at about 8.6·10⁷ units/s (221184's), so 11239424's largest bag
+    (1.16·10¹²) needs about 3.7 h by itself, and 33718272's (1.3–1.7·10¹³ each) about 2 days each.
+  - The 33718272 dry run needs 6 GB (`twoadic.tmax` of its 18–19-digit bags): run it alone.
+- **3/7-adic closing bound** (estimate only; not implemented). Bugeaud–Laurent's two-logarithm bound (Corollary 2 of J. Number
+  Theory 61 (1996), as restated in arXiv 2401.06555 and 2606.18500; the original was not accessible) applied to
+  9y = 10^(a_j)·N + F at both p = 3 and p = 7 gives L ≲ 2.7·10⁴·max(D_(j−1), a_(j+1) + 2) whenever the top facts reach digit j
+  and the bottom facts digit j + 1. Added to the two-chain bound in the MITM planner, it lowers the plans of the largest bags
+  1.4–2.2 times (11239424's 17-digit bag 1.16·10¹² → 5.2·10¹¹; 2¹³·3³ 2.5·10¹⁰ → 1.7·10¹⁰). Before any use the constants need a
+  primary source; Theorem 1 of Bugeaud (Compositio Math. 132 (2002) 137–158, freely available) is the underlying criterion and
+  can give the bound directly with numerically chosen parameters (p = 3 with g = 1; p = 7 needs g = 6).
 
   - The 291 s (`validation_pc/mitm/bag_2e13_3e3_mitm_steps.log`): probe and exact decisions 133 s (1.58·10¹⁰ configurations,
     1.0·10⁶ candidates, 1,131 exactly solvable pairs, all rejected by their last 40 digits), tables 100 s (1.5·10⁸ entries;

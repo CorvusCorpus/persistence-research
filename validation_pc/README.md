@@ -53,3 +53,4 @@ example, `python3 work/gsieve/aggregate.py 36000 -1 validation_pc/task3_cuda/rer
 | `val_mitm.out`, `e2e_24192_gpu_run.log` | `work/val_mitm.sh` at `8a15662`: reference self-test, table, pairs, exact decisions (CPU and GPU), GPU probe, and 24192 re-proved with MITM steps on the GPU probe |
 | `e2e_1229312.out`, `e2e_1229312_gpu_run.log` | `val_twochain_e2e.sh 1229312` with `PC_MITM=1`, the same code |
 | `bag_2e13_3e3_mitm_steps.log` | 221184's largest bag proved alone with MITM steps on the GPU, every step timed (291 s) |
+| `e2e_221184.out`, `e2e_221184_gpu_run.log` | `val_twochain_e2e.sh 221184 6` with `PC_MITM=1` at `31c51cf`: the whole node re-proved with MITM steps (2,037 s) |
