@@ -14,3 +14,6 @@ node 236196: 22 digit multisets
 node 28672: 19 digit multisets
 190 bags, 4 workers, bottom on CPU, top on CPU
   bag (2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3): k=11 tmax=35 top {0: 37, 1: 37, 2: 37, 3: 37, 4: 37, 5: 37} bot {6: 47, 7: 47, 8: 47, 9: 47, 10: 47, 11: 2} -> every solution has L <= 83 (top cases 24925960, bottom solves 13841172, survivor runs 17978, proofs 61, 232s)
+  bag (2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3): k=12 tmax=30 top {0: 37, 1: 37, 2: 37, 3: 37, 4: 37, 5: 37, 6: 37} bot {7: 38, 8: 38, 9: 38, 10: 38, 11: 38, 12: 2} -> every solution has L <= 74 (top cases 97356411, bottom solves 27230128, survivor runs 62989, proofs 77, 598s)
+  bag (2, 3, 3, 3, 3, 3, 3, 3, 3, 7, 7): k=11 tmax=33 top {0: 37, 1: 37, 2: 37, 3: 37, 4: 37, 5: 37} bot {6: 47, 7: 41, 8: 41, 9: 41, 10: 41, 11: 2} -> every solution has L <= 83 (top cases 58885620, bottom solves 33068051, survivor runs 41257, proofs 65, 400s)
+  bag (2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3): k=11 tmax=37 top {0: 37, 1: 37, 2: 37, 3: 37, 4: 37, 5: 37} bot {6: 47, 7: 47, 8: 47, 9: 47, 10: 47, 11: 2} -> every solution has L <= 83 (top cases 25302952, bottom solves 14153352, survivor runs 18889, proofs 61, 184s)
