@@ -1,0 +1,15 @@
+# 2026-11-04T09:22:23Z commit 86095a8 host vm 4 cpus Model name: Intel(R) Xeon(R) Processor @ 2.10GHz
+# gcc: gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0; build: make helpers (work/Makefile, -O3 -march=native)
+# c0930227ead69ce68c15c1088170466cbaa16ae397eb52f9831d99f65da24e62  csrc/topc3
+# e16d85383b043d21dd375935b2dd5482dfd0f9c2b761034f98e80fc9fbb94629  csrc/bottomc3
+# cmd: PC_BOOTSTRAP=twochain PC_GB_FLOOR=1 python3 -u prove_cum_gpu.py --jobs 4 --cpu-bottom --cpu-top 214326 27216 148176 34992 642978 23328 236196 28672
+# start 2026-11-04T09:22:33Z
+node 214326: 8 digit multisets
+node 27216: 28 digit multisets
+node 148176: 17 digit multisets
+node 34992: 39 digit multisets
+node 642978: 9 digit multisets
+node 23328: 48 digit multisets
+node 236196: 22 digit multisets
+node 28672: 19 digit multisets
+190 bags, 4 workers, bottom on CPU, top on CPU
